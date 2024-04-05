@@ -1,0 +1,24 @@
+{
+  "name": "@memento-ai/memento-chat",
+  "version": "1.0.0",
+  "type": "module",
+  "module": "index.ts",
+  "scripts": {
+    "check": "tsc --skipLibCheck --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/debug": "^4.1.12"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@memento-ai/chat": "workspace:*",
+    "@memento-ai/function-calling": "workspace:*",
+    "@memento-ai/postgres-db": "workspace:*",
+    "@memento-ai/utils": "workspace:*",
+    "debug": "^4.3.4",
+    "ollama": "^0.4.4"
+  }
+}

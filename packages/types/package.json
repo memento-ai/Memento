@@ -1,0 +1,20 @@
+{
+  "name": "@memento-ai/types",
+  "version": "1.0.0",
+  "type": "module",
+  "module": "index.ts",
+  "scripts": {
+    "check": "tsc --skipLibCheck --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/debug": "^4.1.12"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "debug": "^4.3.4",
+    "zod": "^3.22.4"
+  }
+}

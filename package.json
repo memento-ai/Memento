@@ -1,0 +1,17 @@
+{
+  "name": "workspaces",
+  "private": true,
+  "workspaces": [
+    "packages/app",
+    "packages/chat",
+    "packages/embedding",
+    "packages/encoding",
+    "packages/function-calling",
+    "packages/ingester",
+    "packages/memento-chat",
+    "packages/memento-db",
+    "packages/postgres-db",
+    "packages/types",
+    "packages/utils"
+  ]
+}
