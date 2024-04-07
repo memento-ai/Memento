@@ -1,0 +1,23 @@
+{
+  "name": "@memento-ai/ingester",
+  "version": "1.0.0",
+  "type": "module",
+  "module": "index.ts",
+  "scripts": {
+    "check": "tsc --skipLibCheck --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/debug": "^4.1.12"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@memento-ai/memento-db": "workspace:*",
+    "@memento-ai/postgres-db": "workspace:*",
+    "@memento-ai/chat": "workspace:*",
+    "debug": "^4.3.4",
+    "tiktoken": "^1.0.13"
+  }
+}

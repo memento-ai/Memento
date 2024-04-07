@@ -1,0 +1,35 @@
+{
+    "logicalOperator": "AND",
+    "conditions": [
+        {
+            "column": "kind",
+            "operator": "=",
+            "value": "conv"
+        },
+        {
+            "column": "role",
+            "operator": "=",
+            "value": "assistant"
+        },
+        {
+            "column": "tokens",
+            "operator": ">",
+            "value": 200
+        },
+        {
+            "logicalOperator": "OR",
+            "conditions": [
+                {
+                    "column": "pinned",
+                    "operator": "=",
+                    "value": "TRUE"
+                },
+                {
+                    "column": "priority",
+                    "operator": ">",
+                    "value": 10
+                }
+            ]
+        }
+    ]
+}
