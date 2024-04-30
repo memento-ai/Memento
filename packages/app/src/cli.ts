@@ -1,15 +1,19 @@
-import { Command } from 'commander';
-import { MementoDb } from '@memento-ai/memento-db';
-import { MementoChat, NewMessageToAssistantArgs } from '@memento-ai/memento-chat';
-import { createChatSession, type ChatSessionArgs, type ChatSession, getModel } from "@memento-ai/chat";
-import c from 'ansi-colors';
+// Path: packages/app/src/cli.ts
 import { cleanUpLastUserMem, wipeDatabase } from '@memento-ai/postgres-db';
+import { Command } from 'commander';
+import { createConversation, type ConversationInterface, type ConversationOptions } from '@memento-ai/conversation';
+import { MementoAgent, type MementoAgentArgs, ContinuityAgent, SynopsisAgent } from '@memento-ai/memento-agent';
+import { MementoDb } from '@memento-ai/memento-db';
+import { type Writable } from 'node:stream';
+import c from 'ansi-colors';
+import { sql } from'slonik';
 
 const program = new Command();
 
 program
     .version('0.0.1')
     .description('A chatbot that persists the conversation')
+    .option('-p, --provider <provider>', 'The provider to use [anthropic, ollama, openai')
     .option('-m, --model <model>', 'The name of the model to use')
     .option('-d, --database <dbname>', 'The name of the database to use')
     .option('-x, --clean-slate', 'Drop the named database and start over');
@@ -18,27 +22,58 @@ program.parse(process.argv);
 
 const options = program.opts();
 
-const model = getModel(options.model);
+const { provider, model, database } = options;
 
-if (!options.database) {
+if (!provider) {
+    console.error('You must specify an LLM provider');
+    program.help();
+}
+
+if (!model) {
+    console.error('You must specify a model supported by the provider');
+    program.help();
+}
+
+if (!database) {
     console.error('You must provide a database');
     program.help();
 }
 
-const args: ChatSessionArgs = {
-    model,
-    outStream: process.stdout
-};
-
-const dbname = options.database;
+const outStream: Writable = process.stdout;
 
 if (options.cleanSlate) {
-    await wipeDatabase(dbname);
+    await wipeDatabase(database);
 }
 
-const db: MementoDb = await MementoDb.create(dbname);
-const chatSession: ChatSession = createChatSession(args);
-const mementoChat: MementoChat = new MementoChat(chatSession, db);
+const mementoConversationOptions: ConversationOptions = {
+    model,
+    stream: process.stdout,
+    logging: { name:'memento' }
+}
+
+const db: MementoDb = await MementoDb.create(database);
+
+if (!await db.pool.exists(sql.unsafe`SELECT id from meta where id = 'guide/csum-cat-convs'`)) {
+    await db.addCsumCategoryConventions();
+}
+
+const conversation: ConversationInterface = createConversation(provider, mementoConversationOptions);
+
+const continuityAgent = new ContinuityAgent({ db });
+
+const synopsisAgent = new SynopsisAgent({ db, conversation: createConversation('anthropic', { model: 'haiku', temperature: 0.0, logging: {name: 'synopsis'} }) });
+
+const mementoChatArgs: MementoAgentArgs = {
+    conversation,
+    continuityAgent,
+    synopsisAgent,
+    db,
+    outStream,
+
+    // There are several parameters with defaults that we might want to expose via the CLI here
+  };
+
+const mementoAgent: MementoAgent = new MementoAgent(mementoChatArgs);
 
 await cleanUpLastUserMem(db.pool);
 
@@ -68,10 +103,8 @@ async function* collectLines() {
 
 for await (const lines of collectLines()) {
     process.stdout.write(`${c.blue('Assistant: ')}`);
-    const args = NewMessageToAssistantArgs.parse({
-        content: lines.join('\n'),
-        retrieveLimit: 10,
-        tokenLimit: 1000
-    });
-    await mementoChat.newMessageToAssistant(args);
+    const args = {
+        content: lines.join('\n')
+    };
+    await mementoAgent.run(args);
 }

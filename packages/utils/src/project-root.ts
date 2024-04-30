@@ -1,3 +1,4 @@
+// Path: packages/utils/src/project-root.ts
 import path from 'node:path';
 
 /// getProjectRoot: this function is called from unit tests to find the root of the project.

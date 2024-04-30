@@ -1,25 +1,37 @@
-// File: src/lib/functions/index.ts
+// Path: packages/function-calling/src/functions/index.ts
 
-import { Glob } from 'bun';
-import type { FunctionConfig } from '../functionRegistry';
+// It is possible to dynamically import functions from a directory
+// and register them with the function registry.
+// However, it is probably better to manually import and register
+// as we do here for two reasons:
+// 1. we will want to be able to create multiple registries that have different subsets of functions
+// 2. by manually importing we can create the RegisteredFunctions discrimated union
 
-export type FunctionRegistry = Record<string, FunctionConfig<any, any>>;
+import { z } from 'zod';
+import  { registerFunction, type FunctionRegistry } from '../functionRegistry';
+
 export const registry: FunctionRegistry = {};
 
-function registerFunction<Input, Output>(config: FunctionConfig<Input, Output>) {
-    registry[config.name] = config;
-}
+import addSynopsis, { AddSynopsis } from './addSynopsis';
+import getCurrentTime, { GetCurrentTime } from './getCurrentTime';
+import gitListFiles, { GitListFiles } from './gitListFiles';
+import queryMementoView, { QueryMementoView } from './queryMementoView';
+import readSourceFile, { ReadSourceFile } from './readSourceFile';
+import updateSummaries, { UpdateSummaries } from './updateSummaries';
 
-const dir = import.meta.dir;
-const glob = new Glob(`**/*.ts`);
+registerFunction(registry, addSynopsis);
+registerFunction(registry, getCurrentTime);
+registerFunction(registry, gitListFiles);
+registerFunction(registry, queryMementoView);
+registerFunction(registry, readSourceFile);
+registerFunction(registry, updateSummaries);
 
-const files = Array.from(glob.scanSync(dir)).sort();
-
-for await (const file of files) {
-    if (file.includes('index.ts')) continue;
-    if (glob.match(file))
-    {
-        const module = await import(import.meta.resolveSync(`${dir}/${file}`));
-        registerFunction(module.default);
-    }
-}
+export const RegisteredFunctions = z.discriminatedUnion('name', [
+    AddSynopsis,
+    GetCurrentTime,
+    GitListFiles,
+    QueryMementoView,
+    ReadSourceFile,
+    UpdateSummaries
+]);
+export type RegisteredFunctions = z.infer<typeof RegisteredFunctions>;

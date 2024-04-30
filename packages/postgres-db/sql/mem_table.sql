@@ -13,7 +13,6 @@
 -- The `tokens` column stores the number of tokens in the content.
 --    The number of tokens is the true length of the content, even if the content
 --    is truncated for computing the embeddings.
-
 CREATE TABLE mem(
     id VARCHAR(24) PRIMARY KEY,     -- string md4 hash of content
     content TEXT NOT NULL,

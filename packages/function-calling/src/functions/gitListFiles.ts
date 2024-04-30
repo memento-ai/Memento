@@ -1,4 +1,4 @@
-// File: src/lib/functions/gitListFiles.ts
+// Path: packages/function-calling/src/functions/gitListFiles.ts
 
 import { z } from 'zod';
 import { baseInputSchema } from '../functionRegistry';
@@ -26,6 +26,13 @@ async function gitListFiles(_: GitListFilesInput): Promise<string[]> {
         return [`Error listing file paths: ${(error as Error).message}`];
     }
 }
+
+export const GitListFiles = z.object({
+    name: z.literal('gitListFiles'),
+    inputSchema,
+    outputSchema,
+    fnSchema
+});
 
 export const config: FunctionConfig<GitListFilesInput, string[]> = {
     name: 'gitListFiles',

@@ -1,0 +1,26 @@
+{
+  "name": "@memento-ai/memento-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "module": "index.ts",
+  "scripts": {
+    "check": "tsc --skipLibCheck --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/debug": "^4.1.12"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@memento-ai/conversation": "workspace:*",
+    "@memento-ai/function-calling": "workspace:*",
+    "@memento-ai/postgres-db": "workspace:*",
+    "@memento-ai/utils": "workspace:*",
+    "debug": "^4.3.4",
+    "handlebars": "^4.7.8",
+    "ollama": "^0.4.4",
+    "trace-error": "^1.0.3"
+  }
+}

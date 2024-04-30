@@ -1,101 +1,91 @@
-import {
-    type Message, type Role,
-    CONV, DOC, FRAG, SYS, CSUM, DSUM,
-    ConversationMetaArgs, DocumentMetaArgs, FragmentMetaArgs, SystemMetaArgs, DocSummaryMetaArgs, ConvSummaryMetaArgs,
-    } from '@memento-ai/types';
-import debug from 'debug';
-import { prompts } from './systemPrompts';
-import { embedding } from '@memento-ai/embedding';
-import { z } from 'zod';
+// Path: packages/memento-db/src/mementoDb.ts
+
+import { addConvSummaryMem, addConversationMem, addDocAndSummary, addFragmentMem, addSynopsisMem } from './mementoDb-mems';
+import { connectDatabase, connectReadonlyDatabase, get_csum_mementos, get_last_assistant_message, get_last_user_message, getConversation, type ID } from '@memento-ai/postgres-db';
 import { registry, type FunctionRegistry } from "@memento-ai/function-calling";
-import { nanoid } from 'nanoid';
-import { sql, type DatabasePool, type QueryResult, type QueryResultRow } from 'slonik';
-import { addMem, connectDatabase, connectReadonlyDatabase, getConversation, getSystemPrompts, type ID } from '@memento-ai/postgres-db';
-import pgvector from 'pgvector';
-
-
-export const Context = z.object({
-    readonlyPool: z.any()
-});
-export type Context = z.infer<typeof Context>;
+import { searchMemsBySimilarity } from './searchMemsBySimilarity';
+import { searchPinnedCsumMems } from './searchPinnedCsumMems';
+import { getSynopses } from './getSynopses';
+import { SimilarityResult } from './mementoDb-types';
+import { type DatabasePool, type CommonQueryMethods, type Interceptor } from 'slonik';
+import debug from 'debug';
+import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddConvSummaryArgs, AddSynopsisArgs } from './mementoDb-types';
+import { type Message, type Memento, ConvSummaryMetaData, SynopsisMetaData } from '@memento-ai/types';
 
 const dlog = debug("mementoDb");
 
-export type AddResponse = {
-    error: string;
-}
-
-// The Add*Args types below are closely related to the *MemArgs types defined in mementoSchema,
-// and possibly should be the same type.
-
-export type AddConvArgs = {
-    content: string;
-    role: Role;
-    priority?: number;
-}
-
-export type AddSysArgs = {
-    content: string;
-    priority: number;
-}
-
-export type AddFragArgs = {
-    content: string;
-    docId: string;
-}
-
-export type AddDocAndSummaryArgs = {
-    source: string;
-    content: string;
-    summary: string
-}
-
-export type AddConvSummaryArgs = {
-    content: string;
-    pinned?: boolean;
-    priority?: number;
-}
-
-export const SimilarityResult = z.object({
-    id: z.string(),
-    content: z.string(),
-    source: z.string(),
-    created_at: z.number(),
-    tokens: z.number(),
-    similarity: z.number(),
-});
-export type SimilarityResult = z.TypeOf<typeof SimilarityResult>;
-
-export interface DocAndSummaryResult {
-    docId: string;
-    summaryId: string;
-}
-
-export class MementoDb
-{
+export class MementoDb {
     name: string;
     private _pool: DatabasePool | null = null;
     private _readonlyPool: DatabasePool | null = null;
+    private interceptors: Interceptor[];
     functionRegistry: FunctionRegistry;
 
-    private constructor(name: string) {
-        dlog('Connecting MementoDb:', name)
+    private constructor(name: string, interceptors: Interceptor[] = []) {
+        dlog('Connecting MementoDb:', name);
         this.name = name;
+        this.interceptors = interceptors;
         this.functionRegistry = registry;
     }
 
     async init() {
-        this._pool = await connectDatabase(this.name);
-        this._readonlyPool = await connectReadonlyDatabase(this.name);
+        this._pool = await connectDatabase(this.name, this.interceptors);
+        this._readonlyPool = await connectReadonlyDatabase(this.name, this.interceptors);
     }
 
-    static async create(name: string) : Promise<MementoDb> {
-        const db = new MementoDb(name);
+    static async create(name: string, interceptors: Interceptor[] = []): Promise<MementoDb> {
+        const db = new MementoDb(name, interceptors);
         await db.init();
         return db;
     }
 
-    public get pool() : DatabasePool {
+    async addCsumCategoryConventions() : Promise<void> {
+        const { metaId, content, pinned, priority } = {
+            metaId: 'guide/csum-cat-convs',
+            pinned: true,
+            priority: 1000,
+            content: `
+<category>/<topic>
+
+Category (3-4 chars):
+- Time-based:
+    now - Immediate/current tasks
+    soon - Short-term objectives
+    goal - Long-term goals
+- Domain-based:
+    test - Testing
+    dev - Development
+    feat - Features
+    arch - Architecture/Design
+    doc - Documentation
+    collab - Collaboration
+    perf - Performance
+    sec - Security
+- Guidelines:
+    guide - Guidelines, clarifications, expected behaviors+
+
+Topic (Descriptive keyword/phrase)
+
+Special cases:
+- todo - High-level todos spanning multiple areas
+- todo included in topic - Specific todos within a domain+
+    (e.g. dev/todo-refactor-auth)
+
+Examples:
+    now/bugfix-login
+    soon/deploy-v2
+    goal/scale-infra
+    dev/refactor-auth
+    test/todo-edge-cases
+    arch/microservices
+    guide/func-call-format
+    todo/roadmap`,
+        };
+
+        await addConvSummaryMem(this.pool, { metaId, content, pinned, priority });
+    }
+
+    public get pool(): DatabasePool {
         if (!this._pool) {
             throw new Error('Pool is already closed');
         }
@@ -129,113 +119,51 @@ export class MementoDb
         dlog('Database closed:', this.name);
     }
 
-    async addConversationMem(args_: AddConvArgs) : Promise<ID> {
-        const {content, role, priority} = args_;
-        const args = ConversationMetaArgs.parse({
-            kind: CONV,
-            role,
-            source: 'conversation',
-            priority
-        });
-        dlog('Adding conversation mem:', args);
-        return await addMem({pool: this.pool, metaId: nanoid(), content, metaArgs: args});
+    async addConversationMem(args_: AddConvArgs): Promise<ID> {
+        return addConversationMem(this.pool, args_);
     }
 
-    async addSystemMem(args_: AddSysArgs) : Promise<ID> {
-        const { content, priority } = args_;
-        const args = SystemMetaArgs.parse({
-            kind: SYS,
-            pinned: true,
-            priority,
-        })
-        return await addMem({pool: this.pool, metaId: nanoid(), content, metaArgs: args});
+    async addFragmentMem(args_: AddFragArgs): Promise<ID> {
+        return addFragmentMem(this.pool, args_);
     }
 
-    async addFragmentMem(args_: AddFragArgs) : Promise<ID> {
-        const { content, docId } = args_;
-        const args = FragmentMetaArgs.parse({
-            kind: FRAG,
-            docId
-        })
-        return await addMem({pool: this.pool, metaId: nanoid(), content, metaArgs: args});
-    }
-
-    /// addDocAndSummary: uses a transation to add both a 'doc' and a 'dsum'.
-    /// This method trusts that `summary` is a valid summary of `content`.
-    async addDocAndSummary(args_: AddDocAndSummaryArgs) : Promise<DocAndSummaryResult> {
-        const { content, source, summary } = args_;
-        const docId = nanoid();
-        const summaryId = nanoid();
-        await addMem({pool: this.pool, metaId: docId, content, metaArgs: DocumentMetaArgs.parse({kind: DOC, docId, source, summaryId})});
-        await addMem({pool: this.pool, metaId: summaryId, content: summary, metaArgs: DocSummaryMetaArgs.parse({kind: DSUM, docId, summaryId, source})});
-        return { docId, summaryId };
+    async addDocAndSummary(args_: AddDocAndSummaryArgs): Promise<DocAndSummaryResult> {
+        return addDocAndSummary(this.pool, args_);
     };
 
-    async addConvSummaryMem(args_: AddConvSummaryArgs) : Promise<ID> {
-        const { content, pinned, priority } = args_;
-        const args = ConvSummaryMetaArgs.parse({
-            kind: CSUM,
-            pinned,
-            priority,
-        });
-        return await addMem({pool: this.pool, metaId: nanoid(), content, metaArgs: args});
+    async addConvSummaryMem(args_: AddConvSummaryArgs): Promise<ID> {
+        return addConvSummaryMem(this.pool, args_);
     }
 
-    private async loadSystemPrompts() {
-        // TODO: batch insert all at once?
-        for (const prompt of prompts) {
-            await this.addSystemMem(prompt);
-        }
+    async addSynopsisMem(args_: AddSynopsisArgs): Promise<ID> {
+        return addSynopsisMem(this.pool, args_);
     }
 
-    async getSystemPrompts() : Promise<string[]> {
-        let prompts = await getSystemPrompts(this.pool);
-        if (prompts.length === 0) {
-            await this.loadSystemPrompts();
-            prompts = await getSystemPrompts(this.pool);
-        }
-        return prompts;
+    async getConversation(maxMessagePairs: number = 10): Promise<Message[]> {
+        return await getConversation(this.pool, maxMessagePairs);
     }
 
-    async getConversation() : Promise<Message[]> {
-        return await getConversation(this.pool);
+    async searchMemsBySimilarity(userMessage: string, tokensLimit: number): Promise<SimilarityResult[]> {
+        return searchMemsBySimilarity(this.pool, userMessage, tokensLimit);
     }
 
-    async searchMemsBySimilarity(userMessage: string, topN: number): Promise<SimilarityResult[]> {
-        const queryEmbedding = await embedding.generateOne(userMessage);
-        const queryVector = pgvector.toSql(queryEmbedding);
+    async searchPinnedCsumMems(tokenLimit: number): Promise<Memento[]> {
+        return await searchPinnedCsumMems(this.pool, tokenLimit);
+    }
 
-        return await this.pool.connect(async (conn) => {
-            const result: QueryResult<QueryResultRow> = await conn.query(sql.unsafe`
-                SELECT
-                m.id,
-                m.content,
-                mt.kind,
-                mt.source,
-                mt.created_at,
-                m.tokens,
-                m.embed_vector <=> ${queryVector} AS similarity
-                FROM
-                mem m
-                JOIN
-                meta mt ON m.id = mt.memid
-                WHERE
-                mt.kind IN (${DOC}, ${DSUM}, ${CONV})
-                ORDER BY
-                similarity ASC
-                LIMIT ${topN}
-            `);
+    async get_csum_mementos(conn: CommonQueryMethods): Promise<ConvSummaryMetaData[]> {
+        return get_csum_mementos(conn);
+    }
 
-            return result.rows.map((row) => {
-                try {
-                    const similarity: SimilarityResult = SimilarityResult.parse(row);
-                    return similarity;
-                } catch (error) {
-                    console.error('Error parsing similarity result:', error);
-                    console.error(row);
-                    throw error;
-                }
-            });
-        });
+    async getSynopses(tokenLimit: number): Promise<string[]> {
+        return getSynopses(this.pool, tokenLimit);
+    }
+
+    async get_last_user_message(): Promise<Message> {
+        return get_last_user_message(this.pool);
+    }
+
+    async get_last_assistant_message(): Promise<Message> {
+        return get_last_assistant_message(this.pool);
     }
 }

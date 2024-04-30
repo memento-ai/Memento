@@ -1,0 +1,23 @@
+{
+  "name": "@memento-ai/agent",
+  "version": "1.0.0",
+  "type": "module",
+  "module": "index.ts",
+  "scripts": {
+    "check": "tsc --skipLibCheck --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/debug": "^4.1.12"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@memento-ai/conversation": "workspace:*",
+    "@memento-ai/function-calling": "workspace:*",
+    "@memento-ai/memento-db": "workspace:*",
+    "@memento-ai/types": "workspace:*",
+    "debug": "^4.3.4"
+  }
+}
