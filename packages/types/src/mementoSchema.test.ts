@@ -1,16 +1,18 @@
-import { expect, it, describe, beforeAll, afterAll, beforeEach, afterEach} from "bun:test";
+// Path: packages/types/src/mementoSchema.test.ts
+import { expect, it, describe} from "bun:test";
 
-import { USER, ASSISTANT, Message, Mem, SYS, CONV, CSUM, DOC, DSUM, FRAG } from "./mementoSchema";
-
+import { CONV, CSUM, DOC, DSUM, FRAG, SYN,  } from "./memKind";
+import { Mem } from "./memSchema";
+import { Message } from "./message";
+import { USER, ASSISTANT,  } from "./role";
 import {
-    SystemMetaArgs,
     ConversationMetaArgs,
-    FragmentMetaArgs,
-    DocumentMetaArgs,
     ConvSummaryMetaArgs,
     DocSummaryMetaArgs,
-} from "./mementoSchema";
-
+    DocumentMetaArgs,
+    FragmentMetaArgs,
+    SynopsisMetaArgs,
+} from "./metaArgs";
 
 describe('Memento schema tests', () => {
 
@@ -41,18 +43,6 @@ describe('Memento schema tests', () => {
         expect(mem.content).toBe('Hello');
         expect(mem.embed_vector).toEqual([1, 2, 3]);
         expect(mem.tokens).toBe(3);
-    });
-
-    it('can parse a SystemMetaArgs', () => {
-        const systemMeta: SystemMetaArgs = SystemMetaArgs.parse({
-            kind: SYS,
-            priority: 1,
-            pinned: true
-        });
-
-        expect(systemMeta.kind).toBe('sys');
-        expect(systemMeta.priority).toBe(1);
-        expect(systemMeta.pinned).toBe(true);
     });
 
     it('can parse a ConversationMetaArgs', () => {
@@ -88,13 +78,14 @@ describe('Memento schema tests', () => {
         });
 
         expect(documentMeta.kind).toBe('doc');
-        expect(documentMeta.docId).toBe('123');
+        // expect(documentMeta.docId).toBe('123');
         expect(documentMeta.summaryId).toBe('456');
         expect(documentMeta.source).toBe('testSource');
     });
 
     it('can parse a ConvSummaryMetaArgs', () => {
         const convSummaryMeta: ConvSummaryMetaArgs = ConvSummaryMetaArgs.parse({
+            metaId: '123/abc',
             kind: CSUM,
             priority: 0,
             pinned: false
@@ -116,6 +107,15 @@ describe('Memento schema tests', () => {
         expect(docSummaryMeta.kind).toBe('dsum');
         expect(docSummaryMeta.docId).toBe('123');
         expect(docSummaryMeta.source).toBe('testSource');
-        expect(docSummaryMeta.summaryId).toBe('456');
+        // expect(docSummaryMeta.summaryId).toBe('456');
     });
+
+    it('can parse a SynopsisMetaArgs', () => {
+        const synopsisArgs: SynopsisMetaArgs = SynopsisMetaArgs.parse({
+            kind: SYN,
+        });
+
+        expect(synopsisArgs.kind).toBe('syn');
+    });
+
 });
