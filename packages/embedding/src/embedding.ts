@@ -1,3 +1,4 @@
+// Path: packages/embedding/src/embedding.ts
 import { Ollama, type EmbeddingsResponse } from 'ollama'
 
 export class MyEmbeddingFunction {

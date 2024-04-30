@@ -1,3 +1,4 @@
+// Path: packages/embedding/src/embedding.test.ts
 import { expect, test } from "bun:test";
 import { MyEmbeddingFunction } from "./embedding";
 
