@@ -1,23 +1,54 @@
-// File: src/lib/ingester.ts
+// Path: packages/ingester/src/ingester.ts
 
 import debug from 'debug';
 import fs from 'fs';
 import path from 'path';
 import { MementoDb, type DocAndSummaryResult } from '@memento-ai/memento-db';
-import { DOC, DSUM } from '@memento-ai/types'
+import { DOC, DSUM, createMem } from '@memento-ai/types'
 import { summarizeAndStoreDocuments, type Summarizer } from './summarizeDocument';
 import { sql } from 'slonik';
+import { z } from 'zod';
 
 const dlog = debug("ingester");
 
-export const SUPPORTED_EXTENSIONS = ['.ts', '.sql'];
+export const SUPPORTED_EXTENSIONS = ['.ts', '.sql', '.md'];
+
+const DocumentIdTuple = z.object({
+  id: z.string(),
+  memid: z.string(),
+  summaryId: z.string(),
+});
 
 export async function ingestFile(db: MementoDb, filePath: string, summarizer?: Summarizer) : Promise<DocAndSummaryResult> {
     summarizer = summarizer ?? (await import('./summarizeDocument')).createMockSummarizer();
     const content = await fs.promises.readFile(filePath, 'utf-8');
     const source = filePath;
+
+    const mem = await createMem(content);
+
+    let result: DocAndSummaryResult | undefined = undefined;
+    let skip: boolean = false;
+    await db.pool.connect(async (conn) => {
+        const row = await conn.maybeOne(sql.type(DocumentIdTuple)`SELECT id, summaryId, memid FROM memento WHERE source = ${source} AND kind = ${DOC};`);
+        if (row) {
+            const { id, memid, summaryId } = row;
+            if (memid === mem.id) {
+                dlog(`Document ${source} unchanged since previous ingestas id=${id}`);
+                skip = true;
+                result = { docId: id, summaryId }
+            } else {
+                dlog(`Document ${source} already ingested as id=${id}, deleting and re-ingesting.`);
+                await conn.query(sql.unsafe`DELETE FROM meta WHERE id=${id} OR docId=${id};`)
+            }
+        }
+    });
+
+    if (result) {
+      return result;
+    }
+
     dlog(`Ingesting file: ${source} with length: ${content.length}`)
-    const result: DocAndSummaryResult = await summarizeAndStoreDocuments({db, source, content, summarizer});
+    result = await summarizeAndStoreDocuments({db, source, content, summarizer});
     dlog(`Summarized document ${result.docId} with summary ${result.summaryId}`)
     return result;
 }

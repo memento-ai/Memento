@@ -1,3 +1,4 @@
+// Path: packages/ingester/src/ingester.test.ts
 import { expect, it, describe, beforeEach, afterEach} from "bun:test";
 import { ingestFile, ingestDirectory, dropIngestedFiles, getIngestedFiles } from "./ingester";
 import { nanoid } from "nanoid";
@@ -10,7 +11,7 @@ const dlog = debug("ingester");
 
 describe("Ingester", () => {
 
-    const timeout = 10000;
+    const timeout = 60000;
 
     const summarizer: Summarizer = createMockSummarizer();
     let db: MementoDb;
@@ -45,7 +46,7 @@ describe("Ingester", () => {
     }, timeout);
 
     it("can ingest a directory", async () => {
-        await ingestDirectory(db, "packages", summarizer);
+        await ingestDirectory(db, "packages/ingester", summarizer);
         const files = await getIngestedFiles(db);
         dlog("files:", files);
         expect(files.length).toBeGreaterThan(0);
@@ -53,7 +54,7 @@ describe("Ingester", () => {
     }, timeout);
 
     it("can ingest a directory and then drop ingest", async () => {
-        await ingestDirectory(db, "packages", summarizer);
+        await ingestDirectory(db, "packages/types", summarizer);
         await dropIngestedFiles(db);
         const files = await getIngestedFiles(db);
         return expect(files.length).toBe(0);

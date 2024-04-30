@@ -1,5 +1,6 @@
+// Path: packages/ingester/src/summarizeDocument.test.ts
 import { expect, describe, it, beforeEach, afterEach } from "bun:test";
-import { createMockSummarizer, summarizeAndStoreDocuments, type Summarizer } from "./summarizeDocument";
+import { createMockSummarizer, summarizeAndStoreDocuments, type SummarizerAgent } from "./summarizeDocument";
 import { nanoid } from "nanoid";
 import { MementoDb, type DocAndSummaryResult } from "@memento-ai/memento-db";
 import { createMementoDb, dropDatabase } from "@memento-ai/postgres-db";
@@ -13,7 +14,7 @@ describe("summarizeDocument", () => {
 
     let db: MementoDb;
     let dbname: string;
-    let summarizer: Summarizer;
+    let summarizer: SummarizerAgent;
     beforeEach(async () => {
         dbname = `test_${nanoid()}`;
         summarizer = createMockSummarizer();
@@ -30,7 +31,7 @@ describe("summarizeDocument", () => {
     });
 
     it("can summarize a document", async () => {
-        const source = "packages/memento-chat/src/mementoChat.ts";
+        const source = "packages/memento-agent/src/mementoAgent.ts";
         const content = await Bun.file(source).text();
 
         const docAndSummaryResult: DocAndSummaryResult = await summarizeAndStoreDocuments({db, source, content, summarizer});
@@ -43,6 +44,7 @@ describe("summarizeDocument", () => {
             FROM meta
             LEFT JOIN mem
             ON meta.memId = mem.id
+            WHERE meta.kind IN (${DOC}, ${DSUM})
             ORDER BY meta.kind`)
         );
 
@@ -56,7 +58,7 @@ describe("summarizeDocument", () => {
         expect(dsum).toBeTruthy();
         expect(doc.summaryid).toBe(dsum.id);
         expect(dsum.docid).toBe(doc.id);
-    }, 60000);
+    });
 
 
 });
