@@ -16,7 +16,7 @@
     "dependencies": {
         "@memento-ai/postgres-db": "workspace:*",
         "@memento-ai/types": "workspace:*",
-        "@memento-ai/chat": "workspace:*",
+        "@memento-ai/conversation": "workspace:*",
         "@memento-ai/ingester": "workspace:*",
         "@memento-ai/utils": "workspace:*",
         "debug": "^4.3.4",
