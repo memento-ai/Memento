@@ -1,3 +1,4 @@
+// Path: packages/postgres-db/src/postgresdb.test.ts
 import { expect, test } from "bun:test";
 import { nanoid } from 'nanoid';
 import { createNewEmptyDatabase, createMementoDb, dropDatabase, connectReadonlyDatabase } from './postgresdb';

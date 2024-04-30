@@ -22,7 +22,7 @@
 -- 'role'
 --     For 'conv' mems this is constrained to be either 'user' or 'assistant'.
 --     For other kinds of mems (in particular csum), it is a more flexible category label.
--- 'docId'
+-- 'docid'
 --     For 'frag' and 'dsum' mems this is the id of the document mem that is the parent of the fragment or summary.
 --     For 'conv' mems this may be the id of the conversation mem (but which one: user or assistant?).
 --     Not yet used for other kinds of mems.
@@ -33,22 +33,18 @@
 --     For 'frag' mems this field may not be needed as the 'docId' field may be sufficient.
            -- but perhaps we next to extend the URI concept to include fragments.
 --     For 'csum' mems this could be the URI of the conversation. Exact URI conventions are not yet defined.
--- 'summaryId'
+-- 'summaryid'
 --     For 'doc' and 'frag' mems this is the id of the summary mem derived from the doc/frag content.
 --     For 'conv' mems this is the id of the 'csum' summary mem for this conversation.
 --         But we need to decide: one summary for both user and assitant, and one for the combined exchange?
-
-
-
-
 CREATE TABLE meta(
     id VARCHAR(21) PRIMARY KEY,   -- nanoid
-    memId VARCHAR(24) REFERENCES mem(id),
+    memid VARCHAR(24) REFERENCES mem(id),
     kind VARCHAR(4) NOT NULL,
     pinned BOOLEAN DEFAULT FALSE,
     priority INT DEFAULT 0,    -- 0 is low priority. high priority is unbounded
     role VARCHAR(10),          -- For 'conv' messages can only be "user" or "assistant". But less constrained for other kinds.
-    docId VARCHAR(24),
+    docid VARCHAR(24),
     source VARCHAR(128),
-    summaryId VARCHAR(24),
+    summaryid VARCHAR(24),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
