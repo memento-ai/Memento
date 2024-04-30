@@ -1,3 +1,4 @@
+// Path: packages/function-calling/src/functions/readSourceFile.ts
 import { z } from 'zod';
 import { baseInputSchema, type FunctionConfig } from '../functionRegistry';
 import fs from 'fs/promises';
@@ -26,6 +27,13 @@ async function readSourceFile(input: ReadSourceFileInput): Promise<string> {
         return `Error reading source file: ${(error as Error).message}`;
     }
 }
+
+export const ReadSourceFile = z.object({
+    name: z.literal('readSourceFile'),
+    inputSchema,
+    outputSchema,
+    fnSchema
+});
 
 export const config: FunctionConfig<ReadSourceFileInput, string> = {
     name: 'readSourceFile',

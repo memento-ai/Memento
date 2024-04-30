@@ -1,6 +1,8 @@
+// Path: packages/function-calling/src/functionCalling.test.ts
 // src/lib/functionCalling_test.ts
 import { describe, it, expect } from 'bun:test';
 import { invokeFunction, type FunctionCallResult, isFunctionError, isFunctionResult, type FunctionCallRequest, extractFunctionCalls } from './functionCalling';
+import { registry } from './functions';
 
 describe('functionCalling', () => {
     it('should return the current time as an ISO 8601 formatted string', async () => {
@@ -9,7 +11,8 @@ describe('functionCalling', () => {
             input: {},
         };
 
-        const result: FunctionCallResult = await invokeFunction(call, {});
+        const context = {};
+        const result: FunctionCallResult = await invokeFunction({registry, call, context});
 
         expect(isFunctionError(result)).toBe(false);
         expect(isFunctionResult(result)).toBe(true);
@@ -52,21 +55,21 @@ for testing purposes`;
 
     it ('should extract multiple function calls', () => {
         const content = `
-        \`\`\`function
-        {
-          "name": "getCurrentTime",
-          "input": {}
-        }
-        \`\`\`
+\`\`\`function
+{
+    "name": "getCurrentTime",
+    "input": {}
+}
+\`\`\`
 
-        just some stuff in between
+just some stuff in between
 
-        \`\`\`function
-        {
-          "name": "getListFiles",
-          "input": {}
-        }
-        \`\`\``.trim();
+\`\`\`function
+{
+    "name": "getListFiles",
+    "input": {}
+}
+\`\`\``.trim();
 
         const functionCalls: FunctionCallRequest[] = Array.from(extractFunctionCalls(content));
         expect(functionCalls.length).toBe(2);

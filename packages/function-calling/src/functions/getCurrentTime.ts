@@ -1,4 +1,4 @@
-// File: packages/function-calling/src/functions/getCurrentTime.ts
+// Path: packages/function-calling/src/functions/getCurrentTime.ts
 
 import { z } from 'zod';
 import { baseInputSchema } from '../functionRegistry';
@@ -12,21 +12,19 @@ function getCurrentTime() : Promise<string> {
     return Promise.resolve(new Date().toISOString());
 }
 
-export const discriminatedUnion = z.discriminatedUnion('name', [
-    z.object({
-      name: z.literal('getCurrentTime'),
-      inputSchema,
-      outputSchema,
-      fnSchema
-    }),
-  ]);
+export const GetCurrentTime = z.object({
+    name: z.literal('getCurrentTime'),
+    inputSchema,
+    outputSchema,
+    fnSchema
+});
 
 export const config: FunctionConfig<BaseInput, string> = {
-  name: 'getCurrentTime',
-  inputSchema,
-  outputSchema,
-  fnSchema,
-  fn: getCurrentTime,
+    name: 'getCurrentTime',
+    inputSchema,
+    outputSchema,
+    fnSchema,
+    fn: getCurrentTime,
 };
 
 export default config;
