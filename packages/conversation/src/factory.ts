@@ -43,14 +43,14 @@ export function withLogger(conversation: ConversationInterface, path: string): C
         const datestring = dayjs().format('YYYY-MM-DD');
         const file = fs.createWriteStream(`${fullPath}/${datestring}.md`, { flags: 'a' });
 
-        file.write("## Prompt:\n" + prompt + '\n');
-        file.write("## Messages:\n");
+        file.write("--- Prompt: ---\n" + prompt + '\n');
+        file.write("--- Messages: ---\n");
         for (const message of messages) {
             file.write(`### ${message.role}:\n`);
             file.write(message.content + '\n');
         }
-        file.write("## Response:\n" + response.content + '\n');
-        file.write("---\n");
+        file.write("--- Response: ---\n" + response.content + '\n');
+        file.write("=======\n");
 
         file.close();
 
