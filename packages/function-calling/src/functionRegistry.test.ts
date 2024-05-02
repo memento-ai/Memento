@@ -1,5 +1,5 @@
 // Path: packages/function-calling/src/functionRegistry.test.ts
-// src/lib/functionRegistry.test.ts
+
 import { describe, it, expect } from 'bun:test';
 import { registry } from './functions/index';
 import { generateFunctionDescription, getRegistryDescription } from './functionRegistry';
