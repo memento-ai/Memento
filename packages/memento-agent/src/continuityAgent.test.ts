@@ -43,7 +43,7 @@ describe("ContinuityAgent", () => {
         expect(db).toBeTruthy();
         expect(db.name).toBe(dbname);
         expect(db.pool).toBeTruthy();
-        conversation = createConversation(provider, {model, temperature: 0.0});
+        conversation = createConversation(provider, {model, temperature: 0.0, logging: { name: "test" }});
 
         const mementoChatArgs: AgentArgs = {
             conversation,

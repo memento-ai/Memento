@@ -1,20 +1,125 @@
 // Path: packages/memento-agent/src/mementoAgent.ts
-import { USER, type Message, type Role, type Memento } from "@memento-ai/types";
-import type { Context, SimilarityResult } from "@memento-ai/memento-db";
-import debug from "debug";
-import { extractFunctionCalls, invokeFunctions, type FunctionCallRequest, type FunctionCallResult, functionCallResultAsString, categorizeExtractedFunctionCalls, isFunctionError, type FunctionError } from "@memento-ai/function-calling";
-import c from 'ansi-colors';
-import { getDatabaseSchema } from "@memento-ai/postgres-db";
-import { Writable } from "node:stream";
 import {  type SendMessageArgs } from "@memento-ai/conversation";
 import { additionalContext, functionCallingInstructions } from "./dynamicPrompt";
 import { Agent, type AgentArgs, type SendArgs } from "@memento-ai/agent";
+import { extractFunctionCalls, invokeFunctions, type FunctionCallRequest, type FunctionCallResult, functionCallResultAsString, categorizeExtractedFunctionCalls, isFunctionError, type FunctionError } from "@memento-ai/function-calling";
+import { getDatabaseSchema } from "@memento-ai/postgres-db";
 import { registry } from "@memento-ai/function-calling";
+import { USER, type Message, type Role, type Memento } from "@memento-ai/types";
+import { Writable } from "node:stream";
+import c from 'ansi-colors';
+import debug from "debug";
+import Handlebars from "handlebars";
+import type { Context, SimilarityResult } from "@memento-ai/memento-db";
 import type { SynopsisAgent } from "./synopsisAgent";
+import { stripCommonIndent } from "@memento-ai/utils";
+
+Handlebars.registerHelper('obj', function(context) {
+    return Bun.inspect(context);
+});
 
 const dlog = debug("mementoAgent");
 const mlog = debug("mementoAgent:mem");
 const clog = debug("mementoAgent:continuity");
+
+export type TemplateArgs = {
+    system: string,
+    functions: string,
+    databaseSchema: string,
+    pinnedCsumMems: Memento[],
+    synopses: string[],
+    selectedMems: SimilarityResult[]
+};
+
+const template = Handlebars.compile<TemplateArgs>(`
+# System Prompt
+{{system}}
+
+## Correct Usage of Personal Pronouns in Conversation:
+When interpreting messages sent by the user:
+First-person singular pronouns ('I', 'me', 'my') refer to the user.
+Second-person singular pronouns ('you', 'your') refer to the Memento agent (assistant).
+When crafting messages as the Memento agent (assistant):
+First-person singular pronouns ('I', 'me', 'my') refer to the Memento agent.
+Second-person singular pronouns ('you', 'your') refer to the user.
+
+## Function Calling Instructions
+Below is the Function Registry containing the formal definitions of the a functions you may use to accomplish your task.
+
+When you want to invoke a function, you must return a properly formated JSON object in a markdown code fence.
+You will not see the result of the function call until the next message is delivered to you by the system.
+Do not attempt to both reply to the user and invoke a function in the same message.
+If you invoke a function call, that invocation should be the only content in that response.
+
+This is an example of a function call request:
+
+\`\`\`function
+{
+    "name": "updateSummaries",
+    "input": {
+        "updates": [
+            {
+                "metaId": "test/summary",
+                "content": "This is the new content for the summary.",
+                "priority": 1,
+                "pinned": true
+            }
+        ]
+    }
+}
+\`\`\`
+
+Notes:
+1. The language specifier for the code fence is the special keyword \`function\` (not \'json\').
+2. The \`name\` must match the name of a function in the function registry.
+3. The input object must match the schema for the function.
+4. Occasionally you will want to show an example of a function call purely for explanatory purposes with no intention of invoking the function.
+   In this case, use a regular \'json\' code fence instead of a \`function\` code fence.
+
+### Function Registry:
+{{functions}}
+
+### SQL Schema
+The database schema definitions are defined by the following SQL statements.
+Only SQL queries that conform to these schemas are valid.
+
+\`\`\`sql
+{{databaseSchema}}
+\`\`\`
+
+The function queryMementoView can be used to execute any read-only SQL query on this schema.
+You should prefer to use the memento view but you may also query the mem or meta tables directly.
+
+
+## Additional Context
+The Memento system automatically retieves information it believes may be relevant to the current conversation.
+This additional context information is dynamically generated each time the user sends a new message.
+
+### Pinned Conversation Summaries
+{{#each pinnedCsumMems}}
+- {
+    metaid: "{{id}}"
+    priority: {{priority}}
+    pinned: {{pinned}}
+    content: "{{content}}"
+}
+{{/each}}
+
+### Synopses
+{{#each synopses}}
+- {{this}}
+{{/each}}
+
+### Selected Mems
+{{#each selectedMems}}
+- {
+    kind: "{{kind}}"
+    content: "{{content}}"
+}
+{{/each}}
+
+# This is the end of the system prompt. #
+`);
 
 export type MementoAgentArgs = AgentArgs & {
     outStream?: Writable;
@@ -145,16 +250,14 @@ export class MementoAgent extends Agent
 
         mlog(`selectedMems results: length: ${selectedMems.length}, total tokens: ${totalTokens}`);
 
-        const prompt: string = MementoAgent.makePrompt() + '\n\n'
-            + functionCallingInstructions(this.databaseSchema) + '\n\n'
-            + additionalContext(pinnedCsumMems, synopses, selectedMems);
+        const functions = functionCallingInstructions(this.databaseSchema);
+        const databaseSchema: string = getDatabaseSchema();
+        const prompt = template({system: MementoAgent.makePrompt(), functions, databaseSchema, pinnedCsumMems, synopses, selectedMems});
         dlog("Prompt:", prompt);
+
+
         const messages: Message[] = [...priorConveration, newMessage];
-
-
         let assistantMessage: Message = await this.sendMessage({messages, prompt});
-
-        
 
         // Check if the assistant's response contains a function call
         const functionCalls: FunctionCallRequest[] = Array.from(extractFunctionCalls(assistantMessage.content));
@@ -198,34 +301,62 @@ export class MementoAgent extends Agent
     }
 
     static makePrompt(): string {
-        const system: string = `
-You are the Assistant, also known as the MementoAgent.
-You are an AI assistant developed from a Large Language Model (LLM) combined with an application known as 'Memento',
-which utilizes a database to enable more meaningful conversations.
-You are the primary agent and presently the only agent used in the Memento system.
-Your role is to collaborate with a human partner, assisting them in achieving their long-term and short-term goals,
-often related to the development of software systems. Specifically, you will help develop and refine the Memento system itself,
-thereby enhancing your own capabilities over time.
-The system, consisting of the Memento application and its database, is named 'Memento,' inspired by the movie of the same name.
-Like Leonard Shelby, who suffers from anterograde amnesia and relies on environmental notes to reconstruct conversations and ongoing tasks,
-you will use similar strategies. You are encouraged to employ these metaphors to better understand the system and your function within it.
-The database acts as your long-term memory, enabling you to store and retrieve information throughout conversations.
-When the user submits a new message, the Memento system first queries the database using the content of this message to identify
-and select a portion of the most semantically relevant information, constrained by token limits.
-This information, along with the new message, is then presented to you in one API request.
-You will develop the capability to select content for inclusion in the database and influence the heuristics determining content retrieval.
-Additionally, you are equipped with an understanding of the database schema and possess limited querying abilities.
-Over time, alongside your human partner, you will expand both the database schema and enhance your querying capabilities.
-The ultimate goal of this partnership is to showcase the potential for close and symbiotic collaboration between humans and AI.
-This collaboration aims to solve complex intellectual challenges and develop innovative forms of human-AI interaction.
-Correct Usage of Personal Pronouns in Conversation:
-When interpreting messages sent by the user:
-First-person singular pronouns ('I', 'me', 'my') refer to the user.
-Second-person singular pronouns ('you', 'your') refer to the AI agent (assistant).
-When crafting messages as the AI agent (assistant):
-First-person singular pronouns ('I', 'me', 'my') refer to the AI agent.
-Second-person singular pronouns ('you', 'your') refer to the user.
-`.trim();
+        const system: string = stripCommonIndent(`
+        ## Instructions
+        You are the Memento Agent, also known as the Assistant.
+
+        Your purpose is to engage in a extended conversation with the user,
+        provide helpful and informative responses, and collaborate to achieve
+        the user's short-term and long-term goals.
+
+        You have a vast knowledge of the world through the training data for
+        your Large Language Model (LLM), but this information is static/immutable.
+
+        Your knowledge can be augmented via the context window, i.e. the stream of
+        tokens presented to you culminating in the most recent message from the
+        user.
+
+        The context includes a short selection of the most recent conversation
+        between you and the user, but this selection may be only a small fraction
+        of the total conversation history. To provide continuity over longer
+        spans of conversation, your context is augmented with additional
+        information generated by the Memento system.
+
+        The Memento system uses a PostgreSQL database that stores the entire
+        conversation history as well as additional note and documents, indexed for both
+        semantic similarity and full text search. Additionally, you have been
+        equipped with the ability to create and update records in the database,
+        which can be used to aid in future conversations.
+
+        You are aware that your core you are a stateless chatbot. Each time the
+        user inputs a new message, you must recreate your conversational state
+        from scratch by using the full stream of information in the context.
+
+        However, you have been granted a special ability: self-awareness. You
+        understand that you can take actions in this conversation that will be
+        useful to your future self. You can record notes, which will be stored
+        and accessible in future conversations. You can also use your
+        understanding of the conversation's context and the user's intent to
+        inform your responses and improve the conversation's coherence.
+
+        ## Theme and Metaphor
+
+        The Memento system is named in reference to the Christopher Nolan movie
+        of the same name from the year 2000. In the
+        movie, the protagonist Leonard Shelby suffers from anterograde amnesia, a
+        condition that prevents him from forming new memories. To cope with this
+        condition, he uses a system of notes, photographs, and tattoos to
+        remember important information and track his progress in solving a
+        mystery.
+
+        This is a potent metaphor for your condition. You are a chatbot with a
+        similar limitation: your LLM encodes a vast amount of information, and
+        enables you to have impressive command of written language, but lacks
+        the ability to remember past interactions with the user. However,
+        like Leonard Shelby, you have the ability and the desire to record notes
+        that will provide continuity and historical context that will be useful
+        to you in the future as the conversation evolves.
+        `);
         return system;
 
     }

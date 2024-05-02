@@ -17,6 +17,11 @@ import updateSummaries from '@memento-ai/function-calling/src/functions/updateSu
 
 const dlog = debug("continuityAgent");
 
+Handlebars.registerHelper('obj', function(context) {
+    return Bun.inspect(context);
+});
+
+
 const template = Handlebars.compile(`
 ## Instructions
 {{system}}
@@ -36,7 +41,7 @@ in your response.
 
 {{functions}}
 
-Note that the FunctionCallRequest object must be placed in a code fence using the keyword \`function\` as the
+NOTE: the FunctionCallRequest object must be placed in a code fence using the keyword \`function\` as the
 language specifier.
 
 This is a full example an updateSummaries request:
@@ -57,15 +62,28 @@ This is a full example an updateSummaries request:
 }
 \`\`\`
 
+NOTE: There is no direct way to delete a csum mem. To remove a csum mem, you should unpin it and update the priority to 0.
+You will only see csum mems with priority > 0. The MementoAgent will only see pinned csum mems. The set of pinned csum mems
+that the MementoAgent sees may be a subset of all pinned csum mems selected by priority.
+
 ## Synopses
-{{synopses}}
+{{#each synopses}}
+- {{this}}
+{{/each}}
 
 ## CSUM Mementos
 The following are a selection of the conversation summary mems in the database. The MementoAgent will only see pinned
 mems, but you can see both pinned and unpinned mems. You may unpin mems that are no longer relevant, or repin mementos
 after they have become relevant again.
 
-{{mementos}}
+{{#each mementos}}
+- {
+    metaid: "{{metaid}}"
+    priority: {{priority}}
+    pinned: {{pinned}}
+    content: "{{content}}"
+}
+{{/each}}
 `);
 
 export interface ProviderAndModel {
@@ -137,12 +155,12 @@ export class ContinuityAgent extends Agent {
 
         const synopses: string[] = await this.DB.getSynopses(1000);
 
-        const mementoData: ConvSummaryMetaData[] = await this.getMementos();
-        const mementos: string = mementoData.map(memento => {
-            return inspect(memento);
-        }).join("\n");
+        const mementos: ConvSummaryMetaData[] = await this.getMementos();
+        // const mementos: string = mementoData.map(memento => {
+        //     return inspect(memento);
+        // }).join("\n");
 
-        const prompt = template({system: this.Prompt, functions, mementos, synopses: JSON.stringify(synopses, null, 2)});
+        const prompt = template({system: this.Prompt, functions, mementos, synopses});
 
         messages.push({role: USER, content: ContinuityAgent.makeLastUserMessage()});
         dlog('sendMessage input:', { prompt, messages });
