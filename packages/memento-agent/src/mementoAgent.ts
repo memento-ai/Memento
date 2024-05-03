@@ -29,6 +29,7 @@ export type TemplateArgs = {
     pinnedCsumMems: Memento[],
     synopses: string[],
     selectedMems: SimilarityResult[]
+    continuityResponseContent: string | null
 };
 
 const template = Handlebars.compile<TemplateArgs>(`
@@ -118,6 +119,12 @@ This additional context information is dynamically generated each time the user 
 }
 {{/each}}
 
+{{#if continuityResponseContent}}
+## Continuity Agent Response
+This is the Continuity Agent's response to the previous message exchange.
+{{continuityResponseContent}}
+{{/if}}
+
 # This is the end of the system prompt. #
 `);
 
@@ -149,6 +156,7 @@ export class MementoAgent extends Agent
     private max_synopses_tokens: number;
     private asyncResults: Promise<FunctionCallResult[]>;
     private continuityResponsePromise: Promise<Message> | null = null;
+    private continuityResponseContent: string | null = null;
 
     constructor(args: MementoAgentArgs)
     {
@@ -165,6 +173,7 @@ export class MementoAgent extends Agent
         this.max_synopses_tokens = max_synopses_tokens ?? 2000;
         this.asyncResults = Promise.resolve([]);
         this.continuityResponsePromise = null;
+        this.continuityResponseContent = null;
     }
 
     close(): Promise<void> {
@@ -185,9 +194,9 @@ export class MementoAgent extends Agent
     async run({ content }: SendArgs) : Promise<Message> {
         if (!!this.continuityAgent && !!this.continuityResponsePromise) {
             try {
-                const continuityResponseResult: Message = await this.continuityResponsePromise;
-                const { content } = continuityResponseResult;
-                clog(c.yellow(`Continuity Agent Response: ${content}`));
+                const result = await this.continuityResponsePromise;
+                this.continuityResponseContent = result.content;
+                clog(c.yellow(`Continuity Agent Response: ${this.continuityResponseContent}`));
             } catch (e) {
                 clog(c.red(`Continuity Agent Response Error: ${(e as Error).message}`));
             }
@@ -252,9 +261,15 @@ export class MementoAgent extends Agent
 
         const functions = functionCallingInstructions(this.databaseSchema);
         const databaseSchema: string = getDatabaseSchema();
-        const prompt = template({system: MementoAgent.makePrompt(), functions, databaseSchema, pinnedCsumMems, synopses, selectedMems});
-        dlog("Prompt:", prompt);
-
+        const tempateArgs: TemplateArgs = {
+            system: MementoAgent.makePrompt(),
+            functions, databaseSchema,
+            pinnedCsumMems,
+            synopses,
+            selectedMems,
+            continuityResponseContent: this.continuityResponseContent
+        };
+        const prompt = template(tempateArgs);
 
         const messages: Message[] = [...priorConveration, newMessage];
         let assistantMessage: Message = await this.sendMessage({messages, prompt});
