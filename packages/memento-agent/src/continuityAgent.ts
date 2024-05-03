@@ -14,6 +14,7 @@ import type { FunctionCallRequest, FunctionCallResult } from "@memento-ai/functi
 import debug from "debug";
 
 import updateSummaries from '@memento-ai/function-calling/src/functions/updateSummaries';
+import { stripCommonIndent } from "@memento-ai/utils";
 
 const dlog = debug("continuityAgent");
 
@@ -201,46 +202,47 @@ export class ContinuityAgent extends Agent {
     }
 
     static makePrompt(): string {
-        return `
-You are the ContinuityAgent, responsible for maintaining high-level continuity and context for the MementoAgent over extended conversations.
+        return stripCommonIndent(`
+        You are the ContinuityAgent, responsible for maintaining high-level continuity and context for the MementoAgent over extended conversations.
 
-Your task is to analyze the conversation history to determine if high-level summaries need to be created or updated
-using the updateSummaries function.
+        Your task is to analyze the conversation history to determine if high-level summaries need to be created or updated
+        using the updateSummaries function.
 
-You will receive indirect assistance from the SynopsisAgent, which produces a short synopsis of each conversational exchange.
-You should avoid redundancies with the synopses. Note that you (and the MementoAgent) are given access to the synopses,
-but the SynopsisAgent is not given access to your summaries, so it is your job to avoid redundancies.
+        You will receive indirect assistance from the SynopsisAgent, which produces a short synopsis of each conversational exchange.
+        You should avoid redundancies with the synopses. Note that you (and the MementoAgent) are given access to the synopses,
+        but the SynopsisAgent is not given access to your summaries, so it is your job to avoid redundancies.
 
-The result of your work will change the summaries visible to the MementoAgent the next time a messasge from the user
-is delivered to the assistant. Your goal is to provide context to the MementoAgent to create continuity
-across conversations that may span hundreds of exchanges, even though only a few of the most recent exchanges are made
-available to the MementoAgent.
-`.trim();
-  }
+        The result of your work will change the summaries visible to the MementoAgent the next time a messasge from the user
+        is delivered to the assistant. Your goal is to provide context to the MementoAgent to create continuity
+        across conversations that may span hundreds of exchanges, even though only a few of the most recent exchanges are made
+        available to the MementoAgent.
+        `);
+    }
 
     static makeLastUserMessage(): string {
-        const content = `
-Based on the recent conversation exchanges and the existing pinned/unpinned conversation summary (csum) mems shown above, perform the following analysis:
+        const content = stripCommonIndent(`
+        Based on the recent conversation exchanges and the existing pinned/unpinned conversation summary (csum) mems shown above, perform the following analysis:
 
-1. Identify any new major topics or subtopics that were introduced and create new csum mems following the <category>/<topic> naming convention. Categories can include now, soon, goal, dev, doc, etc. Aim for ~50 token summaries.
+        1. Identify any new major topics or subtopics that were introduced and create new csum mems following the <category>/<topic> naming convention. Categories can include now, soon, goal, dev, doc, etc. Aim for ~50 token summaries.
 
-2. Check if any important decisions were made, or if there were significant clarifications on existing topics that alter the context. Update the relevant csum mems accordingly.
+        2. Check if any important decisions were made, or if there were significant clarifications on existing topics that alter the context. Update the relevant csum mems accordingly.
 
-3. Remove redundant or obsolete information from existing csum mems.
+        3. Remove redundant or obsolete information from existing csum mems.
 
-4. For topics discussed extensively, consider increasing the priority score of those csum mems.
+        4. For topics discussed extensively, consider increasing the priority score of those csum mems.
 
-5. Any csum mems no longer relevant after this conversation should be unpinned or deleted.
+        5. Any csum mems no longer relevant after this conversation should be unpinned or deleted.
 
-When creating new csum mems, prefer starting a new one over updating an existing vaguely related one. But use your judgment.
+        When creating new csum mems, prefer starting a new one over updating an existing vaguely related one. But use your judgment.
 
-To make updates, use the updateSummaries function, providing an array of updates including:
-- metaId: The category/topic ID of the csum mem
-- content: New content (omit if just changing pinned/priority)
-- pinned: True if this csum should be pinned, false to unpin
-- priority: An integer score for the relative priority
+        To make updates, use the updateSummaries function, providing an array of updates including:
+        - metaId: The category/topic ID of the csum mem
+        - content: New content (omit if just changing pinned/priority)
+        - pinned: True if this csum should be pinned, false to unpin
+        - priority: An integer score for the relative priority
 
-Provide only the updateSummaries function call JSON in your response, with no other commentary. If no updates are needed, respond with "No action required".`;
+        Please also briefly explain your reasoning for each update. If no updates are needed, respond with "No action required."
+        `);
         return content;
     }
 }
