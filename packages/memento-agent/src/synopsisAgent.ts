@@ -70,7 +70,7 @@ assistant. The assistant will be given a chronological record of the synopses fr
 The purpose of this record is to provide the user with a sense of the conversation's history even though they will
 not be able to see the detailed conversation history.
 
-${synopses.length > 0? `For context, here are a few of synopses from the most recent exchanges: \n\n$<synopses>\n{synopses.join('\n')}\n</synopses>` : ''}
+${synopses.length > 0? `For context, here are a few of synopses from the most recent exchanges: \n\n$<synopses>\n${synopses.join('\n')}\n</synopses>` : ''}
 
 The exchange you are to summarize will be given to you in the only message below, using xml style tags to denote the user's instruction
 and the assistant's reply. You should respond with only the brief synopsis of the exchange and no other commentary or
