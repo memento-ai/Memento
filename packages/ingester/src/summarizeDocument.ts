@@ -69,7 +69,7 @@ export class MockSummarizer extends SummarizerAgent {
 }
 
 export function createMockSummarizer(): SummarizerAgent {
-    return new MockSummarizer(createConversation('mock', { model: 'mock' }));
+    return new MockSummarizer(createConversation('mock', { model: 'mock' , logging: { name: 'MockSummarizer' }}));
 }
 
 export class ChatSummarizerAgent extends SummarizerAgent {
@@ -103,7 +103,9 @@ const defaultProviderAndModel: ProviderAndModel = {
 
 export class ModelSummarizerAgent extends ChatSummarizerAgent {
     constructor({ provider, model }: ProviderAndModel) {
-        const conversation: ConversationInterface = createConversation(provider, { model, temperature: 0.0, max_response_tokens: 768 });
+        const conversation: ConversationInterface = createConversation(provider, {
+            model, temperature: 0.0, max_response_tokens: 768, logging: { name: 'ModelSummarizer' }
+        });
         super(conversation);
     }
 }
@@ -126,7 +128,7 @@ export async function summarizeAndStoreDocuments(args: SummarizeAndStoreDocument
         console.error("Error summarizing document");
         throw new Error("Error summarizing document");
     }
-    dlog("Summary:", summary.slice(0, 32) + "...");
+    dlog("Summary:", summary.slice(0, 200) + "...");
     const result: DocAndSummaryResult = await db.addDocAndSummary({content, source, summary});
     dlog("Document and summary stored:", result);
     return result;
