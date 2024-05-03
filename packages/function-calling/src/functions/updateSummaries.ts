@@ -65,6 +65,7 @@ async function updateSummaries(input: UpdateSummariesInput): Promise<ID[]> {
             mem = await createMem(content as string);
             await insertMem(pool, mem);
         } catch (error) {
+            console.error(Bun.inspect(update));
             throw new Error(`Error creating conversation summary mem: ${(error as Error).message}`);
         }
         let metaArgs: ConvSummaryMetaArgs;
