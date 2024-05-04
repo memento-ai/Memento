@@ -15,33 +15,31 @@ import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
 import { mementoCoreSystemPrompt } from "./mementoCoreSystemPrompt";
 import { mementoPromptTemplate, type MementoPromptTemplateArgs } from "./mementoPromptTemplate";
 import { invokeSyncAndAsyncFunctions, type InvokeFunctionsResults, FUNCTION_RESULT_HEADER, type InvokeFunctionsArgs } from "./invokeFunctions";
+import { awaitAsyncAgentActions, startAsyncAgentActions } from "./asyncAgentGlue";
+import type { ContinuityAgent } from "@memento-ai/continuity-agent";
 
 Handlebars.registerHelper('obj', function(context) {
     return Bun.inspect(context);
 });
 
-const dlog = debug("mementoAgent");
 const mlog = debug("mementoAgent:mem");
-const clog = debug("mementoAgent:continuity");
 
 export type MementoAgentArgs = AgentArgs & {
     outStream?: Writable;
-    continuityAgent?: Agent;
+    continuityAgent?: ContinuityAgent;
     synopsisAgent?: SynopsisAgent;
-    max_message_pairs?: number;         // The max number of message pairs to retrieve from the conversation history
-    max_response_tokens?: number;       // The max tokens for the response
-    max_csum_tokens?: number;           // The max tokens for the converation summary (csum) mems
+    max_message_pairs?: number;
+    max_response_tokens?: number;
+    max_csum_tokens?: number;
     max_similarity_tokens?: number;
     max_synopses_tokens?: number;
 }
-
-(BigInt.prototype as unknown as any).toJSON = function() { return this.toString() }
 
 export class MementoAgent extends Agent
 {
     private databaseSchema: string;
     private outStream?: Writable;
-    private continuityAgent?: Agent;
+    private continuityAgent?: ContinuityAgent;
     private synopsisAgent?: SynopsisAgent;
     private lastUserMessage: string;
     private max_message_pairs: number;
@@ -49,7 +47,7 @@ export class MementoAgent extends Agent
     private max_similarity_tokens: number;
     private max_synopses_tokens: number;
     private asyncResults: Promise<FunctionCallResult[]>;
-    private continuityResponsePromise: Promise<Message> | null = null;
+    private continuityResponsePromise: Promise<string> | null = null;
     private continuityResponseContent: string | null = null;
 
     constructor(args: MementoAgentArgs)
@@ -87,38 +85,19 @@ export class MementoAgent extends Agent
 
     async run({ content }: SendArgs) : Promise<Message> {
         if (!!this.continuityAgent && !!this.continuityResponsePromise) {
-            try {
-                const result = await this.continuityResponsePromise;
-                this.continuityResponseContent = result.content;
-                clog(c.yellow(`Continuity Agent Response: ${this.continuityResponseContent}`));
-            } catch (e) {
-                clog(c.red(`Continuity Agent Response Error: ${(e as Error).message}`));
-            }
-
-            // This is defensive programming. We are trying to ensure we only resolve any specific promise once.
+            this.continuityResponseContent = await awaitAsyncAgentActions({ continuityResponsePromise: this.continuityResponsePromise });
             this.continuityResponsePromise = null;
         }
 
         let assistantMessage: Message = await this.send({ content });
 
-        if (!!this.continuityAgent) {
-
-            let promise: Promise<string> = Promise.resolve("");
-
-            if (!!this.synopsisAgent) {
-                promise = this.synopsisAgent.run()
-                .then(async (response: string) => {
-                    const message: Message = { content: response, role: "assistant" };
-                    await this.DB.addSynopsisMem({content: message.content});
-                    return message.content;
-                });
-            }
-
-            this.continuityResponsePromise = promise.then(async () => {
-                const messages: Message[] = await this.DB.getConversation(this.max_message_pairs);
-                return (this.continuityAgent as Agent).sendMessage({prompt:"", messages});
-            });
-        }
+        const startAsyncAgentActionsArgs = {
+            synopsisAgent: this.synopsisAgent,
+            continuityAgent: this.continuityAgent,
+            db: this.DB,
+            max_message_pairs: this.max_message_pairs
+        };
+        this.continuityResponsePromise = startAsyncAgentActions(startAsyncAgentActionsArgs);
 
         return assistantMessage;
     }
