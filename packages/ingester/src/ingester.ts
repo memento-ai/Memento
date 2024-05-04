@@ -17,6 +17,7 @@ const DocumentIdTuple = z.object({
   id: z.string(),
   memid: z.string(),
   summaryId: z.string(),
+  tokens: z.number(),
 });
 
 export async function ingestFile(db: MementoDb, filePath: string, summarizer?: Summarizer) : Promise<DocAndSummaryResult> {
@@ -29,11 +30,11 @@ export async function ingestFile(db: MementoDb, filePath: string, summarizer?: S
     let result: DocAndSummaryResult | undefined = undefined;
     let skip: boolean = false;
     await db.pool.connect(async (conn) => {
-        const row = await conn.maybeOne(sql.type(DocumentIdTuple)`SELECT id, summaryId, memid FROM memento WHERE source = ${source} AND kind = ${DOC};`);
+        const row = await conn.maybeOne(sql.type(DocumentIdTuple)`SELECT id, summaryId, memid, tokens FROM memento WHERE source = ${source} AND kind = ${DOC};`);
         if (row) {
-            const { id, memid, summaryId } = row;
+            const { id, memid, summaryId, tokens } = row;
             if (memid === mem.id) {
-                dlog(`Document ${source} unchanged since previous ingestas id=${id}`);
+                console.log(`Document ${source} with ${tokens} tokens unchanged since previous ingestas id=${id}`);
                 skip = true;
                 result = { docId: id, summaryId }
             } else {
