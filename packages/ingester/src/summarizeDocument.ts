@@ -79,7 +79,7 @@ export class ChatSummarizerAgent extends SummarizerAgent {
 
     async summarize({ content, source }: SummarizerArgs) : Promise<string> {
         const num_tokens = count_tokens(content);
-        console.log(`Summarizing ${source} with ${num_tokens} tokens.`)
+        dlog(`Summarizing ${source} with ${num_tokens} tokens.`)
         const prompt = this.prompt as string
         const sendMessageArgs: SendMessageArgs = { prompt, messages: [{role: USER, content}] };
         const message = await this.conversation.sendMessage(sendMessageArgs);

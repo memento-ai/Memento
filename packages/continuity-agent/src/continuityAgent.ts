@@ -77,7 +77,7 @@ export class ContinuityAgent extends Agent {
         }
 
         if (numConvMessages % 2 !== 0) {
-            console.log(messages);
+            console.error(messages);
             throw new Error('The ContinuityAgent must be given an even number of messages.');
         }
         if (messages[messages.length - 1].role !== ASSISTANT) {

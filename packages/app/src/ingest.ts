@@ -5,7 +5,8 @@ import { delete_unreferenced_mems, executeFileQuery, wipeDatabase } from '@memen
 import debug from 'debug';
 import { ingestDirectory, createModelSummarizer, type Summarizer, SUPPORTED_EXTENSIONS, type ProviderAndModel } from '@memento-ai/ingester';
 
-const dlog = debug("ingest");
+const dlog = debug("ingester");
+debug.enable("ingester");
 
 const program = new Command();
 

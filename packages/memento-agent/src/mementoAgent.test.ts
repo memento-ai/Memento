@@ -3,7 +3,7 @@ import { expect, it, describe, beforeEach, afterEach, beforeAll, afterAll} from 
 import { createConversation, type ConversationInterface, type Provider } from "@memento-ai/conversation";
 import { createMementoDb, dropDatabase, getDatabaseSchema } from "@memento-ai/postgres-db";
 import { functionCallingInstructions, additionalContext } from "./dynamicPrompt";
-import { getProjectRoot } from "@memento-ai/utils";
+import { getProjectRoot, stripCommonIndent } from "@memento-ai/utils";
 import { ingestDirectory } from "@memento-ai/ingester";
 import { MementoAgent, type MementoAgentArgs } from "./mementoAgent";
 import { MementoDb } from "@memento-ai/memento-db";
@@ -115,12 +115,12 @@ describe('Can create the initial message for extra context', () => {
     // }, timeout);
 
     it('creates additionalContext', async () => {
-        await ingestDirectory(db, `${getProjectRoot()}/packages`);
-        const result = await db.searchMemsBySimilarity(`
-import { get_encoding } from "tiktoken";
+        await ingestDirectory(db, `${getProjectRoot()}/packages/encoding`);
+        const result = await db.searchMemsBySimilarity(stripCommonIndent(`
+            import { get_encoding } from "tiktoken";
 
-const enc = get_encoding("cl100k_base");
-`.trim(), 2000);
+            const enc = get_encoding("cl100k_base");
+        `), 2000);
         const message = additionalContext([], [], result);
 
         // Some static text that should appear:
@@ -128,6 +128,6 @@ const enc = get_encoding("cl100k_base");
 
         // The similarity search is crafted such that it should return as the best hit this source file.
         // But note that it is a long enough file (~1200 tokens) that the test might be flaky.
-        expect(result[0].source).toInclude('Memento/packages/encoding/src/encoding.ts');
+        expect(result[0].source).toInclude('packages/encoding/src/encoding.ts');
     }, timeout);
 });

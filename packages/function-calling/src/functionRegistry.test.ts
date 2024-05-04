@@ -24,7 +24,6 @@ Function: getCurrentTime
 
     it('should generate all function descriptions', async () => {
         const descriptions = getRegistryDescription(registry);
-        // console.log(descriptions);
         dlog(descriptions);
         const expected = `
 Available functions:

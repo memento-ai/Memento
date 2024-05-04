@@ -42,7 +42,6 @@ describe('SynopsisAgent', () => {
 
         // Act
         const synopsis = await synopsisAgent.run();
-        console.log(synopsis);
 
         // Assert
         expect(synopsis).toBeTruthy();
