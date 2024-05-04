@@ -46,7 +46,7 @@ describe("Ingester", () => {
     }, timeout);
 
     it("can ingest a directory", async () => {
-        await ingestDirectory(db, "packages/ingester", summarizer);
+        await ingestDirectory({db, dirPath: "packages/ingester", summarizer});
         const files = await getIngestedFiles(db);
         dlog("files:", files);
         expect(files.length).toBeGreaterThan(0);
@@ -54,7 +54,7 @@ describe("Ingester", () => {
     }, timeout);
 
     it("can ingest a directory and then drop ingest", async () => {
-        await ingestDirectory(db, "packages/types", summarizer);
+        await ingestDirectory({db, dirPath: "packages/types", summarizer});
         await dropIngestedFiles(db);
         const files = await getIngestedFiles(db);
         return expect(files.length).toBe(0);

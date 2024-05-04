@@ -56,17 +56,25 @@ export async function ingestFile(db: MementoDb, filePath: string, summarizer?: S
 }
 
 export async function getExistingGitFiles(dirPath: string) : Promise<string[]> {
-
-    const pathsShellOutput: ShellOutput = await $`git ls-files ${dirPath}`.quiet();
-    if (pathsShellOutput.exitCode !== 0) {
-        throw new Error(`Error running git ls-files: ${pathsShellOutput.stderr}`);
-    }
-
-    const paths = pathsShellOutput.text().split('\n').filter((path) => path.length > 0);
+    dlog('getExistingGitFiles: dirPath:', dirPath);
+    const { stdout, stderr, exitCode } = await $`git ls-files ${dirPath}`.nothrow();
+    dlog({exitCode, stderr});
+    if (exitCode || stderr.length) { throw new Error(`Error running git ls-files: ${stderr}`); }
+    const paths = stdout.toString().split('\n').filter((path) => path.length > 0);
     return paths;
 }
 
-export async function ingestDirectory(db: MementoDb, dirPath: string, summarizer?: Summarizer) : Promise<void> {
+export type IngestDirectoryArgs = {
+    db: MementoDb,
+    dirPath: string,
+    summarizer?: Summarizer,
+    log?: boolean,
+};
+
+export async function ingestDirectory({db, dirPath, summarizer, log}: IngestDirectoryArgs) : Promise<void> {
+    log = log ?? false;
+    if (log) debug.enable('ingester');
+
     dlog(`Ingesting directory: ${dirPath}`);
 
     // These are the paths of the files that git knows about in the directory
