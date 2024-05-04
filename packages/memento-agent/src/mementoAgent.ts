@@ -2,7 +2,7 @@
 import {  type SendMessageArgs } from "@memento-ai/conversation";
 import { functionCallingInstructions } from "./dynamicPrompt";
 import { Agent, type AgentArgs, type SendArgs } from "@memento-ai/agent";
-import { extractFunctionCalls, invokeFunctions, type FunctionCallRequest, type FunctionCallResult, functionCallResultAsString, categorizeExtractedFunctionCalls, isFunctionError, type FunctionError, type CategorizedFunctionCalls } from "@memento-ai/function-calling";
+import { type FunctionCallResult } from "@memento-ai/function-calling";
 import { getDatabaseSchema } from "@memento-ai/postgres-db";
 import { registry } from "@memento-ai/function-calling";
 import { USER, type Message, type Role, type Memento } from "@memento-ai/types";
@@ -14,6 +14,7 @@ import type { Context, SimilarityResult } from "@memento-ai/memento-db";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
 import { mementoCoreSystemPrompt } from "./mementoCoreSystemPrompt";
 import { mementoPromptTemplate, type MementoPromptTemplateArgs } from "./mementoPromptTemplate";
+import { invokeSyncAndAsyncFunctions, type InvokeFunctionsResults, FUNCTION_RESULT_HEADER, type InvokeFunctionsArgs } from "./invokeFunctions";
 
 Handlebars.registerHelper('obj', function(context) {
     return Bun.inspect(context);
@@ -35,8 +36,6 @@ export type MementoAgentArgs = AgentArgs & {
 }
 
 (BigInt.prototype as unknown as any).toJSON = function() { return this.toString() }
-
-const FUNCTION_RESULT_HEADER = "SYSTEM: Function call result for";
 
 export class MementoAgent extends Agent
 {
@@ -145,50 +144,10 @@ export class MementoAgent extends Agent
         };
     }
 
-    async getAsyncErrorResults(): Promise<FunctionError[]> {
-
-        let asyncErrorResults: FunctionError[] = [];
-        let asyncResults = await this.asyncResults;
-        if (asyncResults.length > 0) {
-            asyncErrorResults = asyncResults.filter(result => isFunctionError(result)) as FunctionError[];
-        }
-
-        return asyncErrorResults;
-    }
-
     checkForFunctionResults(content: string): void {
         if (!content.startsWith(FUNCTION_RESULT_HEADER)) {
             this.lastUserMessage = content;
         }
-    }
-
-    checkForFunctionCalls(content: string): CategorizedFunctionCalls {
-        const functionCalls: FunctionCallRequest[] = Array.from(extractFunctionCalls(content));
-        const categorizedCalls = categorizeExtractedFunctionCalls(functionCalls);
-        dlog("Extracted function calls:", categorizedCalls);
-        return categorizedCalls;
-    }
-
-    async invokeSyncAndAsyncFunctions(assistantMessage: Message): Promise<string> {
-        const context: Context = { readonlyPool: this.DB.readonlyPool, pool: this.DB.pool};
-
-        const { syncCalls, asyncCalls, badCalls } = this.checkForFunctionCalls(assistantMessage.content);
-
-        const syncResults: FunctionCallResult[] = await invokeFunctions({registry: this.Registry, calls: syncCalls, context});
-        dlog("Extracted function results:", syncResults);
-
-        const asyncErrorResults: FunctionError[] = await this.getAsyncErrorResults();
-        if (asyncCalls) {
-            // Invoke but do not await the result
-            this.asyncResults = invokeFunctions({registry: this.Registry, calls: asyncCalls, context});
-        }
-
-        const functionResultContent = (syncResults.concat(badCalls).concat(asyncErrorResults)).map((result: FunctionCallResult) => {
-            const header = `${FUNCTION_RESULT_HEADER} ${result.name}\n`;
-            return header + `\'\'\'result\n${functionCallResultAsString(result)}\n\'\'\'`;
-        }).join('\n\n');
-
-        return functionResultContent;
     }
 
     async send({ content }: SendArgs): Promise<Message> {
@@ -211,7 +170,10 @@ export class MementoAgent extends Agent
         let assistantMessage: Message = await this.sendMessage({messages, prompt});
 
         // Check if the assistant's response contains a function call
-        const functionResultContent = await this.invokeSyncAndAsyncFunctions(assistantMessage)
+        const context: Context = this.DB.context();
+        const invokeFunctionsArgs: InvokeFunctionsArgs = {assistantMessage, context, registry: this.Registry, asyncResultsP: this.asyncResults};
+        const {functionResultContent, newAsyncResultsP } : InvokeFunctionsResults = await invokeSyncAndAsyncFunctions(invokeFunctionsArgs)
+        this.asyncResults = newAsyncResultsP;
 
         if (functionResultContent !== "")
         {
