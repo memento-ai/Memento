@@ -1,4 +1,4 @@
-// Path: packages/memento-agent/src/continuityLastUserMessage.ts
+// Path: packages/continuity-agent/src/continuityLastUserMessage.ts
 
 import { stripCommonIndent } from "@memento-ai/utils";
 

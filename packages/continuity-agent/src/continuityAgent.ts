@@ -1,4 +1,4 @@
-// Path: packages/memento-agent/src/continuityAgent.ts
+// Path: packages/continuity-agent/src/continuityAgent.ts
 
 import { Agent } from "@memento-ai/agent";
 import { ASSISTANT, ConvSummaryMetaData, USER, type Message } from "@memento-ai/types";

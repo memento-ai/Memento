@@ -1,4 +1,4 @@
-// Path: packages/memento-agent/src/continuityPromptTemplate.ts
+// Path: packages/continuity-agent/src/continuityPromptTemplate.ts
 
 import { stripCommonIndent } from "@memento-ai/utils";
 
