@@ -2,7 +2,7 @@
 import {  type SendMessageArgs } from "@memento-ai/conversation";
 import { functionCallingInstructions } from "./dynamicPrompt";
 import { Agent, type AgentArgs, type SendArgs } from "@memento-ai/agent";
-import { extractFunctionCalls, invokeFunctions, type FunctionCallRequest, type FunctionCallResult, functionCallResultAsString, categorizeExtractedFunctionCalls, isFunctionError, type FunctionError } from "@memento-ai/function-calling";
+import { extractFunctionCalls, invokeFunctions, type FunctionCallRequest, type FunctionCallResult, functionCallResultAsString, categorizeExtractedFunctionCalls, isFunctionError, type FunctionError, type CategorizedFunctionCalls } from "@memento-ai/function-calling";
 import { getDatabaseSchema } from "@memento-ai/postgres-db";
 import { registry } from "@memento-ai/function-calling";
 import { USER, type Message, type Role, type Memento } from "@memento-ai/types";
@@ -145,65 +145,76 @@ export class MementoAgent extends Agent
         };
     }
 
-    async send({ content }: SendArgs): Promise<Message> {
+    async getAsyncErrorResults(): Promise<FunctionError[]> {
+
         let asyncErrorResults: FunctionError[] = [];
         let asyncResults = await this.asyncResults;
         if (asyncResults.length > 0) {
             asyncErrorResults = asyncResults.filter(result => isFunctionError(result)) as FunctionError[];
         }
 
-        const isFunctionCallResult: boolean = content.startsWith(FUNCTION_RESULT_HEADER);
-        if (!isFunctionCallResult)
-        {
+        return asyncErrorResults;
+    }
+
+    checkForFunctionResults(content: string): void {
+        if (!content.startsWith(FUNCTION_RESULT_HEADER)) {
             this.lastUserMessage = content;
         }
+    }
 
-        const role : Role = USER;
-        const newMessage = {content, role};
+    checkForFunctionCalls(content: string): CategorizedFunctionCalls {
+        const functionCalls: FunctionCallRequest[] = Array.from(extractFunctionCalls(content));
+        const categorizedCalls = categorizeExtractedFunctionCalls(functionCalls);
+        dlog("Extracted function calls:", categorizedCalls);
+        return categorizedCalls;
+    }
 
-        // Perform similarity search to retrieve relevant mems
-        const selectedMems: SimilarityResult[] = await this.DB.searchMemsBySimilarity(this.lastUserMessage, this.max_similarity_tokens);
-        const totalTokens: number = selectedMems.reduce((acc, mem) => acc + mem.tokens, 0);
-
-        const maxMessagePairs: number = 5;  // TODO: configure this from command line
-        const priorConveration: Message[] = await this.DB.getConversation(maxMessagePairs);
-
-        await this.DB.addConversationMem(newMessage);
-
-        mlog(`selectedMems results: length: ${selectedMems.length}, total tokens: ${totalTokens}`);
-
-        const tempateArgs: MementoPromptTemplateArgs = await this.retrieveContext();
-        const prompt = mementoPromptTemplate(tempateArgs);
-
-        const messages: Message[] = [...priorConveration, newMessage];
-        let assistantMessage: Message = await this.sendMessage({messages, prompt});
-
-        // Check if the assistant's response contains a function call
-        const functionCalls: FunctionCallRequest[] = Array.from(extractFunctionCalls(assistantMessage.content));
-        const { syncCalls, asyncCalls, badCalls } = categorizeExtractedFunctionCalls(functionCalls);
-        dlog("Extracted function calls:", { syncCalls, asyncCalls, badCalls });
+    async invokeSyncAndAsyncFunctions(assistantMessage: Message): Promise<string> {
         const context: Context = { readonlyPool: this.DB.readonlyPool, pool: this.DB.pool};
-        const functionResults: FunctionCallResult[] = await invokeFunctions({registry: this.Registry, calls: syncCalls, context});
-        dlog("Extracted function results:", functionResults);
 
+        const { syncCalls, asyncCalls, badCalls } = this.checkForFunctionCalls(assistantMessage.content);
+
+        const syncResults: FunctionCallResult[] = await invokeFunctions({registry: this.Registry, calls: syncCalls, context});
+        dlog("Extracted function results:", syncResults);
+
+        const asyncErrorResults: FunctionError[] = await this.getAsyncErrorResults();
         if (asyncCalls) {
             // Invoke but do not await the result
             this.asyncResults = invokeFunctions({registry: this.Registry, calls: asyncCalls, context});
         }
 
-        if (functionResults.length > 0 || badCalls.length > 0)
-        {
-            // There were function call requests. We have already executed them but now
-            // need to send them back to the assisstant. We do that by composing a
-            // message as if it were from the user, and recursively using `send`
-            // to send that message. That should allow the assistant to decide to call
-            // even more functions that will all be executed before we return to
-            // the outer REPL loop and wait for the user's response.
-            const functionResultContent = (functionResults.concat(badCalls).concat(asyncErrorResults)).map((result: FunctionCallResult) => {
-                const header = `${FUNCTION_RESULT_HEADER} ${result.name}\n`;
-                return header + `\'\'\'result\n${functionCallResultAsString(result)}\n\'\'\'`;
-            }).join('\n\n');
+        const functionResultContent = (syncResults.concat(badCalls).concat(asyncErrorResults)).map((result: FunctionCallResult) => {
+            const header = `${FUNCTION_RESULT_HEADER} ${result.name}\n`;
+            return header + `\'\'\'result\n${functionCallResultAsString(result)}\n\'\'\'`;
+        }).join('\n\n');
 
+        return functionResultContent;
+    }
+
+    async send({ content }: SendArgs): Promise<Message> {
+        this.checkForFunctionResults(content);
+
+        const role : Role = USER;
+        const newMessage = {content, role};
+        // Get the prior conversation before adding the new message
+        const maxMessagePairs: number = 5;  // TODO: configure this from command line
+        const priorConveration: Message[] = await this.DB.getConversation(maxMessagePairs);
+
+        await this.DB.addConversationMem(newMessage);
+
+        const tempateArgs: MementoPromptTemplateArgs = await this.retrieveContext();
+        const prompt = mementoPromptTemplate(tempateArgs);
+
+        const messages: Message[] = [...priorConveration, newMessage];
+
+        // --- Send the message to the assistant here ---
+        let assistantMessage: Message = await this.sendMessage({messages, prompt});
+
+        // Check if the assistant's response contains a function call
+        const functionResultContent = await this.invokeSyncAndAsyncFunctions(assistantMessage)
+
+        if (functionResultContent !== "")
+        {
             if (this.outStream)
             {
                 const prompt = c.red("\nYou: ");
