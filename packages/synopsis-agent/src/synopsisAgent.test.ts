@@ -1,4 +1,4 @@
-// Path: packages/memento-agent/src/synopsisAgent.test.ts
+// Path: packages/synopsis-agent/src/synopsisAgent.test.ts
 
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { MementoDb } from '@memento-ai/memento-db';
@@ -42,7 +42,6 @@ describe('SynopsisAgent', () => {
 
         // Act
         const synopsis = await synopsisAgent.run();
-        console.log(synopsis);
 
         // Assert
         expect(synopsis).toBeTruthy();

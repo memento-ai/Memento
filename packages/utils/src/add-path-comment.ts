@@ -19,11 +19,11 @@ const updateFilePath = (filePath: string) => {
   if (match) {
     lines[0] = `// Path: ${relativePath}`;
     fs.writeFileSync(filePath, lines.join('\n'));
-    console.log(`Updated path comment in ${filePath}`);
+    console.info(`Updated path comment in ${filePath}`);
   } else {
     lines.unshift(`// Path: ${relativePath}`);
     fs.writeFileSync(filePath, lines.join('\n'));
-    console.log(`Added path comment to ${filePath}`);
+    console.info(`Added path comment to ${filePath}`);
   }
 };
 

@@ -81,7 +81,7 @@ export function* extractFunctionCalls(content: string): Generator<FunctionCallRe
     }
 }
 
-interface CategorizedFunctionCalls {
+export interface CategorizedFunctionCalls {
     syncCalls: FunctionCall[];
     asyncCalls: FunctionCall[];
     badCalls: FunctionError[];

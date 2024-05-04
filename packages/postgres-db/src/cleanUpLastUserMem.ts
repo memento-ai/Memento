@@ -18,8 +18,8 @@ export async function cleanUpLastUserMem(pool: DatabasePool) {
         `);
         if (lastUserMem.rows.length > 0 && lastUserMem.rows[0].role === 'user') {
             const { id, content } = lastUserMem.rows[0];
-            console.log("Whoops! Looks like we crashed before the assistant could respond. Cleaning up...")
-            console.log('Deleting user message:\n', content)
+            console.warn("Whoops! Looks like we crashed before the assistant could respond. Cleaning up...")
+            console.warn('Deleting user message:\n', content)
             // This will leave the mem in the database, but it will be orphaned, and can be garbage collected later.
             await conn.query(sql.unsafe`
                 DELETE FROM meta

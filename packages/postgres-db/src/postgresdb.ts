@@ -14,6 +14,7 @@ import debug from 'debug';
 
 const dlog = debug('postgresdb');
 
+(BigInt.prototype as unknown as any).toJSON = function() { return this.toString() }
 
 /// Create a new database. Due to requirements imposed by the slonik API, we must first create
 /// a pool to an existing database where the owner of the DB has privileges to create new databases.

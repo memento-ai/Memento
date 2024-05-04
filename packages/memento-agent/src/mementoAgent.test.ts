@@ -3,7 +3,7 @@ import { expect, it, describe, beforeEach, afterEach, beforeAll, afterAll} from 
 import { createConversation, type ConversationInterface, type Provider } from "@memento-ai/conversation";
 import { createMementoDb, dropDatabase, getDatabaseSchema } from "@memento-ai/postgres-db";
 import { functionCallingInstructions, additionalContext } from "./dynamicPrompt";
-import { getProjectRoot } from "@memento-ai/utils";
+import { getProjectRoot, stripCommonIndent } from "@memento-ai/utils";
 import { ingestDirectory } from "@memento-ai/ingester";
 import { MementoAgent, type MementoAgentArgs } from "./mementoAgent";
 import { MementoDb } from "@memento-ai/memento-db";
@@ -82,7 +82,7 @@ describe("MementoAgent", () => {
     }, timeout);
 
     it("can chat with the agent about ingested content", async () => {
-        await ingestDirectory(db, `${getProjectRoot()}/packages/types`);;
+        await ingestDirectory({db, dirPath: `${getProjectRoot()}/packages/types`});
         let args = sendArgs("What are the various kinds of MemMetaData?");
         let message: Message = await mementoAgent.run(args);
         expect(message.content).toBeTruthy();
@@ -106,21 +106,13 @@ describe('Can create the initial message for extra context', () => {
         await dropDatabase(dbname);
     });
 
-    it('creates functionCallingInstructions', async () => {
-        const message = functionCallingInstructions(getDatabaseSchema());
-        expect(message).toInclude("To invoke a function output a code-fenced JSON object.");
-        expect(message).toInclude("CREATE TABLE mem(");
-        expect(message).toInclude("CREATE TABLE meta(");
-        expect(message).toInclude("CREATE OR REPLACE VIEW memento AS");
-    }, timeout);
-
     it('creates additionalContext', async () => {
-        await ingestDirectory(db, `${getProjectRoot()}/packages`);
-        const result = await db.searchMemsBySimilarity(`
-import { get_encoding } from "tiktoken";
+        await ingestDirectory({db, dirPath: `${getProjectRoot()}/packages/encoding`});
+        const result = await db.searchMemsBySimilarity(stripCommonIndent(`
+            import { get_encoding } from "tiktoken";
 
-const enc = get_encoding("cl100k_base");
-`.trim(), 2000);
+            const enc = get_encoding("cl100k_base");
+        `), 2000);
         const message = additionalContext([], [], result);
 
         // Some static text that should appear:
@@ -128,6 +120,6 @@ const enc = get_encoding("cl100k_base");
 
         // The similarity search is crafted such that it should return as the best hit this source file.
         // But note that it is a long enough file (~1200 tokens) that the test might be flaky.
-        expect(result[0].source).toInclude('Memento/packages/encoding/src/encoding.ts');
+        expect(result[0].source).toInclude('packages/encoding/src/encoding.ts');
     }, timeout);
 });

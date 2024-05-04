@@ -1,4 +1,4 @@
-// Path: packages/memento-agent/src/continuityAgent.test.ts
+// Path: packages/continuity-agent/src/continuityAgent.test.ts
 
 import { expect, it, describe, beforeEach, afterEach } from "bun:test";
 import { createConversation, type ConversationInterface, type Provider } from "@memento-ai/conversation";
@@ -7,7 +7,7 @@ import { getProjectRoot } from "@memento-ai/utils";
 import { ingestDirectory } from "@memento-ai/ingester";
 import { ContinuityAgent, type ContinuityAgentArgs } from "./continuityAgent";
 import { MementoDb } from "@memento-ai/memento-db";
-import { MementoAgent } from "./mementoAgent";
+import { MementoAgent } from "@memento-ai/memento-agent";
 import { nanoid } from "nanoid";
 import { type Message } from "@memento-ai/types";
 import { type AgentArgs, type SendArgs } from "@memento-ai/agent";
@@ -43,7 +43,7 @@ describe("ContinuityAgent", () => {
         expect(db).toBeTruthy();
         expect(db.name).toBe(dbname);
         expect(db.pool).toBeTruthy();
-        conversation = createConversation(provider, {model, temperature: 0.0});
+        conversation = createConversation(provider, {model, temperature: 0.0, logging: { name: "test" }});
 
         const mementoChatArgs: AgentArgs = {
             conversation,
@@ -101,7 +101,7 @@ describe("ContinuityAgent", () => {
     }, timeout);
 
     it("can chat with the agent about ingested content", async () => {
-        await ingestDirectory(db, `${getProjectRoot()}/packages/types`);;
+        await ingestDirectory({db, dirPath: `${getProjectRoot()}/packages/types`});
         let { memento, continuity } = await sendMementoAndContinuity(sendArgs("What are the various kinds of MemMetaData?"));
         expect(memento.content).toBeTruthy();
         expect(continuity.content).toBeTruthy();

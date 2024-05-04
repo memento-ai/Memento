@@ -1,5 +1,5 @@
 // Path: packages/function-calling/src/functionRegistry.test.ts
-// src/lib/functionRegistry.test.ts
+
 import { describe, it, expect } from 'bun:test';
 import { registry } from './functions/index';
 import { generateFunctionDescription, getRegistryDescription } from './functionRegistry';
@@ -24,7 +24,6 @@ Function: getCurrentTime
 
     it('should generate all function descriptions', async () => {
         const descriptions = getRegistryDescription(registry);
-        // console.log(descriptions);
         dlog(descriptions);
         const expected = `
 Available functions:

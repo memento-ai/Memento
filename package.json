@@ -7,6 +7,7 @@
   "workspaces": [
     "packages/agent",
     "packages/app",
+    "packages/continuity-agent",
     "packages/conversation",
     "packages/embedding",
     "packages/encoding",
@@ -15,6 +16,7 @@
     "packages/memento-agent",
     "packages/memento-db",
     "packages/postgres-db",
+    "packages/synopsis-agent",
     "packages/types",
     "packages/utils"
   ]

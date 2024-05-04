@@ -53,6 +53,7 @@ export type AddSynopsisArgs = {
 
 export const SimilarityResult = z.object({
     id: z.string(),
+    kind: z.string(),
     content: z.string(),
     source: z.string(),
     created_at: z.number(),

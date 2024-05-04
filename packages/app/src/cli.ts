@@ -2,7 +2,9 @@
 import { cleanUpLastUserMem, wipeDatabase } from '@memento-ai/postgres-db';
 import { Command } from 'commander';
 import { createConversation, type ConversationInterface, type ConversationOptions } from '@memento-ai/conversation';
-import { MementoAgent, type MementoAgentArgs, ContinuityAgent, SynopsisAgent } from '@memento-ai/memento-agent';
+import { MementoAgent, type MementoAgentArgs } from '@memento-ai/memento-agent';
+import { SynopsisAgent } from '@memento-ai/synopsis-agent';
+import { ContinuityAgent } from '@memento-ai/continuity-agent';
 import { MementoDb } from '@memento-ai/memento-db';
 import { type Writable } from 'node:stream';
 import c from 'ansi-colors';
