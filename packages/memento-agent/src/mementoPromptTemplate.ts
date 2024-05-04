@@ -15,6 +15,10 @@ export type MementoPromptTemplateArgs = {
     continuityResponseContent: string | null
 };
 
+Handlebars.registerHelper('obj', function(context) {
+    return Bun.inspect(context);
+});
+
 const mementoPromptTemplateText = stripCommonIndent(`
     # System Prompt
     {{system}}
