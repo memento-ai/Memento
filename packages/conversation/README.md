@@ -8,7 +8,7 @@ The `@memento-ai/conversation` package provides an abstraction for interacting w
 - Abstraction layer for creating and managing conversations with language models
 - Ability to send messages and receive responses
 - Support for streaming responses
-- Configurable options for temperature, max response tokens, and model selection
+- Configurable options for temperature, max response tokens, model selection, and logging
 
 ## Usage and Examples
 
@@ -23,7 +23,8 @@ const provider = 'anthropic';
 const options = {
   model: 'haiku',
   temperature: 0.0,
-  max_response_tokens: 64
+  max_response_tokens: 64,
+  logging: { name: 'my-conversation' }
 };
 
 const conversation = createConversation(provider, options);
@@ -75,3 +76,19 @@ await conversation.sendMessage(args);
 ```
 
 In this example, the response from the language model will be written to the provided `outStream` as it is generated.
+
+### Logging Conversations
+
+Conversations can be logged to a file by providing a `logging` option when creating the `ConversationInterface` instance. The logs will be written to a directory structure based on the provider, model, and the provided name.
+
+```
+logs/
+  my-conversation/
+    anthropic/
+      haiku/
+        2023-04-01.md
+        2023-04-02.md
+        ...
+```
+
+Each log file contains the prompt, messages, and response for each conversation, separated by a delimiter.
