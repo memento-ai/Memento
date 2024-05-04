@@ -61,3 +61,4 @@ main();
 In this example, we create a Memento Agent instance with a conversation object and a database connection. We then use the `send` method to send a message to the agent, which will query the database, retrieve relevant information, and generate a response.
 
 The Memento Agent also supports the ability to call functions that are registered in the `@memento-ai/function-calling` package. These functions can be used to perform various operations, such as updating summaries or adding synop
+```
