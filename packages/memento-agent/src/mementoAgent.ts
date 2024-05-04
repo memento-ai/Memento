@@ -124,6 +124,27 @@ export class MementoAgent extends Agent
         return assistantMessage;
     }
 
+    async retrieveContext(): Promise<MementoPromptTemplateArgs> {
+        const pinnedCsumMems: Memento[] = await this.DB.searchPinnedCsumMems(this.max_csum_tokens);
+        const synopses: string[] = await this.DB.getSynopses(this.max_synopses_tokens);
+        const selectedMems: SimilarityResult[] = await this.DB.searchMemsBySimilarity(this.lastUserMessage, this.max_similarity_tokens);
+        const totalTokens: number = selectedMems.reduce((acc, mem) => acc + mem.tokens, 0);
+        const continuityResponseContent: string | null = this.continuityResponseContent;
+        const functions = functionCallingInstructions(this.databaseSchema);
+
+        mlog(`selectedMems results: length: ${selectedMems.length}, total tokens: ${totalTokens}`);
+
+        return {
+            system: mementoCoreSystemPrompt,
+            functions,
+            databaseSchema: this.databaseSchema,
+            pinnedCsumMems,
+            synopses,
+            selectedMems,
+            continuityResponseContent
+        };
+    }
+
     async send({ content }: SendArgs): Promise<Message> {
         let asyncErrorResults: FunctionError[] = [];
         let asyncResults = await this.asyncResults;
@@ -140,9 +161,6 @@ export class MementoAgent extends Agent
         const role : Role = USER;
         const newMessage = {content, role};
 
-        const pinnedCsumMems: Memento[] = await this.DB.searchPinnedCsumMems(this.max_csum_tokens);
-        const synopses: string[] = await this.DB.getSynopses(this.max_synopses_tokens);
-
         // Perform similarity search to retrieve relevant mems
         const selectedMems: SimilarityResult[] = await this.DB.searchMemsBySimilarity(this.lastUserMessage, this.max_similarity_tokens);
         const totalTokens: number = selectedMems.reduce((acc, mem) => acc + mem.tokens, 0);
@@ -154,16 +172,7 @@ export class MementoAgent extends Agent
 
         mlog(`selectedMems results: length: ${selectedMems.length}, total tokens: ${totalTokens}`);
 
-        const functions = functionCallingInstructions(this.databaseSchema);
-        const databaseSchema: string = getDatabaseSchema();
-        const tempateArgs: MementoPromptTemplateArgs = {
-            system: mementoCoreSystemPrompt,
-            functions, databaseSchema,
-            pinnedCsumMems,
-            synopses,
-            selectedMems,
-            continuityResponseContent: this.continuityResponseContent
-        };
+        const tempateArgs: MementoPromptTemplateArgs = await this.retrieveContext();
         const prompt = mementoPromptTemplate(tempateArgs);
 
         const messages: Message[] = [...priorConveration, newMessage];
