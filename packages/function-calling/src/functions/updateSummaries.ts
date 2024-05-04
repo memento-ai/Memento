@@ -52,6 +52,13 @@ async function updateSummaries(input: UpdateSummariesInput): Promise<ID[]> {
         try {
             let tobe = zodParse(UpdateOneSummaryInputSchema, update);
             if (content===undefined || pinned===undefined || priority===undefined) {
+                if (!tobe.metaId) {
+                    throw new Error('metaId is required');
+                }
+                if (tobe.metaId.length > 21) {
+                    console.warn(`metaId ${tobe.metaId} is longer than 21 characters`);
+                    tobe.metaId = tobe.metaId.slice(0, 21);
+                }
                 const result = await pool.query(sql.unsafe`
                     SELECT content, pinned, priority
                     FROM memento
