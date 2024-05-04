@@ -1,4 +1,4 @@
-// Path: packages/function-calling/src/functionRegistryTemplate_test.ts
+// Path: packages/function-calling/src/functionRegistryTemplate.test.ts
 
 import { describe, it, expect } from 'bun:test';
 import { registry } from './functions/index';
