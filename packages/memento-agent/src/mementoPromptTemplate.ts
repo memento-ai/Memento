@@ -1,8 +1,21 @@
 // Path: packages/memento-agent/src/mementoPromptTemplate.ts
 
+import Handlebars from "handlebars";
 import { stripCommonIndent } from "@memento-ai/utils";
+import type { Memento } from "@memento-ai/types";
+import type { SimilarityResult } from "@memento-ai/memento-db";
 
-export const mementoPromptTemplate = stripCommonIndent(`
+export type MementoPromptTemplateArgs = {
+    system: string,
+    functions: string,
+    databaseSchema: string,
+    pinnedCsumMems: Memento[],
+    synopses: string[],
+    selectedMems: SimilarityResult[]
+    continuityResponseContent: string | null
+};
+
+const mementoPromptTemplateText = stripCommonIndent(`
     # System Prompt
     {{system}}
 
@@ -97,3 +110,5 @@ export const mementoPromptTemplate = stripCommonIndent(`
 
     # This is the end of the system prompt. #
 `);
+
+export const mementoPromptTemplate = Handlebars.compile<MementoPromptTemplateArgs>(mementoPromptTemplateText);

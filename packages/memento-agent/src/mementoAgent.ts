@@ -12,8 +12,8 @@ import debug from "debug";
 import Handlebars from "handlebars";
 import type { Context, SimilarityResult } from "@memento-ai/memento-db";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
-import { mementoPromptTemplate } from "./mementoPromptTemplate";
 import { mementoCoreSystemPrompt } from "./mementoCoreSystemPrompt";
+import { mementoPromptTemplate, type MementoPromptTemplateArgs } from "./mementoPromptTemplate";
 
 Handlebars.registerHelper('obj', function(context) {
     return Bun.inspect(context);
@@ -22,18 +22,6 @@ Handlebars.registerHelper('obj', function(context) {
 const dlog = debug("mementoAgent");
 const mlog = debug("mementoAgent:mem");
 const clog = debug("mementoAgent:continuity");
-
-export type TemplateArgs = {
-    system: string,
-    functions: string,
-    databaseSchema: string,
-    pinnedCsumMems: Memento[],
-    synopses: string[],
-    selectedMems: SimilarityResult[]
-    continuityResponseContent: string | null
-};
-
-const template = Handlebars.compile<TemplateArgs>(mementoPromptTemplate);
 
 export type MementoAgentArgs = AgentArgs & {
     outStream?: Writable;
@@ -168,7 +156,7 @@ export class MementoAgent extends Agent
 
         const functions = functionCallingInstructions(this.databaseSchema);
         const databaseSchema: string = getDatabaseSchema();
-        const tempateArgs: TemplateArgs = {
+        const tempateArgs: MementoPromptTemplateArgs = {
             system: mementoCoreSystemPrompt,
             functions, databaseSchema,
             pinnedCsumMems,
@@ -176,7 +164,7 @@ export class MementoAgent extends Agent
             selectedMems,
             continuityResponseContent: this.continuityResponseContent
         };
-        const prompt = template(tempateArgs);
+        const prompt = mementoPromptTemplate(tempateArgs);
 
         const messages: Message[] = [...priorConveration, newMessage];
         let assistantMessage: Message = await this.sendMessage({messages, prompt});
