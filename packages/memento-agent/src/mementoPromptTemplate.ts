@@ -1,4 +1,4 @@
-// Path: packages/memento-agent/src/mementoSystemPrompt.ts
+// Path: packages/memento-agent/src/mementoPromptTemplate.ts
 
 import { stripCommonIndent } from "@memento-ai/utils";
 
