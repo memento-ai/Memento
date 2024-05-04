@@ -9,7 +9,7 @@ import { getSynopses } from './getSynopses';
 import { SimilarityResult } from './mementoDb-types';
 import { type DatabasePool, type CommonQueryMethods, type Interceptor } from 'slonik';
 import debug from 'debug';
-import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddConvSummaryArgs, AddSynopsisArgs } from './mementoDb-types';
+import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddConvSummaryArgs, AddSynopsisArgs, Context } from './mementoDb-types';
 import { type Message, type Memento, ConvSummaryMetaData, SynopsisMetaData } from '@memento-ai/types';
 
 const dlog = debug("mementoDb");
@@ -20,6 +20,13 @@ export class MementoDb {
     private _readonlyPool: DatabasePool | null = null;
     private interceptors: Interceptor[];
     functionRegistry: FunctionRegistry;
+
+    context() : Context {
+        return {
+            pool: this.pool,
+            readonlyPool: this.readonlyPool,
+        };
+    }
 
     private constructor(name: string, interceptors: Interceptor[] = []) {
         dlog('Connecting MementoDb:', name);
