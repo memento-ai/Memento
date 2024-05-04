@@ -3,14 +3,13 @@ import { expect, it, describe, beforeEach, afterEach} from "bun:test";
 import { SimilarityResult } from "../mementoDb-types";
 import { MementoDb } from '../mementoDb';
 
-import { USER, type Message, ASSISTANT, Memento, ConvSummaryMemento } from "@memento-ai/types";
+import { USER, type Message, ASSISTANT } from "@memento-ai/types";
 import { nanoid } from "nanoid";
 import { createMementoDb, dropDatabase } from "@memento-ai/postgres-db";
 import { ingestDirectory, ingestFile } from "@memento-ai/ingester";
 import { getProjectRoot } from "@memento-ai/utils";
 
 import debug from "debug";
-import { searchPinnedCsumMems } from "../searchPinnedCsumMems";
 
 const dlog = debug("mementoDb:test");
 
@@ -77,7 +76,7 @@ There are six kinds of MemMetaData:
         const projectRoot = getProjectRoot();
         const encodingPath  = `${projectRoot}/packages/encoding/src/encoding.ts`;
         await ingestFile(db, encodingPath);
-        await ingestDirectory(db, `${projectRoot}/packages/function-calling/src`);
+        await ingestDirectory({db, dirPath: `${projectRoot}/packages/function-calling/src`});
         const result = await db.searchMemsBySimilarity(`
 export function decode_to_string(encoded: Uint32Array): string {
     return new TextDecoder().decode(enc.decode(encoded));

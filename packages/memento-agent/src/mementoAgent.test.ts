@@ -82,7 +82,7 @@ describe("MementoAgent", () => {
     }, timeout);
 
     it("can chat with the agent about ingested content", async () => {
-        await ingestDirectory(db, `${getProjectRoot()}/packages/types`);;
+        await ingestDirectory({db, dirPath: `${getProjectRoot()}/packages/types`});
         let args = sendArgs("What are the various kinds of MemMetaData?");
         let message: Message = await mementoAgent.run(args);
         expect(message.content).toBeTruthy();
@@ -106,16 +106,8 @@ describe('Can create the initial message for extra context', () => {
         await dropDatabase(dbname);
     });
 
-    // it('creates functionCallingInstructions', async () => {
-    //     const message = functionCallingInstructions(getDatabaseSchema());
-    //     expect(message).toInclude("Function: queryMementoView");
-    //     expect(message).toInclude("CREATE TABLE mem(");
-    //     expect(message).toInclude("CREATE TABLE meta(");
-    //     expect(message).toInclude("CREATE OR REPLACE VIEW memento AS");
-    // }, timeout);
-
     it('creates additionalContext', async () => {
-        await ingestDirectory(db, `${getProjectRoot()}/packages/encoding`);
+        await ingestDirectory({db, dirPath: `${getProjectRoot()}/packages/encoding`});
         const result = await db.searchMemsBySimilarity(stripCommonIndent(`
             import { get_encoding } from "tiktoken";
 

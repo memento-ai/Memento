@@ -101,7 +101,7 @@ describe("ContinuityAgent", () => {
     }, timeout);
 
     it("can chat with the agent about ingested content", async () => {
-        await ingestDirectory(db, `${getProjectRoot()}/packages/types`);;
+        await ingestDirectory({db, dirPath: `${getProjectRoot()}/packages/types`});
         let { memento, continuity } = await sendMementoAndContinuity(sendArgs("What are the various kinds of MemMetaData?"));
         expect(memento.content).toBeTruthy();
         expect(continuity.content).toBeTruthy();

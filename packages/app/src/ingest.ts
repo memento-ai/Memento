@@ -2,11 +2,7 @@
 import { Command } from 'commander';
 import { MementoDb } from '@memento-ai/memento-db';
 import { delete_unreferenced_mems, executeFileQuery, wipeDatabase } from '@memento-ai/postgres-db';
-import debug from 'debug';
 import { ingestDirectory, createModelSummarizer, type Summarizer, SUPPORTED_EXTENSIONS, type ProviderAndModel } from '@memento-ai/ingester';
-
-const dlog = debug("ingester");
-debug.enable("ingester");
 
 const program = new Command();
 
@@ -48,15 +44,16 @@ async function main() {
 
     const args: ProviderAndModel = { provider, model };
 
-    const summarizer_ : Summarizer = createModelSummarizer(args);
+    const summarizer : Summarizer = createModelSummarizer(args);
 
     if (cleanSlate) {
         await wipeDatabase(database);
     }
 
     const db: MementoDb = await MementoDb.create(database);
+    const dirPath = options.directory ?? 'packages';
 
-    await ingestDirectory(db, options.directory ?? 'packages', summarizer_);
+    await ingestDirectory({db, dirPath, summarizer, log: true});
     await delete_unreferenced_mems(db.pool);
 
     await db.close();
