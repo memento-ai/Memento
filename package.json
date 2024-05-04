@@ -16,6 +16,7 @@
     "packages/memento-agent",
     "packages/memento-db",
     "packages/postgres-db",
+    "packages/synopsis-agent",
     "packages/types",
     "packages/utils"
   ]

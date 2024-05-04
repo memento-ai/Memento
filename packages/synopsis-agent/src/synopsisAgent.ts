@@ -1,4 +1,4 @@
-// Path: packages/memento-agent/src/synopsisAgent.ts
+// Path: packages/synopsis-agent/src/synopsisAgent.ts
 
 import { Agent, type AgentArgs } from '@memento-ai/agent';
 import { type SendMessageArgs } from '@memento-ai/conversation';

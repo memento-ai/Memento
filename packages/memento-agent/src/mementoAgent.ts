@@ -11,7 +11,7 @@ import c from 'ansi-colors';
 import debug from "debug";
 import Handlebars from "handlebars";
 import type { Context, SimilarityResult } from "@memento-ai/memento-db";
-import type { SynopsisAgent } from "./synopsisAgent";
+import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
 import { mementoPromptTemplate } from "./mementoPromptTemplate";
 import { mementoCoreSystemPrompt } from "./mementoCoreSystemPrompt";
 

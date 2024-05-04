@@ -1,5 +1,5 @@
 {
-  "name": "@memento-ai/memento-agent",
+  "name": "@memento-ai/synopsis-agent",
   "version": "1.0.0",
   "type": "module",
   "module": "index.ts",
@@ -14,11 +14,9 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@memento-ai/continuity-agent": "workspace:*",
     "@memento-ai/conversation": "workspace:*",
     "@memento-ai/function-calling": "workspace:*",
     "@memento-ai/postgres-db": "workspace:*",
-    "@memento-ai/synopsis-agent": "workspace:*",
     "@memento-ai/utils": "workspace:*",
     "debug": "^4.3.4",
     "handlebars": "^4.7.8",
