@@ -9,6 +9,7 @@ import type { Message } from "@memento-ai/types";
 import fs from 'fs';
 import { mkdir } from "node:fs/promises";
 import dayjs from 'dayjs';
+import { GroqConversation } from "./groq";
 
 export interface Logging {
     name: string;
@@ -61,13 +62,14 @@ export function withLogger(conversation: ConversationInterface, path: string): C
 }
 
 
-export type Provider = 'openai' | 'anthropic' | 'ollama' | 'mock';
+export type Provider = 'openai' | 'anthropic' | 'ollama' | 'groq' | 'mock';
 
 export function _createConversation(provider: Provider, options: ConversationOptions): ConversationInterface {
     switch (provider) {
         case 'anthropic': return new AnthropicConversation(options);
         case 'ollama': return new OllamaConversation(options);
         case 'openai': return new OpenAIConversation(options);
+        case 'groq': return new GroqConversation(options);
         case 'mock': return new MockConversation(options);
         default: throw new Error('Invalid provider');
     }
@@ -76,7 +78,6 @@ export function _createConversation(provider: Provider, options: ConversationOpt
 export function createConversation(provider: Provider, options: ConversationOptions): ConversationInterface {
     const name = options.logging?.name ?? 'default';
     const path = `${name}/${provider}/${options.model}`;
-    const logging = options.logging ?? { name: provider };
     const conversation = _createConversation(provider, options);
     return withLogger(conversation, path);
 }
