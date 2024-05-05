@@ -1,4 +1,4 @@
--- The memento view is a convenient join of the meta and mem tables.
+-- The memento view joins the meta and mem tables to create the logical view of a memento record.
 CREATE OR REPLACE VIEW memento AS
     SELECT
         mem.id as memid,
