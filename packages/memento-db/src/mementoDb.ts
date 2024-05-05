@@ -10,7 +10,7 @@ import { SimilarityResult } from './mementoDb-types';
 import { type DatabasePool, type CommonQueryMethods, type Interceptor } from 'slonik';
 import debug from 'debug';
 import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddConvSummaryArgs, AddSynopsisArgs, Context } from './mementoDb-types';
-import { type Message, type Memento, ConvSummaryMetaData, SynopsisMetaData } from '@memento-ai/types';
+import { type Message, type Memento, ConvSummaryMetaData, SynopsisMetaData, ConvSummaryMemento } from '@memento-ai/types';
 
 const dlog = debug("mementoDb");
 
@@ -154,7 +154,7 @@ Examples:
         return searchMemsBySimilarity(this.pool, userMessage, tokensLimit);
     }
 
-    async searchPinnedCsumMems(tokenLimit: number): Promise<Memento[]> {
+    async searchPinnedCsumMems(tokenLimit: number): Promise<ConvSummaryMemento[]> {
         return await searchPinnedCsumMems(this.pool, tokenLimit);
     }
 
