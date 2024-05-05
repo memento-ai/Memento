@@ -6,7 +6,7 @@ import type { SendMessageArgs } from "./conversation";
 
 const model = 'gpt-3.5-turbo';
 const provider = 'openai';
-const options: ConversationOptions = { model };
+const options: ConversationOptions = { model, temperature: 0.0, max_response_tokens: 64, seed: 987};
 
 const prompt = "Answer all questions concisely, i.e give the shortest possible answer.";
 
@@ -22,6 +22,6 @@ test("Hello from OpenAI!", async () => {
     }
     const message = await conversation.sendMessage(args)
 
-    let expected: string = 'Hello from OpenAI!';
-    expect(message.content).toBe(expected);
+    expect(message.content).toInclude('Hello! How can I ');
+    expect(message.content).toInclude(' you today?');
 });

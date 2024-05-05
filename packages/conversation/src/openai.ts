@@ -3,14 +3,18 @@ import type { Message, Role } from "@memento-ai/types";
 import type { ConversationInterface, SendMessageArgs } from "./conversation";
 import { type ConversationOptions } from './factory';
 import { Writable } from 'stream';
+import OpenAI from 'openai';
+import type { Stream } from "openai/streaming.mjs";
 
 export class OpenAIConversation implements ConversationInterface {
     private model: string;
     private stream?: Writable;
+    private client: OpenAI;
 
     constructor(options: ConversationOptions) {
-        this.model = options.model;
+        this.model = options.model ?? 'gpt-3.5-turbo';
         this.stream = options.stream;
+        this.client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     }
 
     async sendMessage(args: SendMessageArgs): Promise<Message> {
@@ -42,7 +46,28 @@ export class OpenAIConversation implements ConversationInterface {
         // If this.stream is provided, enable streaming and forward the responses to the stream
         // If this.stream is not provided, wait for the complete response
 
-        const message: Message = { role: 'assistant', content: 'Hello from OpenAI!' };
-        return message;
+        const stream = !!this.stream;
+
+        const completion = await this.client.chat.completions.create({
+            model: this.model,
+            messages: args.messages,
+            stream,
+        });
+
+        if (stream) {
+            const chunks: string[] = [];
+            const completionStream = completion as Stream<OpenAI.Chat.Completions.ChatCompletionChunk>;
+            for await (const chunk of completionStream) {
+                const data = chunk.choices[0]?.delta?.content || '';
+                chunks.push(data);
+                (this.stream as Writable).write(data);
+            }
+            return { role: 'assistant', content: chunks.join('') };
+        } else {
+            const completionResponse = completion as OpenAI.Chat.Completions.ChatCompletion;
+            const { role, content } = completionResponse.choices[0].message;
+            const content_ = content as string;
+            return { role, content: content_ };
+        }
     }
 }
