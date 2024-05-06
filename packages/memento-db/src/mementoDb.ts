@@ -11,8 +11,11 @@ import { type DatabasePool, type CommonQueryMethods, type Interceptor } from 'sl
 import debug from 'debug';
 import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddConvSummaryArgs, AddSynopsisArgs, Context } from './mementoDb-types';
 import { type Message, type Memento, ConvSummaryMetaData, SynopsisMetaData, ConvSummaryMemento } from '@memento-ai/types';
+import { stripCommonIndent } from '@memento-ai/utils';
 
 const dlog = debug("mementoDb");
+
+export const INST_CSUM_CAT_CONVS = 'inst/csum-cat-convs';
 
 export class MementoDb {
     name: string;
@@ -48,45 +51,18 @@ export class MementoDb {
 
     async addCsumCategoryConventions() : Promise<void> {
         const { metaId, content, pinned, priority } = {
-            metaId: 'guide/csum-cat-convs',
+            metaId: INST_CSUM_CAT_CONVS,
             pinned: true,
             priority: 1000,
-            content: `
-<category>/<topic>
+            content: stripCommonIndent(`
+                <domain>/<topic>
 
-Category (3-4 chars):
-- Time-based:
-    now - Immediate/current tasks
-    soon - Short-term objectives
-    goal - Long-term goals
-- Domain-based:
-    test - Testing
-    dev - Development
-    feat - Features
-    arch - Architecture/Design
-    doc - Documentation
-    collab - Collaboration
-    perf - Performance
-    sec - Security
-- Guidelines:
-    guide - Guidelines, clarifications, expected behaviors+
+                Domain: use 'cont', 'inst', or 'dev', defined as:
+                    inst - Instructions (key prompts/directives)
+                    dev - Software development
+                    cont - Continuity (managing context/history)
 
-Topic (Descriptive keyword/phrase)
-
-Special cases:
-- todo - High-level todos spanning multiple areas
-- todo included in topic - Specific todos within a domain+
-    (e.g. dev/todo-refactor-auth)
-
-Examples:
-    now/bugfix-login
-    soon/deploy-v2
-    goal/scale-infra
-    dev/refactor-auth
-    test/todo-edge-cases
-    arch/microservices
-    guide/func-call-format
-    todo/roadmap`,
+                Topic: a descriptive keyword or phrase (e.g. 'csum-cat-convs')`)
         };
 
         await addConvSummaryMem(this.pool, { metaId, content, pinned, priority });
