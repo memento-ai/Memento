@@ -76,7 +76,7 @@ export interface ChatSession {
 export function createChatSession(args: ChatSessionArgs = {}): ChatSession {
     const model = getModel(args.model);
     const temperature = args.temperature ?? 1.0;
-    const max_response_tokens = args.max_response_tokens ?? 1536;
+    const max_response_tokens = args.max_response_tokens ?? 3000;
     const session: ChatSession = {
         anthropic: new Anthropic({}), // use the api key from the environment
         model,
@@ -107,7 +107,7 @@ export class AnthropicConversation implements ConversationInterface {
             model: this.model,
             outStream: this.stream,
             temperature: options.temperature ?? 1.0,
-            max_response_tokens: options.max_response_tokens ?? 1536
+            max_response_tokens: options.max_response_tokens ?? 3000
         };
 
         this.session = createChatSession(args);
