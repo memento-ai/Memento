@@ -18,6 +18,8 @@
     "@memento-ai/types": "workspace:*",
     "dayjs": "^1.11.11",
     "debug": "^4.3.4",
-    "ollama": "^0.4.4"
+    "groq-sdk": "^0.3.3",
+    "ollama": "^0.4.4",
+    "openai": "^4.40.2"
   }
 }

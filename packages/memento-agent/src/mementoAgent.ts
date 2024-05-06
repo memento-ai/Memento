@@ -15,6 +15,10 @@ import c from 'ansi-colors';
 import type { Context } from "@memento-ai/memento-db";
 import type { ContinuityAgent } from "@memento-ai/continuity-agent";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
+import debug from "debug";
+import { count_tokens } from "@memento-ai/encoding";
+
+const tlog = debug("usage:messages");
 
 export type MementoAgentArgs = AgentArgs & {
     outStream?: Writable;
@@ -66,6 +70,11 @@ export class MementoAgent extends Agent
 
     // Given all prior messages, chat with the agent and return the agent's response
     async sendMessage({ prompt, messages }: SendMessageArgs): Promise<Message> {
+        if (tlog.enabled) {
+            const tokens = messages.reduce((acc, message) => acc + count_tokens(message.content), 0);
+            tlog(`message tokens: ${tokens}`);
+        }
+
         // messages must include the last user message
         const message = await this.conversation.sendMessage({ prompt, messages });
         const { content, role } = message;

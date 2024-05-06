@@ -1,3 +1,4 @@
+// Path: packages/memento-agent/src/invokeFunctions.ts
 import { type FunctionCallResult, invokeFunctions, type FunctionError, functionCallResultAsString, categorizeExtractedFunctionCalls, extractFunctionCalls, type FunctionCallRequest, type CategorizedFunctionCalls, type FunctionRegistry, isFunctionError } from "@memento-ai/function-calling";
 import type { Context } from "@memento-ai/memento-db";
 import type { Message } from "ollama";

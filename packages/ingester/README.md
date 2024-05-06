@@ -5,7 +5,7 @@ The `@memento-ai/ingester` package provides functionality for ingesting and summ
 
 ## Key Features
 - Ingest individual files or entire directories
-- Supports TypeScript (.ts) and SQL (.sql) file types
+- Supports TypeScript (.ts), SQL (.sql), and Markdown (.md) file types
 - Configurable summarizer for generating document summaries
 - Drop ingested files from the database
 - Retrieve a list of ingested files
@@ -52,4 +52,4 @@ const db = await MementoDb.create('my-database');
 const ingestedFiles = await getIngestedFiles(db);
 ```
 
-The package also includes a `summarizeDocument` module that provides a `Summarizer` interface and implementations for different summarization approaches, such as a mock summarizer and a chat-based summarizer.
+The package also includes a `summarizeDocument` module that provides a `Summarizer` interface and implementations for different summarization approaches, such as a mock summarizer, a chat-based summarizer, and a model-based summarizer.

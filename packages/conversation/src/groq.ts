@@ -1,20 +1,22 @@
-// Path: packages/conversation/src/openai.ts
+// Path: packages/conversation/src/groq.ts
+
 import type { Message, Role } from "@memento-ai/types";
 import type { ConversationInterface, SendMessageArgs } from "./conversation";
 import { type ConversationOptions } from './factory';
 import { Writable } from 'stream';
-import OpenAI from 'openai';
-import type { Stream } from "openai/streaming.mjs";
+import Groq from 'groq-sdk';
+import type { Stream } from "groq-sdk/lib/streaming.mjs";
+import type { ChatCompletionChunk } from "groq-sdk/lib/chat_completions_ext";
 
-export class OpenAIConversation implements ConversationInterface {
+export class GroqConversation implements ConversationInterface {
     private model: string;
     private stream?: Writable;
-    private client: OpenAI;
+    private client: Groq;
 
     constructor(options: ConversationOptions) {
-        this.model = options.model ?? 'gpt-3.5-turbo';
+        this.model = options.model ?? 'mixtral-8x7b-32768';
         this.stream = options.stream;
-        this.client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        this.client = new Groq({ apiKey: process.env.GROQ_API_KEY });
     }
 
     async sendMessage(args: SendMessageArgs): Promise<Message> {
@@ -40,7 +42,7 @@ export class OpenAIConversation implements ConversationInterface {
     }
 
     private async sendRequest(args: SendMessageArgs): Promise<Message> {
-        // Make the API request to OpenAI
+        // Make the API request to Groq
         // Use the this.apiKey and this.model
         // Include the prepared messages (which may contain a 'system' role message)
         // If this.stream is provided, enable streaming and forward the responses to the stream
@@ -56,7 +58,7 @@ export class OpenAIConversation implements ConversationInterface {
 
         if (stream) {
             const chunks: string[] = [];
-            const completionStream = completion as Stream<OpenAI.Chat.Completions.ChatCompletionChunk>;
+            const completionStream = completion as Stream<ChatCompletionChunk>;
             for await (const chunk of completionStream) {
                 const data = chunk.choices[0]?.delta?.content || '';
                 chunks.push(data);
@@ -64,10 +66,10 @@ export class OpenAIConversation implements ConversationInterface {
             }
             return { role: 'assistant', content: chunks.join('') };
         } else {
-            const completionResponse = completion as OpenAI.Chat.Completions.ChatCompletion;
-            const { role, content } = completionResponse.choices[0].message;
+            const completionResponse = completion as Groq.Chat.Completions.ChatCompletion;
+            const { content } = completionResponse.choices[0].message;
             const content_ = content as string;
-            return { role, content: content_ };
+            return { role: 'assistant', content: content_ };
         }
     }
 }
