@@ -5,7 +5,7 @@ import { createConversation, type ConversationInterface, type ConversationOption
 import { MementoAgent, type MementoAgentArgs } from '@memento-ai/memento-agent';
 import { SynopsisAgent } from '@memento-ai/synopsis-agent';
 import { ContinuityAgent } from '@memento-ai/continuity-agent';
-import { MementoDb } from '@memento-ai/memento-db';
+import { INST_CSUM_CAT_CONVS, MementoDb } from '@memento-ai/memento-db';
 import { type Writable } from 'node:stream';
 import c from 'ansi-colors';
 import { sql } from'slonik';
@@ -55,7 +55,7 @@ const mementoConversationOptions: ConversationOptions = {
 
 const db: MementoDb = await MementoDb.create(database);
 
-if (!await db.pool.exists(sql.unsafe`SELECT id from meta where id = 'guide/csum-cat-convs'`)) {
+if (!await db.pool.exists(sql.unsafe`SELECT id from meta where id = ${INST_CSUM_CAT_CONVS}`)) {
     await db.addCsumCategoryConventions();
 }
 
