@@ -1,14 +1,15 @@
 // Path: packages/app/src/cli.ts
+
 import { cleanUpLastUserMem, wipeDatabase } from '@memento-ai/postgres-db';
 import { Command } from 'commander';
 import { createConversation, type ConversationInterface, type ConversationOptions } from '@memento-ai/conversation';
 import { MementoAgent, type MementoAgentArgs } from '@memento-ai/memento-agent';
 import { SynopsisAgent } from '@memento-ai/synopsis-agent';
 import { ContinuityAgent } from '@memento-ai/continuity-agent';
-import { INST_CSUM_CAT_CONVS, MementoDb } from '@memento-ai/memento-db';
+import { MementoDb } from '@memento-ai/memento-db';
 import { type Writable } from 'node:stream';
 import c from 'ansi-colors';
-import { sql } from'slonik';
+import debug from 'debug';
 
 const program = new Command();
 
@@ -18,13 +19,18 @@ program
     .option('-p, --provider <provider>', 'The provider to use [anthropic, ollama, openai')
     .option('-m, --model <model>', 'The name of the model to use')
     .option('-d, --database <dbname>', 'The name of the database to use')
+    .option('-t, --tokens', 'Show token counts')
     .option('-x, --clean-slate', 'Drop the named database and start over');
 
 program.parse(process.argv);
 
 const options = program.opts();
 
-const { provider, model, database } = options;
+const { provider, model, database, tokens } = options;
+
+if (tokens) {
+    debug.enable("usage:tokens");
+}
 
 if (!provider) {
     console.error('You must specify an LLM provider');
@@ -54,10 +60,6 @@ const mementoConversationOptions: ConversationOptions = {
 }
 
 const db: MementoDb = await MementoDb.create(database);
-
-if (!await db.pool.exists(sql.unsafe`SELECT id from meta where id = ${INST_CSUM_CAT_CONVS}`)) {
-    await db.addCsumCategoryConventions();
-}
 
 const conversation: ConversationInterface = createConversation(provider, mementoConversationOptions);
 

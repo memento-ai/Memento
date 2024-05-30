@@ -1,4 +1,5 @@
 // Path: packages/conversation/src/ollama.test.ts
+
 import { expect, test } from "bun:test";
 import { USER } from "@memento-ai/types";
 import { createConversation, type ConversationOptions } from "./factory";

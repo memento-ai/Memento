@@ -1,4 +1,5 @@
 // Path: packages/types/src/mementoSchema.ts
+
 import { z } from 'zod';
 import { Mem } from './memSchema';
 import { ConvSummaryMetaData, ConversationMetaData, DocSummaryMetaData, DocumentMetaData, FragmentMetaData, SynopsisMetaData } from './metaSchema';

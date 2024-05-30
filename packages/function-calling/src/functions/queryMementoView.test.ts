@@ -1,4 +1,5 @@
 // Path: packages/function-calling/src/functions/queryMementoView.test.ts
+
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { MementoDb } from '@memento-ai/memento-db';
 import { createMementoDb, dropDatabase } from '@memento-ai/postgres-db';
@@ -27,11 +28,11 @@ describe('queryMementoView', () => {
 
         const id = await db.addConversationMem({content: "test conversation mem", role: USER});
         expect(id).toBeTruthy();
-        dlog(`Added conversation mem to ${dbname} with id ${id}`);
+        dlog(`Added conversation mem to ${dbname} with id ${Bun.inspect(id)}`);
 
         const id2 = await db.addConversationMem({content: "another test conversation mem", role: USER});
         expect(id2).toBeTruthy();
-        dlog(`Added conversation mem to ${dbname} with id ${id2}`);
+        dlog(`Added conversation mem to ${dbname} with id ${Bun.inspect(id2)}`);
     });
 
     afterEach(async () => {

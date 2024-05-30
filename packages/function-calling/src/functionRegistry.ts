@@ -1,10 +1,11 @@
 // Path: packages/function-calling/src/functionRegistry.ts
+
 import { z, ZodObject } from 'zod';
 import debug from 'debug';
 
 const dlog = debug('functionRegistry');
 
-export const ID = z.object({ id: z.string() }).describe('The id of the created synopsis meta.');
+export const ID = z.object({ id: z.string() }).describe('The id of the created meta record.');
 export type ID = z.infer<typeof ID>;
 
 export const baseInputSchema = z.object({
@@ -24,10 +25,10 @@ export interface Function<Input, Output> {
 
 export interface FunctionConfig<Input, Output> {
     name: string;
-    async?: z.ZodType<boolean>;
-    inputSchema: z.ZodType<Input>;
-    outputSchema: z.ZodType<Promise<Output>>;
-    fnSchema: z.ZodType<Function<Input, Output>>;
+    async?: z.ZodSchema<boolean>;
+    inputSchema: z.ZodSchema<Input>;
+    outputSchema: z.ZodSchema<Promise<Output>>;
+    fnSchema: z.ZodSchema<Function<Input, Output>>;
     fn: Function<Input, Output>;
     extraTypes?: Record<string, z.ZodTypeAny>;
 }

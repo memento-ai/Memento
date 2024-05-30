@@ -1,4 +1,5 @@
 // Path: packages/memento-db/src/mementoDb-types.ts
+
 import { type Role } from '@memento-ai/types';
 import { z } from 'zod';
 import debug from 'debug';
@@ -22,6 +23,11 @@ export type AddConvArgs = {
     content: string;
     role: Role;
     priority?: number;
+}
+
+export type AddConvExchangeArgs = {
+    userContent: string;
+    asstContent: string;
 }
 
 export type AddSysArgs = {

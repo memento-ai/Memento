@@ -2,11 +2,11 @@
 
 import debug from "debug";
 import c from 'ansi-colors';
-import type { Message } from "@memento-ai/types";
-import type { Agent } from "@memento-ai/agent";
+import { ASSISTANT, type Message } from "@memento-ai/types";
 import type { MementoDb } from "@memento-ai/memento-db";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
 import type { ContinuityAgent } from "../../continuity-agent";
+import type { ID } from "@memento-ai/postgres-db";
 
 const clog = debug("mementoAgent:continuity");
 
@@ -30,15 +30,15 @@ export async function awaitAsyncAgentActions({ continuityResponsePromise }: Awai
 
 export type StartAsyncAgentsArgs = {
     synopsisAgent?: SynopsisAgent;
+    xchgId?: ID;
     continuityAgent?: ContinuityAgent;
     db: MementoDb;
-    max_message_pairs: number;
 };
 
 export type StartAsyncAgentsResults = Promise<string>;
 
 export function startAsyncAgentActions(
-    { synopsisAgent, continuityAgent, db, max_message_pairs }: StartAsyncAgentsArgs)
+    { synopsisAgent, xchgId, continuityAgent, db }: StartAsyncAgentsArgs)
     : StartAsyncAgentsResults {
 
     let promise: Promise<string> = Promise.resolve("");
@@ -46,16 +46,18 @@ export function startAsyncAgentActions(
     if (!!synopsisAgent) {
         promise = synopsisAgent.run()
         .then(async (response: string) => {
-            const message: Message = { content: response, role: "assistant" };
-            await db.addSynopsisMem({content: message.content});
+            const message: Message = { content: response, role: ASSISTANT };
+            const id = await db.addSynopsisMem({content: message.content});
+            if (!!xchgId) {
+                await db.linkExchangeSynopsis({xchg_id: xchgId.id, synopsis_id: id.id});
+            }
             return message.content;
         });
     }
 
     if (!!continuityAgent) {
         promise = promise.then(async () => {
-            const messages: Message[] = await db.getConversation(max_message_pairs);
-            const response = (continuityAgent as Agent).sendMessage({prompt:"", messages});
+            const response = continuityAgent.run();
             return (await response).content;
         });
     }

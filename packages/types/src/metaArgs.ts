@@ -1,7 +1,8 @@
 // Path: packages/types/src/metaArgs.ts
+
 import { z } from 'zod';
 import { Role } from './role';
-import { CONV, DOC, FRAG, DSUM, CSUM, SYN } from './memKind';
+import { CONV, DOC, FRAG, DSUM, CSUM, SYN, XCHG } from './memKind';
 
 /// ==== Args objects are used to specify the required arguments to create the `meta` record.
 // Since this is for a meta record, the content is not needed
@@ -13,7 +14,7 @@ export const ConversationMetaArgs = z.object({
     kind: z.literal(CONV),
     role: Role,
     source: z.literal('conversation'),  // should also use 'function' or 'result' for the function output return on behalf of user
-    priority: z.number().default(0),
+    priority: z.number().default(1),
 });
 export type ConversationMetaArgs = z.input<typeof ConversationMetaArgs>;
 
@@ -31,8 +32,9 @@ export const FragmentMetaArgs = z.object({
 });
 export type FragmentMetaArgs = z.input<typeof FragmentMetaArgs>;
 
-export const MetaId = z.string().regex(/^[\w-]+\/[\w-]+$/).transform(s => s.substring(0, 21))
-    .describe('The metaId of the conversation summary to update or create. Must follow the category/topic convention. Will be truncated to 21 characters.');
+export const MetaId = z.string().regex(/^[a-z0-9-]+$/, 'The metaId must be kebab-case lowercase alphanumeric')
+    .transform(value => value.slice(0, 21))
+    .describe('The metaId of the conversation summary. Lower-case, kebab-case, alphanumeric. Will be truncated to 21 characters.');
 export type MetaId = z.TypeOf<typeof MetaId>;
 
 export const ConvSummaryMetaArgs = z.object({
@@ -55,6 +57,11 @@ export const SynopsisMetaArgs = z.object({
 });
 export type SynopsisMetaArgs = z.input<typeof SynopsisMetaArgs>;
 
+export const ConvExchangeMetaArgs = z.object({
+    kind: z.literal(XCHG),
+});
+export type ConvExchangeMetaArgs = z.input<typeof ConvExchangeMetaArgs>;
+
 export const MetaArgs = z.discriminatedUnion('kind', [
-    ConversationMetaArgs, DocumentMetaArgs, FragmentMetaArgs, DocSummaryMetaArgs, ConvSummaryMetaArgs, SynopsisMetaArgs]);
+    ConversationMetaArgs, DocumentMetaArgs, FragmentMetaArgs, DocSummaryMetaArgs, ConvSummaryMetaArgs, SynopsisMetaArgs, ConvExchangeMetaArgs]);
 export type MetaArgs = z.input<typeof MetaArgs>;

@@ -1,22 +1,21 @@
 // Path: packages/continuity-agent/src/continuityAgent.ts
 
-import { Agent } from "@memento-ai/agent";
-import { ASSISTANT, ConvSummaryMetaData, USER, type Message } from "@memento-ai/types";
-import { createConversation, type ConversationInterface, type Provider, type SendMessageArgs } from "@memento-ai/conversation";
-import { MementoDb, type Context } from "@memento-ai/memento-db";
+import { Agent, FunctionCallingAgent } from "@memento-ai/agent";
+import { ASSISTANT, ConvSummaryMetaData, USER, type Message, AssistantMessage, constructUserMessage, UserMessage } from "@memento-ai/types";
+import { continuityPromptTemplate } from "./continuityPromptTemplate";
+import { createConversation, defaultProviderAndModel } from "@memento-ai/conversation";
 import { get_csum_mementos } from "@memento-ai/postgres-db";
 import { inspect } from "bun";
-import { registerFunction, type FunctionRegistry, extractFunctionCalls, getRegistryDescription, invokeFunctions } from "@memento-ai/function-calling";
+import { lastUserMessage } from "./continuityLastUserMessage";
+import { MementoDb, type Context } from "@memento-ai/memento-db";
+import { registerFunction, extractFunctionCalls, getRegistryDescription, invokeMultFunctions, FunctionHandler } from "@memento-ai/function-calling";
+import debug from "debug";
 import Handlebars from "handlebars";
 import TraceError from "trace-error";
 import type { CommonQueryMethods } from "slonik";
-import type { FunctionCallRequest, FunctionCallResult } from "@memento-ai/function-calling";
-import debug from "debug";
-
+import type { ConversationInterface, ProviderAndModel, SendMessageArgs } from "@memento-ai/conversation";
+import type { FunctionCallRequest, FunctionCallResult, FunctionRegistry } from "@memento-ai/function-calling";
 import updateSummaries from '@memento-ai/function-calling/src/functions/updateSummaries';
-import { continuityPromptTemplate } from "./continuityPromptTemplate";
-import { continuityCorePrompt } from "./continuityCorePrompt";
-import { lastUserMessage } from "./continuityLastUserMessage";
 
 const dlog = debug("continuityAgent");
 
@@ -24,24 +23,16 @@ Handlebars.registerHelper('obj', function(context) {
     return Bun.inspect(context);
 });
 
-const template = Handlebars.compile(continuityPromptTemplate);
-
-export interface ProviderAndModel {
-    provider: Provider;
-    model: string;
-}
-
-const defaultProviderAndModel: ProviderAndModel = {
-    provider: 'anthropic',
-    model: 'haiku'
-}
-
-export interface ContinuityAgentArgs {
+export type ContinuityAgentArgs = {
     db: MementoDb;
     providerAndModel?: ProviderAndModel;
+    max_message_pairs?: number;
 }
 
-export class ContinuityAgent extends Agent {
+export class ContinuityAgent extends FunctionCallingAgent {
+    max_message_pairs: number;
+    functionHandler: FunctionHandler;
+
     constructor(args: ContinuityAgentArgs) {
         const { provider, model } = args.providerAndModel ?? defaultProviderAndModel;
         const conversation: ConversationInterface = createConversation(provider, {
@@ -49,17 +40,21 @@ export class ContinuityAgent extends Agent {
         const { db } = args;
         var registry: FunctionRegistry = {};
         registerFunction(registry, updateSummaries);
-        super({ conversation, db, prompt: continuityCorePrompt, registry });
+        super({ conversation, db, registry });
+        this.max_message_pairs = args.max_message_pairs ?? 5;
+        this.functionHandler = new FunctionHandler({ agent: this });
     }
 
-    async analyze(): Promise<Message> {
-        const maxMessagePairs: number = 5;  // TODO: configure this from command line
-        const priorConveration: Message[] = await this.DB.getConversation(maxMessagePairs);
-        return this.sendMessage({ prompt: this.prompt as string, messages: priorConveration });
+    async generatePrompt(): Promise<string> {
+        const functions: string = getRegistryDescription(this.Registry);
+        const synopses: string[] = await this.DB.getSynopses(1000);
+        const mementos: ConvSummaryMetaData[] = await this.getMementos();
+        return continuityPromptTemplate({functions, mementos, synopses});
     }
 
-    async sendMessage({ messages }: SendMessageArgs): Promise<Message>
-    {
+    async run(): Promise<Message> {
+        const messages: Message[] = await this.DB.getConversation(this.max_message_pairs);
+
         // The ContinuityAgent should be given *almost* the same message history that the MementoAgent was given.
         // The MementoAgnent is always given an odd number of messages (not counting system) with the last message
         // being from the user. The ContinuityAgent can only be given an even number of messages from the conversation,
@@ -90,22 +85,16 @@ export class ContinuityAgent extends Agent {
             throw new Error('The ContinuityAgent registry does not have an updateSummaries function.');
         }
 
-        const functions: string = getRegistryDescription(this.Registry);
-        const synopses: string[] = await this.DB.getSynopses(1000);
-        const mementos: ConvSummaryMetaData[] = await this.getMementos();
-        const prompt = template({system: this.Prompt, functions, mementos, synopses});
+        const userMessage: UserMessage = constructUserMessage(lastUserMessage);
+        let assistantMessage: AssistantMessage = await this.functionHandler.handle(userMessage, messages);
 
-        messages.push({role: USER, content: lastUserMessage});
-        dlog('sendMessage input:', { prompt, messages });
-
-        const assistantMessage = await this.conversation.sendMessage({ prompt, messages });
         dlog('sendMessage response:', assistantMessage);
 
         // Check if the assistant's response contains a function call -- it should much of the time
         const calls: FunctionCallRequest[] = Array.from(extractFunctionCalls(assistantMessage.content));
         dlog("Extracted function calls:", inspect(calls));
         const context: Context = { pool: this.DB.pool};
-        const functionResults: FunctionCallResult[] = await invokeFunctions({registry: this.Registry, calls, context});
+        const functionResults: FunctionCallResult[] = await invokeMultFunctions({registry: this.Registry, calls, context});
         dlog("Extracted function results:", inspect(functionResults));
 
         // TODO: if the function results include an error, it should be reported back to the continuity

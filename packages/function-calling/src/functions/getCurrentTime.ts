@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { baseInputSchema } from '../functionRegistry';
 import type { BaseInput, FunctionConfig } from '../functionRegistry';
 
-const inputSchema = baseInputSchema.describe('No input required');
+const inputSchema = baseInputSchema.describe('No input parameters are necessary, so provide an empty object.');
 const outputSchema = z.promise(z.string()).describe('ISO string');
 const fnSchema = z.function().args(inputSchema).returns(outputSchema).describe('Returns the current UTC time');
 

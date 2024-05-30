@@ -1,4 +1,5 @@
 // Path: packages/types/index.ts
+
 export * from './src/mementoSchema.ts';
 export * from './src/memKind.ts';
 export * from './src/memSchema.ts'

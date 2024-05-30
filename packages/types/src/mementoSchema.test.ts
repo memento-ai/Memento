@@ -1,4 +1,5 @@
 // Path: packages/types/src/mementoSchema.test.ts
+
 import { expect, it, describe} from "bun:test";
 
 import { CONV, CSUM, DOC, DSUM, FRAG, SYN,  } from "./memKind";
@@ -85,7 +86,7 @@ describe('Memento schema tests', () => {
 
     it('can parse a ConvSummaryMetaArgs', () => {
         const convSummaryMeta: ConvSummaryMetaArgs = ConvSummaryMetaArgs.parse({
-            metaId: '123/abc',
+            metaId: '123-abc',
             kind: CSUM,
             priority: 0,
             pinned: false

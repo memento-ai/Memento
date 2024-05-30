@@ -1,4 +1,5 @@
 // Path: packages/memento-agent/src/mementoAgent.test.ts
+
 import { expect, it, describe, beforeEach, afterEach, beforeAll, afterAll} from "bun:test";
 import { createConversation, type ConversationInterface, type Provider } from "@memento-ai/conversation";
 import { createMementoDb, dropDatabase, getDatabaseSchema } from "@memento-ai/postgres-db";
@@ -8,7 +9,7 @@ import { ingestDirectory } from "@memento-ai/ingester";
 import { MementoAgent, type MementoAgentArgs } from "./mementoAgent";
 import { MementoDb } from "@memento-ai/memento-db";
 import { nanoid } from "nanoid";
-import { type Message } from "@memento-ai/types";
+import { AssistantMessage, type Message } from "@memento-ai/types";
 import { type SendArgs } from "@memento-ai/agent";
 import { type Interceptor } from "slonik";
 import debug from "debug";
@@ -64,27 +65,23 @@ describe("MementoAgent", () => {
     });
 
     it("can chat with the agent", async () => {
-        const args = sendArgs("0. What did Leonard Shelby suffer from?");
-        const message: Message = await mementoAgent.run(args);
+        const message: AssistantMessage = await mementoAgent.run(sendArgs("0. What did Leonard Shelby suffer from?"));
         expect(message.content).toBeTruthy();
     }, timeout);
 
     it("can chat with the agent and get a response", async () => {
-        let args = sendArgs("1. What did Leonard Shelby suffer from?");
-        let message: Message = await mementoAgent.run(args);
+        let message: AssistantMessage = await mementoAgent.run(sendArgs("1. What did Leonard Shelby suffer from?"));
         expect(message.content).toBeTruthy();
-        args = sendArgs("2. What is anterograde amnesia?");
-        message = await mementoAgent.send(args);
+        message = await mementoAgent.run(sendArgs("2. What is anterograde amnesia?"));
         expect(message.content).toBeTruthy();
-        args = sendArgs("3. What is 2 + 2?");
-        message = await mementoAgent.send(args);
+        message = await mementoAgent.run(sendArgs("3. What is 2 + 2?"));
         expect(message.content).toBeTruthy();
     }, timeout);
 
     it("can chat with the agent about ingested content", async () => {
         await ingestDirectory({db, dirPath: `${getProjectRoot()}/packages/types`});
         let args = sendArgs("What are the various kinds of MemMetaData?");
-        let message: Message = await mementoAgent.run(args);
+        let message: AssistantMessage = await mementoAgent.run(args);
         expect(message.content).toBeTruthy();
     }, timeout);
 });

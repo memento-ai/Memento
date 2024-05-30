@@ -72,14 +72,14 @@ describe("ContinuityAgent", () => {
     });
 
     async function sendMementoAndContinuity(sendArgs: SendArgs): Promise<{memento: Message, continuity: Message}> {
-        const memento: Message = await mementoAgent.send(sendArgs);
+        const memento: Message = await mementoAgent.run(sendArgs);
         expect(memento.content).toBeTruthy();
-        const continuity: Message = await continuityAgent.analyze();
+        const continuity: Message = await continuityAgent.run();
         expect(continuity.content).toBeTruthy();
         return { memento, continuity };
     }
 
-        it("can chat with the agent", async () => {
+    it("can chat with the agent", async () => {
         const args = sendArgs("0. What did Leonard Shelby suffer from?");
         const { memento, continuity } = await sendMementoAndContinuity(args);
         expect(memento.content).toBeTruthy();

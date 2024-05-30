@@ -1,6 +1,6 @@
 // Path: packages/conversation/src/groq.ts
 
-import type { Message, Role } from "@memento-ai/types";
+import { ASSISTANT, type AssistantMessage, type Message, type Role } from "@memento-ai/types";
 import type { ConversationInterface, SendMessageArgs } from "./conversation";
 import { type ConversationOptions } from './factory';
 import { Writable } from 'stream';
@@ -19,7 +19,7 @@ export class GroqConversation implements ConversationInterface {
         this.client = new Groq({ apiKey: process.env.GROQ_API_KEY });
     }
 
-    async sendMessage(args: SendMessageArgs): Promise<Message> {
+    async sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {
         // Validate and prepare the messages
         const preparedMessages = this.prepareMessages(args);
         args.messages = preparedMessages;
@@ -41,7 +41,7 @@ export class GroqConversation implements ConversationInterface {
         return messages;
     }
 
-    private async sendRequest(args: SendMessageArgs): Promise<Message> {
+    private async sendRequest(args: SendMessageArgs): Promise<AssistantMessage> {
         // Make the API request to Groq
         // Use the this.apiKey and this.model
         // Include the prepared messages (which may contain a 'system' role message)
@@ -64,12 +64,12 @@ export class GroqConversation implements ConversationInterface {
                 chunks.push(data);
                 (this.stream as Writable).write(data);
             }
-            return { role: 'assistant', content: chunks.join('') };
+            return { role: ASSISTANT, content: chunks.join('') };
         } else {
             const completionResponse = completion as Groq.Chat.Completions.ChatCompletion;
             const { content } = completionResponse.choices[0].message;
             const content_ = content as string;
-            return { role: 'assistant', content: content_ };
+            return { role: ASSISTANT, content: content_ };
         }
     }
 }

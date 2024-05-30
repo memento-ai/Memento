@@ -1,5 +1,6 @@
 // Path: packages/conversation/src/openai.ts
-import type { Message, Role } from "@memento-ai/types";
+
+import type { AssistantMessage, Message, Role } from "@memento-ai/types";
 import type { ConversationInterface, SendMessageArgs } from "./conversation";
 import { type ConversationOptions } from './factory';
 import { Writable } from 'stream';
@@ -10,20 +11,22 @@ export class OpenAIConversation implements ConversationInterface {
     private model: string;
     private stream?: Writable;
     private client: OpenAI;
+    private temperature?: number;
 
     constructor(options: ConversationOptions) {
         this.model = options.model ?? 'gpt-3.5-turbo';
         this.stream = options.stream;
         this.client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        this.temperature = options.temperature;
     }
 
-    async sendMessage(args: SendMessageArgs): Promise<Message> {
+    async sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {
         // Validate and prepare the messages
         const preparedMessages = this.prepareMessages(args);
         args.messages = preparedMessages;
 
         // Make the API request to OpenAI
-        return await this.sendRequest(args);
+        return await this.sendRequest(args) as AssistantMessage;
     }
 
     private prepareMessages(args: SendMessageArgs): Message[] {
@@ -39,7 +42,7 @@ export class OpenAIConversation implements ConversationInterface {
         return messages;
     }
 
-    private async sendRequest(args: SendMessageArgs): Promise<Message> {
+    private async sendRequest(args: SendMessageArgs): Promise<AssistantMessage> {
         // Make the API request to OpenAI
         // Use the this.apiKey and this.model
         // Include the prepared messages (which may contain a 'system' role message)
@@ -52,6 +55,7 @@ export class OpenAIConversation implements ConversationInterface {
             model: this.model,
             messages: args.messages,
             stream,
+            temperature: this.temperature ?? 1.0,
         });
 
         if (stream) {

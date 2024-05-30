@@ -1,4 +1,5 @@
 // Path: packages/utils/src/project-root.test.ts
+
 import { expect, describe, it } from "bun:test";
 import { getProjectRoot } from './project-root';
 import path from 'node:path';

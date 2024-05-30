@@ -1,4 +1,5 @@
 // Path: packages/utils/src/add-path-comment.ts
+
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
@@ -13,11 +14,13 @@ const updateFilePath = (filePath: string) => {
   const lines = content.split('\n');
   const relativePath = path.relative(process.cwd(), filePath);
 
-  const pathCommentRegex = /^\/\/\/?\s*(?:Path|File): (.+)$/;
+  const pathCommentRegex = /^\/\/\/?\s*(?:Path|File):(.+)$/;
   const match = lines[0].match(pathCommentRegex);
 
   if (match) {
     lines[0] = `// Path: ${relativePath}`;
+    if (lines[1].trim() !== '')
+      lines[0] += '\n';
     fs.writeFileSync(filePath, lines.join('\n'));
     console.info(`Updated path comment in ${filePath}`);
   } else {

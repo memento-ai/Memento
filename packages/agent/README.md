@@ -1,64 +1,59 @@
 # @memento-ai/agent
-
 ## Description
-
 The `@memento-ai/agent` package provides an abstract `Agent` class that represents a conversational agent or a specialized tool. Agents can be used in place of a `ConversationInterface` in a Conversation, and can be layered on top of or wrapped around another Agent.
-
 ## Key Features
-
-- The `Agent` class implements the `ConversationInterface`, which means it can be used in place of a `ConversationInterface` in a Conversation.
-- An `Agent` can have a database connection (`MementoDb`), a registry of callable functions (`FunctionRegistry`), and a prompt.
-- The primary method is `sendMessage`, which has the same signature as `ConversationInterface.sendMessage`.
-- The `send` method is a convenience method for simple tools with a fixed prompt and a single message (no conversation history).
-
+- The `Agent` class provides a `forward` method that delegates to the `sendMessage` method of the underlying `ConversationInterface`.
+- The `Agent` class provides an abstract `generatePrompt` method that subclasses must implement to provide a prompt specific to the agent.
+- The `Agent` class provides a `send` method as a convenience for simple tools with a fixed prompt and a single message (no conversation history).
+- The `FunctionCallingAgent` subclass adds support for a `FunctionRegistry` to allow agents to invoke functions.
 ## Usage and Examples
-
 ### Creating an Agent Subclass
-
-To use the `Agent` class, you can create a subclass that implements the `sendMessage` method. Here's an example:
-
+To create a custom agent, extend the `Agent` class and implement the `generatePrompt` method:
 ```typescript
 import { Agent, AgentArgs, SendArgs } from '@memento-ai/agent';
-import { ConversationInterface, SendMessageArgs } from '@memento-ai/conversation';
-import { FunctionRegistry } from '@memento-ai/function-calling';
-import { MementoDb } from '@memento-ai/memento-db';
-import { Message, USER } from '@memento-ai/types';
+import { AssistantMessage } from '@memento-ai/types';
 
 class MyAgent extends Agent {
   constructor(args: AgentArgs) {
     super(args);
   }
 
-  async sendMessage({ prompt, messages }: SendMessageArgs): Promise<Message> {
-    // Implement your agent's logic here
-    const response = await this.conversation.sendMessage({ prompt, messages });
-    return response;
-  }
-
-  async send({ content }: SendArgs): Promise<Message> {
-    const role = USER;
-    return this.sendMessage({ prompt: this.Prompt, messages: [{ role, content }] });
+  async generatePrompt(): Promise<string> {
+    return 'This is the prompt for MyAgent.';
   }
 }
 ```
-
-In this example, we create a subclass of `Agent` called `MyAgent` that implements the `sendMessage` method. The `sendMessage` method is the primary method of an `Agent` and has the same signature as `ConversationInterface.sendMessage`. This means that an `Agent` can be used in place of a `ConversationInterface` in a Conversation, and that an `Agent` can be layered on top of or wrapped around another `Agent`.
-
-The `send` method is a convenience method that can be used for simple tools with a fixed prompt and a single message (no conversation history). It calls the `sendMessage` method with the agent's prompt and a single message with the provided content.
-
 ### Using an Agent
-
+To use an agent, create an instance with the required `AgentArgs`:
 ```typescript
-// Usage
 const myAgent = new MyAgent({
   conversation: myConversationInterface,
   db: myMementoDb,
-  prompt: 'Hello, how can I assist you today?',
-  registry: myFunctionRegistry,
 });
 
-const response = await myAgent.send({ content: 'What is the weather like today?' });
+const response = await myAgent.send({ content: 'Hello, agent!' });
 console.log(response);
 ```
+### Creating a Function Calling Agent
+To create an agent that can invoke functions, extend the `FunctionCallingAgent` class:
+```typescript
+import { FunctionCallingAgent, FunctionCallingAgentArgs } from '@memento-ai/agent';
 
-In this example, we create an instance of `MyAgent` and use its `send` method to send a message to the agent. The `send` method returns a `Message` object, which can be logged or further processed.
+class MyFunctionCallingAgent extends FunctionCallingAgent {
+  constructor(args: FunctionCallingAgentArgs) {
+    super(args);
+  }
+
+  async generatePrompt(): Promise<string> {
+    return 'This is the prompt for MyFunctionCallingAgent.';
+  }
+}
+```
+Then create an instance with the required `FunctionCallingAgentArgs`, including a `FunctionRegistry`:
+```typescript
+const myFunctionCallingAgent = new MyFunctionCallingAgent({
+  conversation: myConversationInterface, 
+  db: myMementoDb,
+  registry: myFunctionRegistry,
+});
+```
