@@ -3,7 +3,7 @@
 import { baseInputSchema, type FunctionConfig, ID } from '../functionRegistry';
 import { z } from 'zod';
 import { SYN, SynopsisMetaArgs } from '@memento-ai/types';
-import { addMem } from '@memento-ai/postgres-db';
+import { addMemento } from '@memento-ai/postgres-db';
 import { nanoid } from 'nanoid';
 
 const inputSchema = baseInputSchema.extend({
@@ -28,7 +28,7 @@ async function addSynopsis(input: SynopsisInput): Promise<ID> {
 
     const metaArgs: SynopsisMetaArgs = { kind: SYN };
     const metaId = nanoid();
-    return await addMem({ pool, metaId, content, metaArgs });
+    return await addMemento({ pool, metaId, content, metaArgs });
 }
 
 export const AddSynopsis = z.object({

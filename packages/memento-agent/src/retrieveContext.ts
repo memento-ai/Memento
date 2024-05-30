@@ -26,7 +26,7 @@ function tokens(content: Item): number {
 export async function retrieveContext(agent: MementoAgent): Promise<MementoPromptTemplateArgs> {
     const pinnedCsumMems: ConvSummaryMemento[] = await agent.DB.searchPinnedCsumMems(agent.max_csum_tokens);
     const synopses: string[] = await agent.DB.getSynopses(agent.max_synopses_tokens);
-    const selectedMems: SimilarityResult[] = await agent.DB.searchMemsBySimilarity(agent.lastUserMessage, agent.max_similarity_tokens);
+    const selectedMems: SimilarityResult[] = await agent.DB.searchMemsBySimilarity(agent.lastUserMessage.content, agent.max_similarity_tokens);
     const continuityResponseContent: string | null = agent.continuityResponseContent;
     const functions = functionCallingInstructions(agent.databaseSchema);
 

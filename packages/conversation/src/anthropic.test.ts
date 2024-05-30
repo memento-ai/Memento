@@ -1,5 +1,6 @@
 // Path: packages/conversation/src/anthropic.test.ts
-import { expect, test } from "bun:test";
+
+import { expect, test, describe } from "bun:test";
 import { USER } from "@memento-ai/types";
 import { createConversation, type ConversationOptions } from "./factory";
 import type { SendMessageArgs } from "./conversation";
@@ -10,18 +11,20 @@ const options: ConversationOptions = { model, temperature: 0.0, max_response_tok
 
 const prompt = "Answer all questions concisely, i.e give the shortest possible answer. Omit punctuation where possible.";
 
-test("Fingers on one hand", async () => {
-    const conversation = createConversation(provider, options);
+describe("Anthropic", () => {
+    test("Fingers on one hand", async () => {
+        const conversation = createConversation(provider, options);
 
-    const args: SendMessageArgs = {
-        prompt,
-        messages: [{
-            role: USER,
-            content: 'How many fingers on one hand?'
-        }]
-    }
-    const message = await conversation.sendMessage(args)
+        const args: SendMessageArgs = {
+            prompt,
+            messages: [{
+                role: USER,
+                content: 'How many fingers on one hand?'
+            }]
+        }
+        const message = await conversation.sendMessage(args)
 
-    let expected: string = '5';
-    expect(message.content).toBe(expected);
+        let expected: string = '5';
+        expect(message.content).toBe(expected);
+    });
 });

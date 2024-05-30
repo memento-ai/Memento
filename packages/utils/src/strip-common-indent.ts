@@ -1,4 +1,5 @@
 // Path: packages/utils/src/strip-common-indent.ts
+
 export function stripCommonIndent(text: string): string {
     // Given a block of text spanning multiple lines, remove the common indent from all lines.
     // We assume that the first line may be empty or not indented and will be ignored.

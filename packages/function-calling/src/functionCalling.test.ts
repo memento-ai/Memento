@@ -1,7 +1,8 @@
 // Path: packages/function-calling/src/functionCalling.test.ts
+
 // src/lib/functionCalling_test.ts
 import { describe, it, expect } from 'bun:test';
-import { invokeFunction, type FunctionCallResult, isFunctionError, isFunctionResult, type FunctionCallRequest, extractFunctionCalls } from './functionCalling';
+import { invokeOneFunction, type FunctionCallResult, isFunctionError, isFunctionResult, type FunctionCallRequest, extractFunctionCalls } from './functionCalling';
 import { registry } from './functions';
 
 describe('functionCalling', () => {
@@ -12,7 +13,7 @@ describe('functionCalling', () => {
         };
 
         const context = {};
-        const result: FunctionCallResult = await invokeFunction({registry, call, context});
+        const result: FunctionCallResult = await invokeOneFunction({registry, call, context});
 
         expect(isFunctionError(result)).toBe(false);
         expect(isFunctionResult(result)).toBe(true);
@@ -61,9 +62,6 @@ for testing purposes`;
     "input": {}
 }
 \`\`\`
-
-just some stuff in between
-
 \`\`\`function
 {
     "name": "getListFiles",

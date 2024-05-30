@@ -1,4 +1,5 @@
 // Path: packages/memento-db/src/tests/mementoDb-get_csum_mementos.test.ts
+
 import { createMementoDb, dropDatabase } from "@memento-ai/postgres-db";
 import { expect, it, describe, beforeEach, afterEach} from "bun:test";
 import { nanoid } from "nanoid";
@@ -18,8 +19,8 @@ describe("Get CSUM mementos", () => {
         expect(db.name).toBe(dbname);
         expect(db.pool).toBeTruthy();
 
-        await db.addConvSummaryMem({content: "test conversation summary", metaId: "test/summary", pinned: true, priority: 1});
-        await db.addConvSummaryMem({content: "bogus", metaId: "foo/123", pinned: false, priority: 9});
+        await db.addConvSummaryMem({content: "test conversation summary", metaId: "test-summary", pinned: true, priority: 1});
+        await db.addConvSummaryMem({content: "bogus", metaId: "foo-123", pinned: false, priority: 9});
     });
 
     afterEach(async () => {

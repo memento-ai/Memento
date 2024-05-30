@@ -1,21 +1,22 @@
 // Path: packages/conversation/src/factory.ts
+
 import { AnthropicConversation } from "./anthropic";
-import { OpenAIConversation } from "./openai";
-import { OllamaConversation } from "./ollama";
-import { MockConversation } from "./mock";
-import { Writable } from 'stream';
-import type { ConversationInterface, SendMessageArgs } from "./conversation";
-import type { Message } from "@memento-ai/types";
-import fs from 'fs';
-import { mkdir } from "node:fs/promises";
-import dayjs from 'dayjs';
 import { GroqConversation } from "./groq";
+import { mkdir } from "node:fs/promises";
+import { MockConversation } from "./mock";
+import { OllamaConversation } from "./ollama";
+import { OpenAIConversation } from "./openai";
+import { Writable } from 'stream';
+import dayjs from 'dayjs';
+import fs from 'fs';
+import type { ConversationInterface, SendMessageArgs } from "./conversation";
+import type { AssistantMessage, Message } from "@memento-ai/types";
+import type { Provider } from "./provider";
+import { GoogleConversation } from "./google";
 
 export interface Logging {
     name: string;
 }
-
-
 
 // Our Conversation abstraction is created from just the provider and the model.
 // The stream argument is uses to enable streaming response.
@@ -34,24 +35,24 @@ export type ConversationOptions = {
 
 export function withLogger(conversation: ConversationInterface, path: string): ConversationInterface {
 
-    async function sendMessage(args: SendMessageArgs): Promise<Message> {
+    async function sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {
         const { prompt, messages } = args;
-        const response: Message = await conversation.sendMessage(args);
-
-        const fullPath = `logs/${path}`;
-        await mkdir(fullPath, { recursive: true });
+        const response: AssistantMessage = await conversation.sendMessage(args);
 
         const datestring = dayjs().format('YYYY-MM-DD');
-        const file = fs.createWriteStream(`${fullPath}/${datestring}.md`, { flags: 'a' });
+        const fullPath = `logs/${path}/${datestring}`;
+        await mkdir(fullPath, { recursive: true });
 
-        file.write("--- Prompt: ---\n" + prompt + '\n');
-        file.write("--- Messages: ---\n");
+        const hm = dayjs().format('HH:mm');
+        const file = fs.createWriteStream(`${fullPath}/${hm}.md`, { flags: 'a' });
+
+        file.write(prompt);
+        file.write("# Messages:\n");
         for (const message of messages) {
-            file.write(`### ${message.role}:\n`);
+            file.write(`## ${message.role}:\n`);
             file.write(message.content + '\n');
         }
-        file.write("--- Response: ---\n" + response.content + '\n');
-        file.write("=======\n");
+        file.write("# Response:\n" + response.content + '\n');
 
         file.close();
 
@@ -61,16 +62,14 @@ export function withLogger(conversation: ConversationInterface, path: string): C
     return { sendMessage };
 }
 
-
-export type Provider = 'openai' | 'anthropic' | 'ollama' | 'groq' | 'mock';
-
 export function _createConversation(provider: Provider, options: ConversationOptions): ConversationInterface {
     switch (provider) {
         case 'anthropic': return new AnthropicConversation(options);
-        case 'ollama': return new OllamaConversation(options);
-        case 'openai': return new OpenAIConversation(options);
+        case 'google': return new GoogleConversation(options);
         case 'groq': return new GroqConversation(options);
         case 'mock': return new MockConversation(options);
+        case 'ollama': return new OllamaConversation(options);
+        case 'openai': return new OpenAIConversation(options);
         default: throw new Error('Invalid provider');
     }
 }

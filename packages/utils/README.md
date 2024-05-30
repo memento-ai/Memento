@@ -1,41 +1,61 @@
 # @memento-ai/utils
-
 ## Description
-The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for finding the project root directory, generating README.md files for packages, and adding path comments to TypeScript files.
-
+The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for finding the project root directory, generating README.md files for packages, adding path comments to TypeScript files, copying ingested mementos between databases, parsing input using Zod schemas with error handling, and removing common indentation from text blocks.
 ## Key Features
 - `getProjectRoot()` function to obtain the root directory of the Memento project
-- `AddPackageReadmeAgent` class to generate README.md files for packages based on their source files
-- `add-path-comment.ts` script to automatically add or update path comments at the top of TypeScript files
-
+- `copyIngestedMementos` function to copy ingested mementos from one database to another
+- `zodParse` function to parse input using Zod schemas with error handling
+- `stripCommonIndent` function to remove common indentation from a block of text
 ## Usage and Examples
-
 ### Finding the Project Root
 The `getProjectRoot()` function can be used to obtain the root directory of the Memento project, regardless of the current working directory. This is useful for building paths to other project files and resources.
-
 ```typescript
 import { getProjectRoot } from '@memento-ai/utils';
 
 const projectRoot = getProjectRoot();
 console.log(projectRoot); // Output: /path/to/Memento
 ```
-
-### Generating Package READMEs
-The `AddPackageReadmeAgent` class can be used to generate a README.md file for a package based on the contents of its source files. This is particularly useful in a monorepo setup where you have multiple packages.
-
+### Copying Ingested Mementos
+The `copyIngestedMementos` function can be used to copy ingested mementos from one database to another. This is useful for creating backups or for migrating data between different environments.
 ```typescript
-import { AddPackageReadmeAgent } from '@memento-ai/utils';
+import { copyIngestedMementos } from '@memento-ai/utils';
+import { MementoDb } from '@memento-ai/memento-db';
 
-const agent = new AddPackageReadmeAgent({ provider: 'anthropic', model: 'haiku' });
-const readme = await agent.send({ content: packageSourceFiles });
-await Bun.write('README.md', readme.content);
+const fromDb = await MementoDb.create('from_db');
+const toDb = await MementoDb.create('to_db');
+
+await copyIngestedMementos(fromDb.pool, toDb.pool);
 ```
+### Parsing with Zod
+The `zodParse` function provides a convenient way to parse input using Zod schemas while handling errors gracefully.
+```typescript
+import { zodParse } from '@memento-ai/utils';
+import { z } from 'zod';
 
-### Adding Path Comments
-The `add-path-comment.ts` script can be used to automatically add or update path comments at the top of TypeScript files. This helps with code navigation and understanding the file structure of the project.
+const schema = z.object({
+  name: z.string(),
+  age: z.number(),
+});
 
+const input = { name: 'John', age: '30' };
+
+const parsedInput = zodParse(schema, input);
+console.log(parsedInput); // Output: { name: 'John', age: 30 }
 ```
-npm run add-path-comment
-```
+### Stripping Common Indentation
+The `stripCommonIndent` function can be used to remove common indentation from a block of text. This is useful for creating multiline string literals in code which match the indent level of the code -- the function will strip the excess leading spaces.
+```typescript
+import { stripCommonIndent } from '@memento-ai/utils';
 
-This will scan the project for all TypeScript files and ensure they have a path comment at the top of the file.
+const text = `
+    This is some text
+    with common indentation.
+`;
+
+const strippedText = stripCommonIndent(text);
+```
+In this example, `strippedText` will be as if it had been declared as:
+```typescript
+const text = `This is some text
+with common indentation.`;
+```

@@ -3,16 +3,18 @@
 import { z } from 'zod';
 import TraceError from "trace-error";
 
-export function zodParse<T>(schema: z.ZodSchema<T>, input: any): T {
-    const result = schema.safeParse(input);
-    if (result.success) {
-        return result.data;
-    } else {
-        const err = new Error(result.error.message);
-        Error.captureStackTrace(err);
-        console.error(err.stack);
-        const traced = new TraceError(result.error.message, err);
-        console.error(traced.stack);
-        throw traced;
+export function zodParse<T extends z.ZodTypeAny>(schema: T, input: any): z.infer<T> {
+    try {
+        return schema.parse(input);
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            const err = new Error(error.message);
+            Error.captureStackTrace(err);
+            console.error(err.stack);
+            const traced = new TraceError(error.message, err);
+            console.error(traced.stack);
+            throw traced;
+        }
+        throw error;
     }
 }

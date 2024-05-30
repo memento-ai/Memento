@@ -1,5 +1,6 @@
 // Path: packages/conversation/src/conversation.ts
-import { type Message } from '@memento-ai/types';
+
+import { AssistantMessage, type Message } from '@memento-ai/types';
 
 // We only declare the interface for sending a message here.
 // See factory.ts for how we create instances of Conversations that implement this interface
@@ -16,5 +17,5 @@ export interface SendMessageArgs {
 }
 
 export interface ConversationInterface {
-    sendMessage(args: SendMessageArgs): Promise<Message>;
+    sendMessage(args: SendMessageArgs): Promise<AssistantMessage>;
 }

@@ -16,7 +16,7 @@ describe('generateFunctionDescription', () => {
         const expected = `
 Function: getCurrentTime
     Purpose: Returns the current UTC time
-    Input: No input required
+    Input: No input parameters are necessary, so provide an empty object.
         context: An optional context object. Leave unspecified -- Memento will provide.
     Output: ISO string`.trim();
         expect(description).toEqual(expected);
@@ -38,13 +38,13 @@ Function: addSynopsis
 
 Function: getCurrentTime
     Purpose: Returns the current UTC time
-    Input: No input required
+    Input: No input parameters are necessary, so provide an empty object.
         context: An optional context object. Leave unspecified -- Memento will provide.
     Output: ISO string
 
 Function: gitListFiles
     Purpose: Returns list of file paths tracked by git for the current repository.
-    Input: No input required
+    Input: No input parameters are necessary, so provide an empty object.
         context: An optional context object. Leave unspecified -- Memento will provide.
     Output: Array of file paths
 
@@ -68,10 +68,10 @@ Function: updateSummaries
     Input: The input for updateSummaries
         context: An optional context object. Leave unspecified -- Memento will provide.
         updates: An array of UpdateOneSummaryInput objects
-    Output: An array of metaIds for the updated conversation summaries.
+    Output: An array of Errors or metaIds for the updated conversation summaries.
     Nested Types:
         UpdateOneSummaryInput: Update or create one conversation summary
-            metaId: The metaId of the conversation summary to update or create. Must follow the category/topic convention. Will be truncated to 21 characters.
+            metaId: The metaId of the conversation summary. Lower-case, kebab-case, alphanumeric. Will be truncated to 21 characters.
             content: The new content for the conversation summary. Omit if only changing pinned or priority.
             pinned: Whether the conversation summary is pinned
             priority: The priority of the conversation summary

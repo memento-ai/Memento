@@ -1,4 +1,5 @@
 // Path: packages/types/src/role.ts
+
 import { z } from 'zod';
 
 // We restrict Role to just 'user' and 'assistant' here even though the third role 'system'

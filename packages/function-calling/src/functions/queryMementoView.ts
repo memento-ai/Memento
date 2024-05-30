@@ -1,11 +1,13 @@
 // Path: packages/function-calling/src/functions/queryMementoView.ts
 
-import { baseInputSchema, type FunctionConfig, ErrorMessage } from '../functionRegistry';
+import { baseInputSchema, ErrorMessage } from '../functionRegistry';
+import { count_tokens } from '@memento-ai/encoding';
 import { raw } from 'slonik-sql-tag-raw';
 import { sql } from 'slonik';
+import { stripCommonIndent } from '@memento-ai/utils';
 import { z } from 'zod';
 import debug from 'debug';
-
+import type {  FunctionConfig } from '../functionRegistry';
 const dlog = debug('queryMementoView');
 
 const inputSchema = baseInputSchema.extend({
@@ -43,6 +45,20 @@ async function queryMementoView(input: queryMementoViewInput): Promise<RowsOrErr
         const sqlFragment = raw(query, []);
         const result = await readonlyPool.query(sql.unsafe`${sqlFragment}`);
         dlog('Result:', result);
+        if (result && result.rows && Array.isArray(result.rows)) {
+            const tokens = result.rows.reduce((row: any) => {
+                return count_tokens(Bun.inspect(row));
+            }, 0);
+            const max_query_result_tokens = 4000;
+            if (tokens > max_query_result_tokens) {
+                return { error: stripCommonIndent(`
+                    Query result has ${tokens} tokens, which is more than the maximum of ${max_query_result_tokens}.
+                    Please narrow your query to return fewer tokens.
+                `) };
+            } else if (tokens > max_query_result_tokens/2) {
+                dlog(`Query result has ${tokens} tokens, which is more than half the maximum of ${max_query_result_tokens}`);
+            }
+        }
         return result.rows;
     }
     catch (error) {

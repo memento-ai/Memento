@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.17.1",
+    "@google/generative-ai": "^0.11.3",
     "@memento-ai/types": "workspace:*",
     "dayjs": "^1.11.11",
     "debug": "^4.3.4",

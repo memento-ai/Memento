@@ -1,5 +1,6 @@
 // Path: packages/conversation/src/ollama.ts
-import { ASSISTANT, type Message, type Role } from "@memento-ai/types";
+
+import { ASSISTANT, AssistantMessage, type Message, type Role } from "@memento-ai/types";
 import type { ConversationInterface, SendMessageArgs } from "./conversation";
 import { type ConversationOptions } from './factory';
 import { Writable } from 'stream';
@@ -57,7 +58,7 @@ export class OllamaConversation implements ConversationInterface {
         this.session = createChatSession(args);
     }
 
-    async sendMessage(args: SendMessageArgs): Promise<Message> {
+    async sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {
         // Validate and prepare the messages
         const preparedMessages = this.prepareMessages(args);
         args.messages = preparedMessages;
@@ -79,7 +80,7 @@ export class OllamaConversation implements ConversationInterface {
         return messages;
     }
 
-    private async sendRequest(args: SendMessageArgs): Promise<Message> {
+    private async sendRequest(args: SendMessageArgs): Promise<AssistantMessage> {
         // Make the API request to OpenAI
         // Use the this.apiKey and this.model
         // Include the prepared messages (which may contain a 'system' role message)

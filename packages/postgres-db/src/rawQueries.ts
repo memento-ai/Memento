@@ -1,4 +1,5 @@
 // Path: packages/postgres-db/src/rawQueries.ts
+
 // PATH: packages/postgres-db/sql/get_csum_mementos.sql
 
 import { sql, type CommonQueryMethods, type QueryResult, type DatabasePool } from 'slonik';

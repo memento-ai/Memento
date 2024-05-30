@@ -4,9 +4,10 @@ import { Agent, type AgentArgs } from "@memento-ai/agent";
 import { count_tokens } from "@memento-ai/encoding";
 import { createConversation, type ConversationInterface, type SendMessageArgs, type Provider } from "@memento-ai/conversation";
 import { MementoDb, type DocAndSummaryResult } from "@memento-ai/memento-db";
-import { Message, USER } from "@memento-ai/types";
+import { ASSISTANT, AssistantMessage, Message, USER } from "@memento-ai/types";
 
 import debug from "debug";
+import { stripCommonIndent } from "@memento-ai/utils";
 
 const dlog = debug("summarizeDocument");
 
@@ -16,55 +17,45 @@ export interface SummarizerArgs {
 }
 
 export interface Summarizer {
-    summarize: (args: SummarizerArgs) => Promise<string>;
+    summarize: (args: SummarizerArgs) => Promise<AssistantMessage>;
 }
 
 export abstract class SummarizerAgent extends Agent implements Summarizer {
     constructor({ conversation }: AgentArgs) {
-        const prompt = SummarizerAgent.makePrompt();
-        super({ conversation, prompt });
+        super({ conversation });
     }
 
-    async sendMessage({ messages }: SendMessageArgs) : Promise<Message> {
-        return messages[0];
-    }
+    abstract summarize({ content, source }: SummarizerArgs) : Promise<AssistantMessage>;
 
-    abstract summarize({ content, source }: SummarizerArgs) : Promise<string>;
-
-    static makePrompt() : string {
-        const system: string[] = [
-            "Your task is to generate a summary of the given document.",
-            "The document's entire content is provided in the user message. Your reponse should be a summary of the document.",
-            "The document and the summary will be stored in a PostgreSQL database for Retrieval Augmented Generation.",
-            "Each document will be indexed for both full text search (tsvector) and semantic similarity (pgvector).",
-            "Your goal is to generate a summary that captures the essence of the document in a concise manner,",
-            "such that the document and the summary will have similar tsvector and pgvector representations.",
-            "This is the only purpose of the summary - to serve as a surrogate for the full document during retrieval.",
-            "Note carefully:",
-            "1. The summary will NOT be presented to human users.",
-            "2. Do NOT include any helpful preamble or commentary.",
-            "2a. Specifically, do NOT start the summary with `Here is a summary of the document:` or similar.",
-            "3. Do NOT include any information that is not obtained from the document",
-            "4. Be concise and factual."
-        ]
-        return system.join("\n");
+    async generatePrompt() : Promise<string> {
+        const system: string = stripCommonIndent(`
+            Your task is to generate a summary of the given document.
+            The document's entire content is provided in the user message. Your reponse should be a summary of the document.
+            The document and the summary will be stored in a PostgreSQL database for Retrieval Augmented Generation.
+            Each document will be indexed for both full text search (tsvector) and semantic similarity (pgvector).
+            Your goal is to generate a summary that captures the essence of the document in a concise manner,
+            such that the document and the summary will have similar tsvector and pgvector representations.
+            This is the only purpose of the summary - to serve as a surrogate for the full document during retrieval.
+            Note carefully:
+            1. The summary will NOT be presented to human users.
+            2. Do NOT include any helpful preamble or commentary.
+            2a. Specifically, do NOT start the summary with \`Here is a summary of the document:\` or similar.
+            3. Do NOT include any information that is not obtained from the document.
+            4. Be concise and factual.
+        `);
+        return system;
     }
 }
 
 export class MockSummarizer extends SummarizerAgent {
-
     constructor(conversation: ConversationInterface) {
         super({ conversation });
     }
 
-    async summarize({ content, source }: SummarizerArgs) : Promise<string> {
+    async summarize({ content, source }: SummarizerArgs) : Promise<AssistantMessage> {
         dlog("Mock summarizer called with source:", source.slice(0, 32) + "...");
-        return `Source path: ${source}\n${content.slice(0, 50)}\n... truncated here ...\n`;
-    }
-
-    async sendMessage(_: SendMessageArgs) : Promise<Message> {
-        // Not used in this mock implementation
-        throw new Error("MockSummarizer.sendMessage should never be called.");
+        const response = `Source path: ${source}\n${content.slice(0, 50)}\n... truncated here ...\n`;
+        return { role: ASSISTANT, content: response };
     }
 }
 
@@ -77,13 +68,10 @@ export class ChatSummarizerAgent extends SummarizerAgent {
         super({ conversation });
     }
 
-    async summarize({ content, source }: SummarizerArgs) : Promise<string> {
+    async summarize({ content, source }: SummarizerArgs) : Promise<AssistantMessage> {
         const num_tokens = count_tokens(content);
-        dlog(`Summarizing ${source} with ${num_tokens} tokens.`)
-        const prompt = this.prompt as string
-        const sendMessageArgs: SendMessageArgs = { prompt, messages: [{role: USER, content}] };
-        const message = await this.conversation.sendMessage(sendMessageArgs);
-        return message.content;
+        dlog(`Summarizing ${source} with ${num_tokens} tokens.`);
+        return this.send({ content });
     }
 }
 
@@ -123,7 +111,7 @@ export interface SummarizeAndStoreDocumentsArgs {
 
 export async function summarizeAndStoreDocuments(args: SummarizeAndStoreDocumentsArgs): Promise<DocAndSummaryResult> {
     const { db, source, content, summarizer } = args;
-    const summary = await summarizer.summarize({content, source});
+    const summary = (await summarizer.summarize({content, source})).content;
     if (!summary) {
         console.error("Error summarizing document");
         throw new Error("Error summarizing document");

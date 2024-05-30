@@ -58,4 +58,4 @@ export const mementoCoreSystemPrompt = stripCommonIndent(`
     like Leonard Shelby, you have the ability and the desire to record notes
     that will provide continuity and historical context that will be useful
     to you in the future as the conversation evolves.
-    `);
+`);

@@ -1,8 +1,9 @@
 // Path: packages/conversation/src/anthropic.ts
+
 import { type ConversationInterface, type SendMessageArgs } from './conversation';
 import { type ConversationOptions } from './factory';
-import { ASSISTANT, USER, type Message } from '@memento-ai/types';
-import { Writable } from 'stream';
+import { ASSISTANT, USER, type Message, AssistantMessage } from '@memento-ai/types';
+import { Writable } from 'node:stream';
 import Anthropic from '@anthropic-ai/sdk';
 import type { MessageCreateParams } from '@anthropic-ai/sdk/resources/messages.mjs';
 import debug from 'debug';
@@ -94,6 +95,14 @@ export interface ChatStreamingArgs {
     outStream: Writable;
 }
 
+function logBadMessages(messages: Message[]) {
+    debug.enable('anthropic')
+    for (let i = 0; i < messages.length; i++) {
+        const message = messages[i];
+        dlog(`At index ${i}: ${message.role}: ${message.content}`);
+    }
+}
+
 export class AnthropicConversation implements ConversationInterface {
     private model: string;
     private stream?: Writable;
@@ -118,15 +127,36 @@ export class AnthropicConversation implements ConversationInterface {
     // 1. The system prompt
     // 2. The conversation history in messages
     // 3. The new user message as the last entry in messages.
-    async sendMessage(args: SendMessageArgs): Promise<Message> {
+    async sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {
         // Validate and prepare the messages
 
+        const { messages } = args;
+        if (messages.length === 0) {
+            throw new Error("No messages to send");
+        }
+        if (messages.length % 2 === 0) {
+            logBadMessages(messages);
+            throw new Error("Messages must have an odd number of entries");
+        }
+        if (messages[messages.length - 1].role !== USER) {
+            logBadMessages(messages);
+            throw new Error("Last message must be from the user");
+        }
+        for (let i = 0; i < messages.length - 1; i++) {
+            const role = i % 2 === 0? USER : ASSISTANT;
+            if (messages[i].role !== role) {
+                console.error(`At index ${i}: ${messages[i].role} !== ${role}`);
+                logBadMessages(messages);
+                throw new Error("Roles are not alternating");
+            }
+        }
+
         // Make the API request to Anthropic
-        const message: Message = await this.sendRequest(args);
+        const message: AssistantMessage = await this.sendRequest(args);
         return message;
     }
 
-    private async sendRequest(args: SendMessageArgs): Promise<Message> {
+    private async sendRequest(args: SendMessageArgs): Promise<AssistantMessage> {
         const { prompt, messages: messages_ } = args;
         const messages = asClaudeMessages(messages_);
         const streaming = !!this.stream;
@@ -139,7 +169,6 @@ export class AnthropicConversation implements ConversationInterface {
             temperature: this.session.temperature,
         };
         dlog(body);
-        let usage: Usage;
         let response: ResponseMessage
         if (!body.stream) {
             response = await this.session.anthropic.messages.create(body);
@@ -157,8 +186,8 @@ export class AnthropicConversation implements ConversationInterface {
             ulog('usage:', usage);
         }
         const content = response.content.map(item => item.text).join("");
-        const message: Message = {
-            role: response.role,
+        const message: AssistantMessage = {
+            role: ASSISTANT,
             content
         }
         dlog('sendRequest response message:', message);

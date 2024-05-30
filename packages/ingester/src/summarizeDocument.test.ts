@@ -1,4 +1,5 @@
 // Path: packages/ingester/src/summarizeDocument.test.ts
+
 import { expect, describe, it, beforeEach, afterEach } from "bun:test";
 import { createMockSummarizer, summarizeAndStoreDocuments, type SummarizerAgent } from "./summarizeDocument";
 import { nanoid } from "nanoid";

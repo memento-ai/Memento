@@ -1,6 +1,6 @@
 // Path: packages/postgres-db/src/mem.ts
 
-import { CONV, CSUM, ConvSummaryMetaArgs, ConversationMetaArgs, DOC, DSUM, DocSummaryMetaArgs, DocumentMetaArgs, FRAG, FragmentMetaArgs, Mem, MetaArgs, SYN, SynopsisMetaArgs, createMem } from '@memento-ai/types';
+import { CONV, CSUM, ConvExchangeMetaArgs, ConvSummaryMetaArgs, ConversationMetaArgs, DOC, DSUM, DocSummaryMetaArgs, DocumentMetaArgs, FRAG, FragmentMetaArgs, Mem, MetaArgs, SYN, SynopsisMetaArgs, XCHG, createMem } from '@memento-ai/types';
 import { sql, type DatabasePool, type CommonQueryMethods, type QueryResult } from 'slonik';
 import debug from 'debug';
 import { zodParse } from '@memento-ai/utils';
@@ -81,6 +81,15 @@ export async function insertMeta(conn: CommonQueryMethods, memId: string, metaId
                 RETURNING id`);
             break;
         }
+        case XCHG: {
+            const { kind } = zodParse(ConvExchangeMetaArgs, metaArgs);
+            results = await conn.query(sql.unsafe`
+                INSERT INTO meta (id, memid, kind)
+                VALUES (${metaId}, ${memId}, ${kind})
+                RETURNING id`);
+            break;
+        }
+
         default:
             throw new Error(`Unsupported MemMetaData kind: ${kind}`);
     }
@@ -90,23 +99,37 @@ export async function insertMeta(conn: CommonQueryMethods, memId: string, metaId
 }
 
 // Add a Mem and Meta to the database
-export async function addMem(args: AddMemArgs): Promise<ID> {
+export async function addMemento(args: AddMemArgs): Promise<ID> {
     const { pool, metaId, content, metaArgs } = args;
 
     // A Mem is entirely determined from its content, so we only pass in the content to this function,
     // and then construct the Mem from the content.
     const mem: Mem = await createMem(content);
 
-    return await pool.connect(async conn => {
-        try {
-            const memId = mem.id;
-            await insertMem(conn, mem);
-            await insertMeta(conn, memId, metaId, metaArgs)
-        } catch (err) {
-            console.error((err as Error).stack)
-            throw err;
-        }
-
-        return { ...metaArgs, id: metaId, memId: mem.id };
+    const result = await pool.connect(async conn => {
+        return await addMementoWithConn({ conn, mem, metaId, metaArgs });
     });
+
+    return result;
+}
+
+export interface AddMemWithConnArgs {
+    conn: CommonQueryMethods,
+    mem: Mem,
+    metaId: string,
+    metaArgs: MetaArgs
+}
+
+// Add a Mem and Meta to the database using a connection for use within a transaction
+export async function addMementoWithConn(args: AddMemWithConnArgs): Promise<ID> {
+    const { conn, mem, metaId, metaArgs } = args;
+    const memId = mem.id;
+    try {
+        await insertMem(conn, mem);
+        await insertMeta(conn, memId, metaId, metaArgs)
+    } catch (err) {
+        console.error((err as Error).stack)
+        throw err;
+    }
+    return { id: metaId };
 }

@@ -11,6 +11,8 @@
         "@memento-ai/encoding": "workspace:*",
         "@memento-ai/function-calling": "workspace:*",
         "@memento-ai/memento-db": "workspace:*",
-        "@memento-ai/postgres-db": "workspace:*"
+        "@memento-ai/postgres-db": "workspace:*",
+        "@memento-ai/readme-agents": "workspace:*",
+        "@memento-ai/utils": "workspace:*"
     }
 }

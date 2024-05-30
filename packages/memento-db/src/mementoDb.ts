@@ -1,6 +1,6 @@
 // Path: packages/memento-db/src/mementoDb.ts
 
-import { addConvSummaryMem, addConversationMem, addDocAndSummary, addFragmentMem, addSynopsisMem } from './mementoDb-mems';
+import { addConvSummaryMem, addConversationMem, addDocAndSummary, addFragmentMem, addSynopsisMem, addConvExchangeMementos, linkExchangeSynopsis } from './mementoDb-mems';
 import { connectDatabase, connectReadonlyDatabase, get_csum_mementos, get_last_assistant_message, get_last_user_message, getConversation, type ID } from '@memento-ai/postgres-db';
 import { registry, type FunctionRegistry } from "@memento-ai/function-calling";
 import { searchMemsBySimilarity } from './searchMemsBySimilarity';
@@ -9,13 +9,15 @@ import { getSynopses } from './getSynopses';
 import { SimilarityResult } from './mementoDb-types';
 import { type DatabasePool, type CommonQueryMethods, type Interceptor } from 'slonik';
 import debug from 'debug';
-import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddConvSummaryArgs, AddSynopsisArgs, Context } from './mementoDb-types';
-import { type Message, type Memento, ConvSummaryMetaData, SynopsisMetaData, ConvSummaryMemento } from '@memento-ai/types';
-import { stripCommonIndent } from '@memento-ai/utils';
+import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddConvSummaryArgs, AddSynopsisArgs, Context, AddConvExchangeArgs } from './mementoDb-types';
+import { type Message, ConvSummaryMetaData, ConvSummaryMemento } from '@memento-ai/types';
 
 const dlog = debug("mementoDb");
 
-export const INST_CSUM_CAT_CONVS = 'inst/csum-cat-convs';
+export type LinkExchangeArgs = {
+    xchg_id: string;
+    synopsis_id: string;
+};
 
 export class MementoDb {
     name: string;
@@ -47,25 +49,6 @@ export class MementoDb {
         const db = new MementoDb(name, interceptors);
         await db.init();
         return db;
-    }
-
-    async addCsumCategoryConventions() : Promise<void> {
-        const { metaId, content, pinned, priority } = {
-            metaId: INST_CSUM_CAT_CONVS,
-            pinned: true,
-            priority: 1000,
-            content: stripCommonIndent(`
-                <domain>/<topic>
-
-                Domain: use 'cont', 'inst', or 'dev', defined as:
-                    inst - Instructions (key prompts/directives)
-                    dev - Software development
-                    cont - Continuity (managing context/history)
-
-                Topic: a descriptive keyword or phrase (e.g. 'csum-cat-convs')`)
-        };
-
-        await addConvSummaryMem(this.pool, { metaId, content, pinned, priority });
     }
 
     public get pool(): DatabasePool {
@@ -108,6 +91,18 @@ export class MementoDb {
 
     async addFragmentMem(args_: AddFragArgs): Promise<ID> {
         return addFragmentMem(this.pool, args_);
+    }
+
+    // This adds multiple mementos in one transaction:
+    // - a conversation exchange memento
+    // - a conv memento for the user message
+    // - a conv memento for the assistant message
+    async addConvExchangeMementos(args_: AddConvExchangeArgs): Promise<ID> {
+        return addConvExchangeMementos(this.pool, args_);
+    }
+
+    async linkExchangeSynopsis(args_: LinkExchangeArgs): Promise<void> {
+        return linkExchangeSynopsis(this.pool, args_);
     }
 
     async addDocAndSummary(args_: AddDocAndSummaryArgs): Promise<DocAndSummaryResult> {

@@ -5,7 +5,7 @@ import { baseInputSchema } from '../functionRegistry';
 import type { FunctionConfig } from '../functionRegistry';
 import { $ } from "bun";
 
-const inputSchema = baseInputSchema.extend({}).describe('No input required');
+const inputSchema = baseInputSchema.extend({}).describe('No input parameters are necessary, so provide an empty object.');
 export type GitListFilesInput = z.infer<typeof inputSchema>;
 
 const outputSchema = z.promise(z.array(z.string())).describe('Array of file paths');

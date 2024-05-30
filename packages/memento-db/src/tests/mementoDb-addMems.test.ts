@@ -1,4 +1,5 @@
 // Path: packages/memento-db/src/tests/mementoDb-addMems.test.ts
+
 import { expect, it, describe, beforeAll, afterAll} from "bun:test";
 import { MementoDb } from '../mementoDb';
 
@@ -40,7 +41,7 @@ describe("MementoDb", () => {
     });
 
     it("can add a conversation summary mem", async () => {
-        const id = await db.addConvSummaryMem({content: "test conversation summary", metaId: "test/summary", pinned: true, priority: 1});
+        const id = await db.addConvSummaryMem({content: "test conversation summary", metaId: "test-summary", pinned: true, priority: 1});
         expect(id).toBeTruthy();
     });
 });

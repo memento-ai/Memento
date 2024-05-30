@@ -1,8 +1,10 @@
 // Path: packages/agent/src/agent.ts
+
 import type { ConversationInterface, SendMessageArgs } from "@memento-ai/conversation";
-import type { FunctionRegistry } from "@memento-ai/function-calling";
+import { FUNCTION_RESULT_HEADER, type FunctionRegistry } from "@memento-ai/function-calling";
 import type { MementoDb } from "@memento-ai/memento-db";
-import { USER, type Message } from "@memento-ai/types";
+import { constructUserMessage, UserMessage, AssistantMessage, USER } from "@memento-ai/types";
+import type { Message } from "@memento-ai/types";
 
 // An Agent is a class that may represent:
 // 1. a conversational agent/chatbot that interacts with the user, or
@@ -17,43 +19,56 @@ import { USER, type Message } from "@memento-ai/types";
 // 1. The MementoAgent agent
 // 2. The Memento Conversation Summarizer run asynchronously.
 
-// The core method of an Agent is `sendMessage` with a signature that implements ConversationInterface.
-// This means that an Agent can be used in place of a ConversationInterface in a Conversation.
-// and that an Agent can be layered on top of (or wrapping) another Agent.
-
-export interface AgentArgs {
+export type AgentArgs = {
     conversation: ConversationInterface;
     db?: MementoDb;
-    prompt?: string;
-    registry?: FunctionRegistry;
+}
+
+export type FunctionCallingAgentArgs = AgentArgs & {
+    registry: FunctionRegistry;
 }
 
 export interface SendArgs {
     content: string;
 }
 
-export abstract class Agent implements ConversationInterface {
-    protected conversation: ConversationInterface;
+export abstract class Agent  {
+    private conversation: ConversationInterface;
     protected db?: MementoDb;
-    protected prompt?: string;
-    protected registry?: FunctionRegistry;
 
-    constructor({conversation, db, prompt, registry}: AgentArgs) {
+    constructor({conversation, db}: AgentArgs) {
         this.conversation = conversation;
         this.db = db;
-        this.prompt = prompt;
-        this.registry = registry;
+        Object.defineProperty(this, 'send', {
+            value: this.send,
+            writable: false,
+            configurable: false
+        });
     }
 
-    // This is primary method and has the same signature as ConversationInterface
-    abstract sendMessage({ prompt, messages }: SendMessageArgs): Promise<Message>;
+    // This method forwards the message to the conversation interface.
+    // We could have used the exact same method name as in ConversationInterface,
+    // and even declared that Agent implements ConversationInterface,
+    // but that's not necessary and could lead to confusion.
+    // Instead, we just delegate to ConversationInterface through this method.
+    // All subclasses of Agent will have to call this method either directly
+    // or indirectly via the send method.
+    async forward({ prompt, messages }: SendMessageArgs): Promise<AssistantMessage>
+    {
+        return this.conversation.sendMessage({ prompt, messages }) ;
+    }
+
+    // Every agent will need a prompt that is specific to the agent
+    // It is useful to have a comment method for this purpose.
+    abstract generatePrompt(): Promise<string>;
 
     // This is a convenience method what will be used for simple tools with a fixed prompt and a single message (no coversation history)
-    // But it can be overridden in a subclass to provide more complex behavior, and in fact,
-    // this is the interface that was formerly newMessageToAssistant in MementoAgent.
-    async send({content}: SendArgs): Promise<Message> {
-        const role = USER;
-        return this.sendMessage({prompt: this.Prompt, messages: [{ role, content }]})
+    // But note that this method cannot be overridden by subclasses, as it becomes difficult to reason about behavior
+    // if both send and sendMessage can be overridden.
+    public async send({content}: SendArgs): Promise<AssistantMessage> {
+        const prompt = await this.generatePrompt();
+        const message = constructUserMessage(content);
+        return this.forward({prompt, messages: [message]})
     }
 
     get DB(): MementoDb
@@ -65,21 +80,26 @@ export abstract class Agent implements ConversationInterface {
         return this.db;
     }
 
-    get Registry(): FunctionRegistry
-    {
-        if (!this.registry)
-        {
-            throw new Error("Agent: Function registry is not set");
-        }
-        return this.registry;
+}
+
+export abstract class FunctionCallingAgent extends Agent {
+    protected registry: FunctionRegistry;
+    lastUserMessage: UserMessage;
+
+    constructor(args: FunctionCallingAgentArgs) {
+        super(args);
+        this.registry = args.registry;
+        this.lastUserMessage = { content: "", role: USER };
     }
 
-    get Prompt(): string
-    {
-        if (!this.prompt)
-        {
-            throw new Error("Agent: Prompt is not defined");
+    checkForFunctionResults(userMessage: UserMessage): void {
+        if (!userMessage.content.startsWith(FUNCTION_RESULT_HEADER)) {
+            this.lastUserMessage = userMessage;
         }
-        return this.prompt;
+    }
+
+    get Registry(): FunctionRegistry
+    {
+        return this.registry;
     }
 }

@@ -16,7 +16,7 @@ describe('generateFunctionDescription', () => {
         const expected = `
 Function: getCurrentTime
     Purpose: Returns the current UTC time
-    Input: No input required
+    Input: No input parameters are necessary, so provide an empty object.
         context: An optional context object. Leave unspecified -- Memento will provide.
     Output: ISO string`.trim();
         expect(description).toEqual(expected);

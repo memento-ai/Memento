@@ -1,8 +1,6 @@
 # @memento-ai/function-calling
-
 ## Description
 The `@memento-ai/function-calling` package provides a framework for defining and invoking functions within the Memento application. It allows for the registration and execution of functions, as well as the extraction and validation of function calls from content.
-
 ## Key Features
 - Register custom functions with input/output schemas and function implementations
 - Invoke registered functions with provided input and context
@@ -10,9 +8,7 @@ The `@memento-ai/function-calling` package provides a framework for defining and
 - Validate extracted function calls against registered function schemas
 - Execute multiple function calls in sequence
 - Handle function errors and results
-
 ## Usage and Examples
-
 ### Registering Functions
 To register a new function, import the `registerFunction` function from the `functionRegistry` module and provide a `FunctionConfig` object:
 
@@ -34,10 +30,10 @@ registerFunction(registry, getCurrentTimeConfig);
 ```
 
 ### Invoking Functions
-You can invoke registered functions using the `invokeFunction` function from the `functionCalling` module:
+You can invoke registered functions using the `invokeOneFunction` function from the `functionCalling` module:
 
 ```typescript
-import { invokeFunction, type FunctionCall, type FunctionCallResult } from '@memento-ai/function-calling/src/functionCalling';
+import { invokeOneFunction, type FunctionCall, type FunctionCallResult } from '@memento-ai/function-calling/src/functionCalling';
 import { registry } from '@memento-ai/function-calling/src/functions';
 
 const call: FunctionCall = {
@@ -46,7 +42,7 @@ const call: FunctionCall = {
 };
 
 const context = { readonlyPool: db.readonlyPool };
-const result: FunctionCallResult = await invokeFunction({ registry, call, context });
+const result: FunctionCallResult = await invokeOneFunction({ registry, call, context });
 ```
 
 ### Extracting Function Calls
@@ -56,12 +52,12 @@ The `functionCalling` module provides a way to extract function calls from conte
 import { extractFunctionCalls, type FunctionCallRequest } from '@memento-ai/function-calling/src/functionCalling';
 
 const content = `
-```function
+\`\`\`function
 {
   "name": "getCurrentTime",
   "input": {}
 }
-```
+\`\`\`
 
 const functionCalls: FunctionCallRequest[] = Array.from(extractFunctionCalls(content));
 ```
@@ -69,17 +65,17 @@ const functionCalls: FunctionCallRequest[] = Array.from(extractFunctionCalls(con
 This will extract the function call request from the provided content and return an array of `FunctionCallRequest` objects.
 
 ### Executing Multiple Function Calls
-You can execute multiple function calls in sequence using the `invokeFunctions` function:
+You can execute multiple function calls in sequence using the `invokeMultFunctions` function:
 
 ```typescript
-import { invokeFunctions, type FunctionCallRequest } from '@memento-ai/function-calling/src/functionCalling';
+import { invokeMultFunctions, type FunctionCallRequest } from '@memento-ai/function-calling/src/functionCalling';
 import { registry } from '@memento-ai/function-calling/src/functions';
 
 const functionCalls: FunctionCallRequest[] = [
   { name: 'getCurrentTime', input: {} },
-  { name: 'getListFiles', input: {} },
+  { name: 'gitListFiles', input: {} },
 ];
 
 const context = { readonlyPool: db.readonlyPool };
-const results: FunctionCallResult[] = await invokeFunctions({ registry, calls: functionCalls, context });
+const results: FunctionCallResult[] = await invokeMultFunctions({ registry, calls: functionCalls, context });
 ```

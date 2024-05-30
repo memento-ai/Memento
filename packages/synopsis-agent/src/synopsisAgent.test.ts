@@ -5,20 +5,16 @@ import { MementoDb } from '@memento-ai/memento-db';
 import { createMementoDb, dropDatabase } from '@memento-ai/postgres-db';
 import { nanoid } from 'nanoid';
 import { SynopsisAgent } from './synopsisAgent';
-import { createConversation, type ConversationInterface } from '@memento-ai/conversation';
+import { createConversation, type ConversationInterface, defaultProviderAndModel } from '@memento-ai/conversation';
 
 describe('SynopsisAgent', () => {
     let db: MementoDb;
     let dbname: string;
-    let conversation: ConversationInterface;
 
     beforeEach(async () => {
         dbname = `test_${nanoid()}`;
         await createMementoDb(dbname);
         db = await MementoDb.create(dbname);
-        const provider = 'anthropic';
-        const model = 'haiku';
-        conversation = createConversation(provider, { model, temperature: 0.0 })
     });
 
     afterEach(async () => {
@@ -27,7 +23,6 @@ describe('SynopsisAgent', () => {
     });
 
     it('generates a synopsis for the latest conversational exchange', async () => {
-        // Arrange
         await db.addConversationMem({
             content: 'Hello, how are you?',
             role: 'user',
@@ -38,13 +33,13 @@ describe('SynopsisAgent', () => {
             role: 'assistant',
         });
 
+        const { provider, model } = defaultProviderAndModel;
+        const conversation: ConversationInterface = createConversation(provider, { model, temperature: 0.0, max_response_tokens: 70, logging: { name: 'synopsis'} });
         const synopsisAgent = new SynopsisAgent({ db, conversation });
-
-        // Act
         const synopsis = await synopsisAgent.run();
 
-        // Assert
         expect(synopsis).toBeTruthy();
-        expect(synopsis).toMatch(/\bI\b/);
+        expect(synopsis).toMatch(/\bWe\b/);
+        expect(synopsis).toMatch(/\bgreeted\b/);
     });
 });
