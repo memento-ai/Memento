@@ -73,8 +73,8 @@ async function handleInsertNewCsumRequest(pool: DatabasePool, request: UpdateOne
 
 async function handleUpdateExistingCsumRequest(pool: DatabasePool, request: UpdateOneSummaryInput, current: CsumMetaData): Promise<IDorError> {
     if (request.metaId !== current.metaid) {
-        console.log('request', request);
-        console.log('current', current);
+        dlog('request', request);
+        dlog('current', current);
         throw new Error(`Shouldn't be possible: ${current.metaid} not same as ${request.metaId}`);
     }
 
@@ -125,8 +125,8 @@ async function updateSummaries(input: UpdateSummariesInput): Promise<IDorError[]
         if (current.rows.length === 0) {
             resultID = await handleInsertNewCsumRequest(pool, request);
         } else {
-            console.log('request', request)
-            console.log('current', current.rows[0]);
+            dlog('request', request)
+            dlog('current', current.rows[0]);
             resultID = await handleUpdateExistingCsumRequest(pool, request, current.rows[0]);
         }
 
