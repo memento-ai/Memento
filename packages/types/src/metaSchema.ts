@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { Role } from './role';
-import { CONV, DOC, FRAG, DSUM, CSUM, SYN, MemKind } from './memKind';
+import { CONV, DOC, FRAG, DSUM, CSUM, SYN, MemKind, XCHG } from './memKind';
 import { MetaId } from './metaArgs';
 
 // The various *MetaData types are the logical database schema for each of the mem kinds.
@@ -31,7 +31,8 @@ export type MemBaseMetaData = z.TypeOf<typeof MemBaseMetaData>;
 
 export const ConversationMetaData = RequiredMetaBase.extend({
     kind: z.literal(CONV),
-    role: Role
+    role: Role,
+    docid: z.string()
 });
 export type ConversationMetaData = z.TypeOf<typeof ConversationMetaData>;
 
@@ -51,7 +52,6 @@ export type DocumentMetaData = z.TypeOf<typeof DocumentMetaData>;
 export const ConvSummaryMetaData = RequiredMetaBase.extend({
     kind: z.literal(CSUM),
     metaid: MetaId,
-    content: z.string(),
     priority: z.number().default(0),
     pinned: z.boolean().default(false),
 });
@@ -59,16 +59,19 @@ export type ConvSummaryMetaData = z.TypeOf<typeof ConvSummaryMetaData>;
 
 export const DocSummaryMetaData = RequiredMetaBase.extend({
     kind: z.literal(DSUM),
-    content: z.string(),
     docId: z.string()
 });
 export type DocSummaryMetaData = z.TypeOf<typeof DocSummaryMetaData>;
 
 export const SynopsisMetaData = RequiredMetaBase.extend({
     kind: z.literal(SYN),
-    content: z.string(),
 });
 export type SynopsisMetaData = z.TypeOf<typeof SynopsisMetaData>;
+
+export const ConvExchangeMetaData = RequiredMetaBase.extend({
+    kind: z.literal(XCHG),
+});
+export type ConvExchangeMetaData = z.TypeOf<typeof ConvExchangeMetaData>;
 
 export const MemMetaData = z.discriminatedUnion('kind', [
     ConversationMetaData,
@@ -77,5 +80,6 @@ export const MemMetaData = z.discriminatedUnion('kind', [
     DocumentMetaData,
     FragmentMetaData,
     SynopsisMetaData,
+    ConvExchangeMetaData,
 ]);
 export type MemMetaData = z.TypeOf<typeof MemMetaData>;
