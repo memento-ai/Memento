@@ -1,14 +1,14 @@
 # @memento-ai/app
+
 ## Description
-The `@memento-ai/app` package provides a command-line interface (CLI) for the Memento AI system and a utility for ingesting files into the Memento database. It also includes a utility for updating the README.md files across the Memento monorepo.
+The `@memento-ai/app` package provides a command-line interface (CLI) for interacting with the Memento AI system, as well as utilities for ingesting files into the Memento database and updating README.md files across the Memento monorepo.
+
 ## Key Features
 - CLI for interacting with the Memento AI agent, persisting conversation history in a database
 - Ingestion utility for adding files to the Memento database, with support for summarizing file content using a specified language model
 - Utility for updating README.md files across the Memento monorepo packages
-## Usage and Examples
 
-Generally, you will want to run the Ingestion utility first to create a database and populate
-it with content.
+## Usage and Examples
 
 ### Ingestion Utility
 To ingest files into a new Memento database, run the following command:
@@ -17,9 +17,7 @@ To ingest files into a new Memento database, run the following command:
 bun run packages/app/src/ingest.ts -p <provider> -m <model> -d <database> --clean-slate
 ```
 
-Note that `--clean-slate` will drop the specified database if it already exists, and recreate
-it from scratch. You can reingest into the same database later, but don't forget to omit
-the `--clean-slate` option!
+Note that `--clean-slate` will drop the specified database if it already exists, and recreate it from scratch. You can reingest into the same database later, but don't forget to omit the `--clean-slate` option!
 
 The options are:
 - `-p, --provider <provider>`: The provider to use (e.g., `anthropic`, `ollama`, `openai`)
@@ -48,8 +46,7 @@ bun run packages/app/src/cli.ts -p <provider> -m <model> -d <database>
 
 This will start the chatbot, which will persist the conversation history in the specified database. You can then interact with the chatbot by typing your messages and pressing Enter.
 
-To enter multi-line messages, type '!!' and press Enter to begin multi-line mode. While in this mode,
-to send a message, type '**' and press Enter. To exit multi-line mode, use the !! command again.
+To enter multi-line messages, type '!!' and press Enter to begin multi-line mode. While in this mode, to send a message, type '**' and press Enter. To exit multi-line mode, use the !! command again.
 
 ### README Update Utility
 

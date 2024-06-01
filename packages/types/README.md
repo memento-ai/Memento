@@ -1,6 +1,8 @@
 # @memento-ai/types
+
 ## Description
 The `@memento-ai/types` package provides the core data types, schemas, and utility functions used throughout the Memento application. It defines the structure of the `Mem` object, which represents a single piece of content, as well as the various metadata types associated with each `Mem`. The package also includes enumerations for classifying different types of `Mem` objects and representing the roles of users and assistants in conversations.
+
 ## Key Features
 - Defines the `Mem` object schema, which represents a single piece of content with its ID, content string, embedding vector, and token count.
 - Provides metadata schemas for different types of `Mem` objects, including conversations, documents, fragments, summaries, and synopses.
@@ -8,6 +10,7 @@ The `@memento-ai/types` package provides the core data types, schemas, and utili
 - Offers utility functions for creating `Mem` objects, parsing various data types, and constructing user and assistant messages.
 - Defines the `Memento` schema, which combines a metadata record with the linked `Mem` content record.
 - Provides argument schemas for creating different types of metadata records.
+
 ## Usage and Examples
 
 The types and schemas defined in this package are used extensively throughout the Memento codebase to ensure consistency and type safety. Here are some examples of how they can be used:
