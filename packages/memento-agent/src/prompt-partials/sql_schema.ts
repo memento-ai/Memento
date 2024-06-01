@@ -11,7 +11,7 @@ const sql_schema_text = stripCommonIndent(`
     Only SQL queries that conform to these schemas are valid.
 
     \`\`\`sql
-    {{this}}
+    {{databaseSchema}}
     \`\`\`
 
     The function queryMementoView can be used to execute any read-only SQL query on this schema.

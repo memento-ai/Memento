@@ -36,9 +36,9 @@ const mementoPromptTemplateText = stripCommonIndent(`
 
     {{> pronouns }}
 
-    {{> function_calling functions }}
+    {{> function_calling functions=functions }}
 
-    {{> sql_schema databaseSchema }}
+    {{> sql_schema databaseSchema=databaseSchema }}
 
     {{> additional_context pinnedCsumMems=pinnedCsumMems synopses=synopses selectedMems=selectedMems }}
 

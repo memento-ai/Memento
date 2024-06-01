@@ -49,7 +49,7 @@ const function_calling_text = stripCommonIndent(`
         if you should consult the database for a fuller answer.**
 
     ### Function Registry:
-    {{this}}
+    {{functions}}
 `);
 
 export const function_calling = Handlebars.compile<FunctionCallingTemplateArgs>(function_calling_text);
