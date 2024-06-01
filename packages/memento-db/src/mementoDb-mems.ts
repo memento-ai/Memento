@@ -84,14 +84,14 @@ export async function addConvExchangeMementos(pool: DatabasePool, args_: AddConv
             kind: CONV,
             role: USER,
             source: 'conversation',
-            priority: 0,
+            docid: xchgMetaId,
         });
 
         const asstMetaArgs = zodParse(ConversationMetaArgs, {
             kind: CONV,
             role: ASSISTANT,
             source: 'conversation',
-            priority: 0,
+            docid: xchgMetaId,
         });
 
         const xchgMetaArgs = zodParse(ConvExchangeMetaArgs, {
