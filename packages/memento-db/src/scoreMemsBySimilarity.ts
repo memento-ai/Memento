@@ -17,6 +17,7 @@ export const SimilarityScore = z.object({
     source: z.string().optional().nullable(),
     docid: z.string().optional().nullable(),
     summaryid: z.string().optional().nullable(),
+    created_at: z.coerce.date(),
 });
 export type SimilarityScore = z.TypeOf<typeof SimilarityScore>;
 
@@ -28,7 +29,7 @@ export async function scoreMemsBySimilarity(dbPool: DatabasePool, userMessage: s
 
     const resultMap: SimilarityMap = {};
     await dbPool.connect(async (conn) => {
-        const result: QueryResult<QueryResultRow> = await conn.query(sql.type(SimilarityScore)`
+        const result: QueryResult<SimilarityScore> = await conn.query(sql.type(SimilarityScore)`
             WITH cte AS (
                 SELECT
                     m.id,
@@ -36,6 +37,7 @@ export async function scoreMemsBySimilarity(dbPool: DatabasePool, userMessage: s
                     mt.source,
                     mt.docid,
                     mt.summaryid,
+                    mt.created_at,
                     m.tokens,
                     m.content,
                     1.0 - (m.embed_vector <=> ${queryVector}) AS similarity,
@@ -53,7 +55,8 @@ export async function scoreMemsBySimilarity(dbPool: DatabasePool, userMessage: s
                 summaryid,
                 tokens,
                 similarity,
-                content
+                content,
+                created_at
             FROM
                 cte
             WHERE
