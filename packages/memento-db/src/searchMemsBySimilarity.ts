@@ -23,8 +23,8 @@ export async function searchMemsBySimilarity(dbPool: DatabasePool, userMessage: 
                     mt.source,
                     mt.created_at,
                     m.tokens,
-                    m.embed_vector <=> ${queryVector} AS similarity,
-                    SUM(m.tokens) OVER (ORDER BY m.embed_vector <=> ${queryVector} ASC) AS cumulative_tokens
+                    1.0 - (m.embed_vector <=> ${queryVector}) AS similarity,
+                    SUM(m.tokens) OVER (ORDER BY 1.0 - (m.embed_vector <=> ${queryVector}) DESC) AS cumulative_tokens
                 FROM
                     mem m
                 JOIN
@@ -45,7 +45,7 @@ export async function searchMemsBySimilarity(dbPool: DatabasePool, userMessage: 
             WHERE
                 cumulative_tokens <= ${tokensLimit}
             ORDER BY
-                similarity ASC
+                similarity DESC
         `);
 
         return result.rows.map((row) => {

@@ -15,12 +15,12 @@ export const ConversationMetaArgs = z.object({
     role: Role,
     source: z.literal('conversation'),  // should also use 'function' or 'result' for the function output return on behalf of user
     priority: z.number().default(1),
+    docid: z.string().optional(),       // the id of the exchange mememto
 });
 export type ConversationMetaArgs = z.input<typeof ConversationMetaArgs>;
 
 export const DocumentMetaArgs = z.object({
     kind: z.literal(DOC),
-    // docId: z.string(),              // the id of the document. Must be provided to ensure doc and dsum are linked correctly
     summaryId: z.string(),          // the id of the associated summary
     source: z.string(),
 });
