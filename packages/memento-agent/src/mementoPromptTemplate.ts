@@ -8,6 +8,7 @@ import type { SimilarityResult } from "@memento-ai/memento-db";
 import { core_system } from "./prompt-partials/core_system";
 import { pronouns } from "./prompt-partials/pronouns";
 import { function_calling } from "./prompt-partials/function_calling";
+import { sql_schema } from "./prompt-partials/sql_schema";
 
 export type MementoPromptTemplateArgs = {
     functions: string,
@@ -25,6 +26,7 @@ Handlebars.registerHelper('obj', function(context) {
 Handlebars.registerPartial('core_system', core_system);
 Handlebars.registerPartial('pronouns', pronouns);
 Handlebars.registerPartial('function_calling', function_calling);
+Handlebars.registerPartial('sql_schema', sql_schema);
 
 const mementoPromptTemplateText = stripCommonIndent(`
     # System Prompt
@@ -34,16 +36,7 @@ const mementoPromptTemplateText = stripCommonIndent(`
 
     {{> function_calling functions }}
 
-    ## SQL Schema
-    The database schema definitions are defined by the following SQL statements.
-    Only SQL queries that conform to these schemas are valid.
-
-    \`\`\`sql
-    {{databaseSchema}}
-    \`\`\`
-
-    The function queryMementoView can be used to execute any read-only SQL query on this schema.
-    You should prefer to use the memento view but you may also query the mem or meta tables directly.
+    {{> sql_schema databaseSchema }}
 
     ## Additional Context
     The Memento system automatically retieves information it believes may be relevant to the current conversation.
