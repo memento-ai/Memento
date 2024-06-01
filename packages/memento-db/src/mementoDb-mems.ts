@@ -74,7 +74,7 @@ export async function addConvExchangeMementos(pool: DatabasePool, args_: AddConv
     const result = await pool.connect(async conn => {
         const userMem: Mem = await createMem(userContent);
         const asstMem: Mem = await createMem(asstContent);
-        const xchgMem: Mem = await createMem(`# User:\n\n${userContent.trim()}\n\n---\n\n# Assistant:\n${asstContent.trim()}\n`);
+        const xchgMem: Mem = await createMem(`# User:\n${userContent.trim()}\n\n---\n\n# Assistant:\n${asstContent.trim()}\n`);
 
         const userMetaId = nanoid();
         const asstMetaId = nanoid();
