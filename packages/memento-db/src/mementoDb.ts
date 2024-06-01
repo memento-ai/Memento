@@ -129,7 +129,7 @@ export class MementoDb {
         return await searchPinnedCsumMems(this.pool, tokenLimit);
     }
 
-    async get_csum_mementos(conn: CommonQueryMethods): Promise<ConvSummaryMetaData[]> {
+    async get_csum_mementos(conn: CommonQueryMethods): Promise<ConvSummaryMemento[]> {
         return get_csum_mementos(conn);
     }
 
