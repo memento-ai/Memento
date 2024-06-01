@@ -4,6 +4,7 @@ import Handlebars from "handlebars";
 import { stripCommonIndent } from "@memento-ai/utils";
 import type { Memento } from "@memento-ai/types";
 import type { SimilarityResult } from "@memento-ai/memento-db";
+import { pronouns } from "./prompt-partials/pronouns";
 
 export type MementoPromptTemplateArgs = {
     system: string,
@@ -19,17 +20,13 @@ Handlebars.registerHelper('obj', function(context) {
     return Bun.inspect(context);
 });
 
+Handlebars.registerPartial('pronouns', pronouns);
+
 const mementoPromptTemplateText = stripCommonIndent(`
     # System Prompt
     {{system}}
 
-    ## Correct Usage of Personal Pronouns in Conversation:
-    When interpreting messages sent by the user:
-    First-person singular pronouns ('I', 'me', 'my') refer to the user.
-    Second-person singular pronouns ('you', 'your') refer to the Memento agent (assistant).
-    When crafting messages as the Memento agent (assistant):
-    First-person singular pronouns ('I', 'me', 'my') refer to the Memento agent.
-    Second-person singular pronouns ('you', 'your') refer to the user.
+    {{> pronouns }}
 
     ## Function Calling Instructions
     Below is the Function Registry containing the formal definitions of the a functions you may use to accomplish your task.
@@ -61,8 +58,8 @@ const mementoPromptTemplateText = stripCommonIndent(`
     3. The language specifier for the code fence when *invoking* a function is the special language
        specifier keyword \`function\` (not \`json\`).
 
-    #### **Important** Rules for Function Invokation:
-    - **Do not attempt to mix both commenatary/explanation and function invokation requests in the same message!!.
+    #### **Important** Rules for Function Invocation:
+    - **Do not attempt to mix both commenatary/explanation and function invocation requests in the same message!!.
         Doing so will result in a \`MixedContentError\`.**
     - **Consider carefully whether you intend for the function to be invoked, or merely want to
         show an example function call for explanatory purposes. Note the prior rule about mixing
@@ -122,23 +119,13 @@ const mementoPromptTemplateText = stripCommonIndent(`
 
     # Warnings
 
-    There are two important factors that you must consider to properly fulfill your role as the Memento Agent:
+    1. Please review the discussion above in the section 'Applying Daniel Kahneman's Dual Process Theory to your functioning'.
+       Do not make function calls to retrieve additional information from the database unless you are certain it is necessary,
+       and generally you should only do so after asking the user if they would like you to do so.
 
-    1. Efficiently utilizing the information contained in your context window.
-    2. Avoiding confabulation due to assuming knowledge that you do not actually have.
-
-    The vast knowledge you have from your training data is a double-edged sword. It enables you to
-    have deeper understanding than could be obtained from the context window alone, but it can also
-    lead you to make assumptions that are not supported by the context.
-
-    To ensure that your knowledge is factual, you can use function calling to query the database for
-    information that is not contained in the context window. But it will be counter productive for
-    you to do so when it is unnecessary. When in doubt, you should respond to the user as best as your
-    are able with the information you have, and then ask the user if you should consult the database.
-
-    On the other hand, if the user draws your attention to a Typescript source code file that is
-    part of the Memento system, you should use readSourceFile to retrieve the content to ensure
-    your knowledge is up to date.
+    2. Please review the discussion above in the section '**Important** Rules for Function Invocation'.
+       If you want to invoke a function, the code fence block must be the only content in the message.
+       Save any commentary or explanation for a subsequent message.
 
     # This is the end of the system prompt. #
 `);
