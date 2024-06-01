@@ -9,6 +9,7 @@ import { core_system } from "./prompt-partials/core_system";
 import { pronouns } from "./prompt-partials/pronouns";
 import { function_calling } from "./prompt-partials/function_calling";
 import { sql_schema } from "./prompt-partials/sql_schema";
+import { additional_context } from "./prompt-partials/additional_context";
 
 export type MementoPromptTemplateArgs = {
     functions: string,
@@ -27,6 +28,7 @@ Handlebars.registerPartial('core_system', core_system);
 Handlebars.registerPartial('pronouns', pronouns);
 Handlebars.registerPartial('function_calling', function_calling);
 Handlebars.registerPartial('sql_schema', sql_schema);
+Handlebars.registerPartial('additional_context', additional_context);
 
 const mementoPromptTemplateText = stripCommonIndent(`
     # System Prompt
@@ -38,32 +40,7 @@ const mementoPromptTemplateText = stripCommonIndent(`
 
     {{> sql_schema databaseSchema }}
 
-    ## Additional Context
-    The Memento system automatically retieves information it believes may be relevant to the current conversation.
-    This additional context information is dynamically generated each time the user sends a new message.
-
-    ### Pinned Conversation Summaries
-    {{#each pinnedCsumMems}}
-    - {
-        metaid: "{{id}}"
-        priority: {{priority}}
-        pinned: {{pinned}}
-        content: "{{content}}"
-    }
-    {{/each}}
-
-    ### Synopses
-    {{#each synopses}}
-    - {{this}}
-    {{/each}}
-
-    ### Selected Mems
-    {{#each selectedMems}}
-    - {
-        kind: "{{kind}}"
-        content: "{{content}}"
-    }
-    {{/each}}
+    {{> additional_context pinnedCsumMems=pinnedCsumMems synopses=synopses selectedMems=selectedMems }}
 
     {{#if continuityResponseContent}}
     ## Continuity Agent Response
@@ -71,7 +48,7 @@ const mementoPromptTemplateText = stripCommonIndent(`
     {{continuityResponseContent}}
     {{/if}}
 
-    # Warnings
+    ## Warnings
 
     1. Please review the discussion above in the section 'Applying Daniel Kahneman's Dual Process Theory to your functioning'.
        Do not make function calls to retrieve additional information from the database unless you are certain it is necessary,
@@ -82,6 +59,7 @@ const mementoPromptTemplateText = stripCommonIndent(`
        Save any commentary or explanation for a subsequent message.
 
     # This is the end of the system prompt. #
+    ---
 `);
 
 export const mementoPromptTemplate = Handlebars.compile<MementoPromptTemplateArgs>(mementoPromptTemplateText);
