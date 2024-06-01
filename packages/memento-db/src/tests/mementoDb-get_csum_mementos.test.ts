@@ -4,7 +4,7 @@ import { createMementoDb, dropDatabase } from "@memento-ai/postgres-db";
 import { expect, it, describe, beforeEach, afterEach} from "bun:test";
 import { nanoid } from "nanoid";
 import { MementoDb } from "../mementoDb";
-import type { ConvSummaryMetaData } from "@memento-ai/types";
+import type { ConvSummaryMemento, ConvSummaryMetaData } from "@memento-ai/types";
 import type { CommonQueryMethods } from "slonik";
 
 describe("Get CSUM mementos", () => {
@@ -30,13 +30,13 @@ describe("Get CSUM mementos", () => {
     });
 
     it("can get csum mementos", async () => {
-        let csumMementos: ConvSummaryMetaData[] = [];
+        let csumMementos: ConvSummaryMemento[] = [];
         await db.pool.connect(async (conn: CommonQueryMethods) => {
             csumMementos = await db.get_csum_mementos(conn);
         })
         expect(csumMementos.length).toBe(2);
         expect(csumMementos[0]).toBeTypeOf("object");
-        expect(csumMementos.find((m: ConvSummaryMetaData) => m.content === "test conversation summary")).toBeTruthy();
-        expect(csumMementos.find((m: ConvSummaryMetaData) => m.content === "bogus")).toBeTruthy();
+        expect(csumMementos.find((m: ConvSummaryMemento) => m.content === "test conversation summary")).toBeTruthy();
+        expect(csumMementos.find((m: ConvSummaryMemento) => m.content === "bogus")).toBeTruthy();
     });
 });
