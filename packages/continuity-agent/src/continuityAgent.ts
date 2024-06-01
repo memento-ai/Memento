@@ -1,7 +1,7 @@
 // Path: packages/continuity-agent/src/continuityAgent.ts
 
 import { Agent, FunctionCallingAgent } from "@memento-ai/agent";
-import { ASSISTANT, ConvSummaryMetaData, USER, type Message, AssistantMessage, constructUserMessage, UserMessage } from "@memento-ai/types";
+import { ASSISTANT, ConvSummaryMetaData, USER, type Message, AssistantMessage, constructUserMessage, UserMessage, ConvSummaryMemento } from "@memento-ai/types";
 import { continuityPromptTemplate } from "./continuityPromptTemplate";
 import { createConversation, defaultProviderAndModel } from "@memento-ai/conversation";
 import { get_csum_mementos } from "@memento-ai/postgres-db";
@@ -48,7 +48,7 @@ export class ContinuityAgent extends FunctionCallingAgent {
     async generatePrompt(): Promise<string> {
         const functions: string = getRegistryDescription(this.Registry);
         const synopses: string[] = await this.DB.getSynopses(1000);
-        const mementos: ConvSummaryMetaData[] = await this.getMementos();
+        const mementos: ConvSummaryMemento[] = await this.getMementos();
         return continuityPromptTemplate({functions, mementos, synopses});
     }
 
@@ -106,8 +106,8 @@ export class ContinuityAgent extends FunctionCallingAgent {
         return { role: ASSISTANT, content };
     }
 
-    async getMementos(): Promise<ConvSummaryMetaData[]> {
-        let mementoData: ConvSummaryMetaData[] = [];
+    async getMementos(): Promise<ConvSummaryMemento[]> {
+        let mementoData: ConvSummaryMemento[] = [];
         await this.DB.readonlyPool.connect(async (conn: CommonQueryMethods) => {
             try {
                 dlog('getMementos: connected to readonly pool, calling get_csum_mementos')
