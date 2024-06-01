@@ -8,6 +8,9 @@ import { isProvider, ProviderNames } from '@memento-ai/conversation';
 import { MementoDb } from '@memento-ai/memento-db';
 import type { DatabasePool } from 'slonik';
 import type { ProviderAndModel, Summarizer } from '@memento-ai/ingester';
+import { sql } from 'slonik';
+import { z } from 'zod';
+import { DocumentMemento } from '@memento-ai/types';
 
 const program = new Command();
 
@@ -32,6 +35,11 @@ type Options = {
     directory?: string,
 };
 
+const Documents = DocumentMemento.pick({
+    id: true,
+    tokens: true,
+    source: true,
+});
 
 async function main() {
     const options: Options = program.opts() as Options;
@@ -92,14 +100,11 @@ async function main() {
         process.exit(1);
     }
 
-
     const db: MementoDb = await MementoDb.create(template_db_name);
     const dirPath = directory ?? 'packages';
 
     await ingestDirectory({db, dirPath, summarizer, log: true});
     await delete_unreferenced_mems(db.pool);
-
-
 
     if (cleanSlate) {
         await wipeDatabase(database);
@@ -107,8 +112,12 @@ async function main() {
 
     const target: MementoDb = await MementoDb.create(database);
     await copyIngestedMementos(db.pool, target.pool);
-
     await db.close();
+
+    const result = await target.pool.query(sql.type(Documents)`SELECT id, source, tokens FROM memento WHERE kind = 'doc' ORDER BY tokens DESC LIMIT 10`);
+    console.table(result.rows);
+
+    await target.close();
 }
 
 main().catch(console.error);
