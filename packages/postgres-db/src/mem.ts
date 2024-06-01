@@ -29,10 +29,10 @@ export async function insertMeta(conn: CommonQueryMethods, memId: string, metaId
     let results: QueryResult<any>;
     switch (kind) {
         case CONV: {
-            const { role, source, priority } = zodParse(ConversationMetaArgs, metaArgs);
+            const { role, source, priority, docid } = zodParse(ConversationMetaArgs, metaArgs);
             results = await conn.query(sql.unsafe`
-                INSERT INTO meta (id, memid, kind, role, source, priority)
-                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${role}, ${source}, ${priority ?? null})
+                INSERT INTO meta (id, memid, kind, role, source, priority, docid)
+                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${role}, ${source}, ${priority ?? null}, ${docid ?? null})
                 RETURNING id`);
             break;
         }
