@@ -1,16 +1,16 @@
 // Path: packages/function-calling/src/functionHandler.ts
 
-import type { AssistantMessage, Message, UserMessage } from "@memento-ai/types";
-import type { FunctionRegistry } from "./functionRegistry";
-import type { FunctionCallingAgent } from "@memento-ai/agent";
-import { invokeSyncAndAsyncFunctions } from "./functionCalling";
-import type { InvokeFunctionsResults, InvokeFunctionsArgs } from "./functionCalling";
-import type { Context } from "@memento-ai/memento-db";
-import c from 'ansi-colors';
 import { constructAssistantMessage, constructUserMessage } from "@memento-ai/types";
-import debug from "debug";
-import type { FunctionCallResult } from "./functionCalling";
+import { invokeSyncAndAsyncFunctions } from "./invokeSyncAndAsyncFunctions";
 import { Writable } from "node:stream";
+import c from 'ansi-colors';
+import debug from "debug";
+import type { AssistantMessage, Message, UserMessage } from "@memento-ai/types";
+import type { Context } from "@memento-ai/memento-db";
+import type { FunctionCallingAgent } from "@memento-ai/agent";
+import type { FunctionCallResult } from "./functionCallingTypes";
+import type { FunctionRegistry } from "./functionRegistry";
+import type { InvokeFunctionsResults, InvokeFunctionsArgs } from "./functionCalling";
 
 const dlog = debug("functionHandler");
 

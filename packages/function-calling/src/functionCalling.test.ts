@@ -1,9 +1,9 @@
 // Path: packages/function-calling/src/functionCalling.test.ts
 
-// src/lib/functionCalling_test.ts
 import { describe, it, expect } from 'bun:test';
-import { invokeOneFunction, type FunctionCallResult, isFunctionError, isFunctionResult, type FunctionCallRequest, extractFunctionCalls } from './functionCalling';
+import { invokeOneFunction, isFunctionError, isFunctionResult, extractFunctionCalls } from '..';
 import { registry } from './functions';
+import type { FunctionCallResult, FunctionCallRequest } from '..';
 
 describe('functionCalling', () => {
     it('should return the current time as an ISO 8601 formatted string', async () => {
