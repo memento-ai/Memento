@@ -1,4 +1,4 @@
-// Path: packages/memento-db/src/searchMemsBySimilarity.ts
+// Path: packages/memento-db/src/scoreMemsBySimilarity.ts
 
 // search.ts
 

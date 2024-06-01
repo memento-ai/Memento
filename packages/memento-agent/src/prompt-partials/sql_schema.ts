@@ -1,3 +1,5 @@
+// Path: packages/memento-agent/src/prompt-partials/sql_schema.ts
+
 import { stripCommonIndent } from "@memento-ai/utils";
 import Handlebars from "handlebars";
 

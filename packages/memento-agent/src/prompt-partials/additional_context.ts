@@ -1,3 +1,5 @@
+// Path: packages/memento-agent/src/prompt-partials/additional_context.ts
+
 import type { SimilarityResult } from "@memento-ai/memento-db";
 import type { Memento } from "@memento-ai/types";
 import { stripCommonIndent } from "@memento-ai/utils";
