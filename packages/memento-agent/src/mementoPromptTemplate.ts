@@ -10,6 +10,7 @@ import { pronouns } from "./prompt-partials/pronouns";
 import { function_calling } from "./prompt-partials/function_calling";
 import { sql_schema } from "./prompt-partials/sql_schema";
 import { additional_context } from "./prompt-partials/additional_context";
+import { continuity_response } from "./prompt-partials/continuity_response";
 
 export type MementoPromptTemplateArgs = {
     functions: string,
@@ -29,6 +30,7 @@ Handlebars.registerPartial('pronouns', pronouns);
 Handlebars.registerPartial('function_calling', function_calling);
 Handlebars.registerPartial('sql_schema', sql_schema);
 Handlebars.registerPartial('additional_context', additional_context);
+Handlebars.registerPartial('continuity_response', continuity_response);
 
 const mementoPromptTemplateText = stripCommonIndent(`
     # System Prompt
@@ -42,11 +44,7 @@ const mementoPromptTemplateText = stripCommonIndent(`
 
     {{> additional_context pinnedCsumMems=pinnedCsumMems synopses=synopses selectedMems=selectedMems }}
 
-    {{#if continuityResponseContent}}
-    ## Continuity Agent Response
-    This is the Continuity Agent's response to the previous message exchange.
-    {{continuityResponseContent}}
-    {{/if}}
+    {{> continuity_response continuityResponseContent=continuityResponseContent }}
 
     ## Warnings
 
