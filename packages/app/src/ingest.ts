@@ -3,14 +3,13 @@
 import { Command } from 'commander';
 import { connectDatabase, createMementoDb, delete_unreferenced_mems, wipeDatabase } from '@memento-ai/postgres-db';
 import { copyIngestedMementos } from '@memento-ai/utils';
-import { ingestDirectory, createModelSummarizer, SUPPORTED_EXTENSIONS } from '@memento-ai/ingester';
+import { DocumentMemento } from '@memento-ai/types';
+import { ingestDirectory, createModelSummarizer, SUPPORTED_EXTENSIONS, dropIngestedFiles } from '@memento-ai/ingester';
 import { isProvider, ProviderNames } from '@memento-ai/conversation';
 import { MementoDb } from '@memento-ai/memento-db';
+import { sql } from 'slonik';
 import type { DatabasePool } from 'slonik';
 import type { ProviderAndModel, Summarizer } from '@memento-ai/ingester';
-import { sql } from 'slonik';
-import { z } from 'zod';
-import { DocumentMemento } from '@memento-ai/types';
 
 const program = new Command();
 
@@ -111,8 +110,11 @@ async function main() {
     }
 
     const target: MementoDb = await MementoDb.create(database);
+    await dropIngestedFiles(target);
     await copyIngestedMementos(db.pool, target.pool);
     await db.close();
+
+    await delete_unreferenced_mems(target.pool);
 
     const result = await target.pool.query(sql.type(Documents)`SELECT id, source, tokens FROM memento WHERE kind = 'doc' ORDER BY tokens DESC LIMIT 10`);
     console.table(result.rows);
