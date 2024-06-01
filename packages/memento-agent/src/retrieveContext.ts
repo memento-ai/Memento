@@ -2,7 +2,6 @@
 
 import { count_tokens } from "@memento-ai/encoding";
 import { functionCallingInstructions } from "./dynamicPrompt";
-import { mementoCoreSystemPrompt } from "./mementoCoreSystemPrompt";
 import debug from "debug";
 import type { ConvSummaryMemento, Memento } from "@memento-ai/types";
 import type { MementoAgent } from "./mementoAgent";
@@ -31,7 +30,6 @@ export async function retrieveContext(agent: MementoAgent): Promise<MementoPromp
     const functions = functionCallingInstructions(agent.databaseSchema);
 
     const retrievedContext = {
-        system: mementoCoreSystemPrompt,
         functions,
         databaseSchema: agent.databaseSchema,
         pinnedCsumMems,

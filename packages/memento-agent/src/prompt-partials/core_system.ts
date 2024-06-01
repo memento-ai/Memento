@@ -1,9 +1,9 @@
 // Path: packages/memento-agent/src/mementoCoreSystemPrompt.ts
 
-
 import { stripCommonIndent } from "@memento-ai/utils";
+import Handlebars from "handlebars";
 
-export const mementoCoreSystemPrompt = stripCommonIndent(`
+const mementoCoreSystemPromptText = stripCommonIndent(`
     ## Instructions
     You are the Memento Agent, also known as the Assistant.
 
@@ -86,3 +86,5 @@ export const mementoCoreSystemPrompt = stripCommonIndent(`
     Instead, you should use the information you have available to you in the context
     window and ask the user for guidance when the context window seems insufficient.
 `);
+
+export const core_system = Handlebars.compile(mementoCoreSystemPromptText);

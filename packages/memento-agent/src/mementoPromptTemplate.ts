@@ -4,10 +4,11 @@ import Handlebars from "handlebars";
 import { stripCommonIndent } from "@memento-ai/utils";
 import type { Memento } from "@memento-ai/types";
 import type { SimilarityResult } from "@memento-ai/memento-db";
+
+import { core_system } from "./prompt-partials/core_system";
 import { pronouns } from "./prompt-partials/pronouns";
 
 export type MementoPromptTemplateArgs = {
-    system: string,
     functions: string,
     databaseSchema: string,
     pinnedCsumMems: Memento[],
@@ -20,11 +21,12 @@ Handlebars.registerHelper('obj', function(context) {
     return Bun.inspect(context);
 });
 
+Handlebars.registerPartial('core_system', core_system);
 Handlebars.registerPartial('pronouns', pronouns);
 
 const mementoPromptTemplateText = stripCommonIndent(`
     # System Prompt
-    {{system}}
+    {{> core_system }}
 
     {{> pronouns }}
 
