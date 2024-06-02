@@ -61,7 +61,7 @@ const Content = z.object({
 type Content = z.infer<typeof Content>
 
 function idQuality(id: string): number {
-    // A simple heuristic to score an id based on its length and whether it uses the `mememto-` prefix.
+    // A simple heuristic to score an id based on its length and whether it uses the `memento-` prefix.
     // We consider the `memento-` prefix to contribute minimal information, so we prefer ids without it.
     // We therefore remove the `memento-` prefix and score the id based on its length.
     const idWithoutPrefix = id.replace('memento-', '');
