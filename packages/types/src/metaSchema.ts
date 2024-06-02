@@ -17,6 +17,7 @@ export const RequiredMetaBase = z.object({
     kind: MemKind,      // The kind of the meta record
     id: MetaId,     // The id of the meta record
     memId: z.string(),  // The foreign key to the associated mem content.
+    created_at: z.coerce.date().optional(), // The time the meta record was created.
 });
 
 export const MemBaseMetaData = RequiredMetaBase.extend({

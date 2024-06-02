@@ -22,4 +22,5 @@ export const MemKindMap = {
 } as const;
 
 export type MemKind = (typeof MemKindMap)[keyof typeof MemKindMap]
+export const MemKindValues = Object.values(MemKindMap) as MemKind[];
 export const MemKind = z.nativeEnum(MemKindMap);
