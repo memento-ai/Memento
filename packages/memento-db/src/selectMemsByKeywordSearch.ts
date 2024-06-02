@@ -67,7 +67,6 @@ export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : Sel
     const keywords = await extractKeywordsFromContent(dbPool, {content, numKeywords});
 
     const keywordQuery = keywords.map((keyword) => keyword.lexeme).join(' | ');
-    console.log('keywordQuery:', keywordQuery);
 
     const query = sql.type(MementosSimilarToContent)`
         WITH query AS (
@@ -90,6 +89,7 @@ export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : Sel
                 id,
                 kind,
                 content,
+                source,
                 rank,
                 tokens,
                 SUM(tokens) OVER (ORDER BY rank DESC) AS total_tokens
@@ -99,6 +99,7 @@ export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : Sel
             id,
             kind,
             content,
+            source,
             rank
         FROM mementos_with_running_sum
         WHERE total_tokens <= ${maxTokens}

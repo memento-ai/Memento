@@ -34,6 +34,7 @@ async function main() {
     const db: MementoDb = await MementoDb.create(database);
 
     const keywords = await extractKeywordsFromContent(db.pool, {content});
+    console.info(c.bold('Keywords:'));
     console.table(keywords);
 
     const mementosSimilarToContent = await selectMemsByKeywordSearch(db.pool, {content, maxTokens: tokens});
@@ -43,6 +44,8 @@ async function main() {
 
     const result: SimilarityMap = await selectMemsBySemanticSimilarity(db.pool, content, tokens);
     const semanticallySimilarMementos = Object.values(result).sort((a, b) => b.similarity - a.similarity);
+
+    console.info(c.bold('Semantically similar mementos:'));
     console.table(semanticallySimilarMementos.map(m => {
         const content = m.content.split('\n')[0].slice(0, 60);
         const { id, kind, similarity, source } = m;
@@ -61,6 +64,7 @@ async function main() {
             content = content.split('\n')[0].slice(0, 60);
             return {...m, content};
         });
+        console.info(c.bold(`SimilarityIndex mementos of kind ${kind}:`));
         console.table(abbrev);
     }
 
