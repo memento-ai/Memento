@@ -1,12 +1,14 @@
-// Path: packages/memento-db/src/selectMemsBySemanticSimilarity.ts
+// Path: packages/search/src/selectMemsBySemanticSimilarity.ts
 
-import { sql, type QueryResult, type DatabasePool } from 'slonik';
-import pgvector from 'pgvector';
+import { DOC, DSUM, CONV, SYN, XCHG } from '@memento-ai/types';
 import { embedding } from '@memento-ai/embedding';
-import { zodParse } from '@memento-ai/utils';
+import { MementoSearchResult } from './mementoSearchResult';
+import { MemKind, MemKindValues } from '@memento-ai/types';
+import { sql } from 'slonik';
 import { z } from 'zod';
-import { MemKind, MemKindValues } from '@memento-ai/types/src/memKind';
-import { RequiredMetaBase } from '@memento-ai/types';
+import { zodParse } from '@memento-ai/utils';
+import pgvector from 'pgvector';
+import type { QueryResult, DatabasePool } from 'slonik';
 
 export const SimilarityScore = z.object({
     id: z.string(),
@@ -38,29 +40,29 @@ export function makeSimilarityIndex(similarityMap: SimilarityMap): SimilarityInd
         const { kind } = similarity;
         index[kind].add(id);
         switch (kind) {
-            case 'doc': {
+            case DOC: {
                 const { summaryid } = similarity;
-                if (!!summaryid) { index['dsum'].add(summaryid); }
+                if (!!summaryid) { index[DSUM].add(summaryid); }
                 break;
             }
-            case 'dsum': {
+            case DSUM: {
                 const { docid } = similarity;
-                if (!!docid) { index['doc'].add(docid); }
+                if (!!docid) { index[DOC].add(docid); }
                 break;
             }
-            case 'conv': {
+            case CONV: {
                 const { docid } = similarity;
-                if (!!docid) { index['xchg'].add(docid); }
+                if (!!docid) { index[XCHG].add(docid); }
                 break;
             }
-            case 'syn': {
+            case SYN: {
                 const { docid } = similarity;
-                if (!!docid) { index['xchg'].add(docid); }
+                if (!!docid) { index[XCHG].add(docid); }
                 break;
             }
-            case 'xchg': {
+            case XCHG: {
                 const { summaryid } = similarity;
-                if (!!summaryid) { index['syn'].add(summaryid); }
+                if (!!summaryid) { index[SYN].add(summaryid); }
                 break;
             }
         }
@@ -68,25 +70,10 @@ export function makeSimilarityIndex(similarityMap: SimilarityMap): SimilarityInd
     return index;
 }
 
-
-const PartialMemento = RequiredMetaBase.pick({
-    id: true,
-    tokens: true,
-    content: true,
-    source: true,
-    kind: true,
-})
-.extend({
-    content: z.string(),
-    tokens: z.number(),
-})
-;
-type PartialMemento = z.TypeOf<typeof PartialMemento>;
-
-export async function loadMementoSet(dbPool: DatabasePool, idSet: Set<string>): Promise<PartialMemento[]> {
+export async function loadMementoSet(dbPool: DatabasePool, idSet: Set<string>): Promise<MementoSearchResult[]> {
     const idArray: string[] = Array.from(idSet);
     const result = await dbPool.connect(async (conn) => {
-        const query = sql.type(PartialMemento)`
+        const query = sql.type(MementoSearchResult)`
             SELECT
                 id,
                 tokens,
@@ -101,7 +88,7 @@ export async function loadMementoSet(dbPool: DatabasePool, idSet: Set<string>): 
         `;
         return await conn.query(query);
     });
-    return result.rows.map((row: PartialMemento) => row);
+    return result.rows.map((row: MementoSearchResult) => row);
 }
 
 export async function selectMemsBySemanticSimilarity(dbPool: DatabasePool, userMessage: string, tokensLimit: number): Promise<SimilarityMap> {

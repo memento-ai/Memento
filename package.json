@@ -17,6 +17,7 @@
     "packages/memento-db",
     "packages/postgres-db",
     "packages/readme-agents",
+    "packages/search",
     "packages/synopsis-agent",
     "packages/types",
     "packages/utils"

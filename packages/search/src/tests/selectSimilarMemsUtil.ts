@@ -1,9 +1,9 @@
-// Path: packages/memento-db/src/tests/selectSimilarMemsUtil.ts
+// Path: packages/search/src/tests/selectSimilarMemsUtil.ts
 
 import { Command } from 'commander';
 import { extractKeywordsFromContent, selectMemsByKeywordSearch } from '../selectMemsByKeywordSearch';
 import { loadMementoSet, makeSimilarityIndex, selectMemsBySemanticSimilarity } from '../selectMemsBySemanticSimilarity';
-import { MementoDb } from '../mementoDb';
+import { MementoDb } from '@memento-ai/memento-db';
 import { MemKindValues } from '@memento-ai/types';
 import c from 'ansi-colors';
 import type { SimilarityIndex, SimilarityMap } from '../selectMemsBySemanticSimilarity';

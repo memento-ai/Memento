@@ -1,7 +1,9 @@
-// Path: packages/memento-db/src/extractKeywordsFromContent.ts
+// Path: packages/search/src/selectMemsByKeywordSearch.ts
 
-import { sql, type DatabasePool } from 'slonik';
+import { MementoSearchResult } from './mementoSearchResult';
+import { sql } from 'slonik';
 import { z } from 'zod';
+import type { DatabasePool } from 'slonik';
 
 export const ExtractKeywordsFromContentResult = z.object({
     lexeme: z.string(),
@@ -49,26 +51,17 @@ export async function extractKeywordsFromContent(dbPool: DatabasePool, args: Ext
     });
 }
 
-export const MementosSimilarToContent = z.object({
-    id: z.string(),
-    kind: z.string(),
-    content: z.string(),
-    source: z.string(),
-    rank: z.number(),
-});
-export type MementosSimilarToContent = z.infer<typeof MementosSimilarToContent>;
-
 export type SelectMementosSimilarArgs = ExtractKeywordsArgs & {
     maxTokens?: number,
 };
 
-export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : SelectMementosSimilarArgs): Promise<MementosSimilarToContent[]> {
+export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : SelectMementosSimilarArgs): Promise<MementoSearchResult[]> {
     const { content, maxTokens=5000, numKeywords=5 } = args;
     const keywords = await extractKeywordsFromContent(dbPool, {content, numKeywords});
 
     const keywordQuery = keywords.map((keyword) => keyword.lexeme).join(' | ');
 
-    const query = sql.type(MementosSimilarToContent)`
+    const query = sql.type(MementoSearchResult)`
         WITH query AS (
             SELECT to_tsquery('english', ${keywordQuery}) AS query
         ),
