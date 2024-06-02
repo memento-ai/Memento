@@ -1,11 +1,12 @@
 // Path: packages/memento-db/src/tests/scoreMemsBySimilarityUtil.ts
 
 import { Command } from 'commander';
-import debug from 'debug';
-import { extractExchangeHistory, loadMementoSet, makeSimilarityIndex, scoreMemsBySimilarity, type SimilarityIndex, type SimilarityMap } from '../scoreMemsBySimilarity';
+import { extractKeywordsFromMessage, selectMementosSimilarToContent } from '../extractKeywordsFromMessage';
+import { loadMementoSet, makeSimilarityIndex, scoreMemsBySimilarity } from '../scoreMemsBySimilarity';
 import { MementoDb } from '../mementoDb';
+import { MemKindValues } from '@memento-ai/types';
 import c from 'ansi-colors';
-import { MemKindValues, XCHG } from '@memento-ai/types';
+import type { SimilarityIndex, SimilarityMap } from '../scoreMemsBySimilarity';
 
 const program = new Command();
 
@@ -58,6 +59,15 @@ async function main() {
     for await (const lines of collectLines()) {
         process.stdout.write(`${c.blue('Assistant: ')}`);
         const content: string = lines.join('\n')
+
+        const keywords = await extractKeywordsFromMessage(db.pool, {content});
+        console.table(keywords);
+
+        const mementosSimilarToContent = await selectMementosSimilarToContent(db.pool, {content});
+        console.table(mementosSimilarToContent.map(m => {
+            return { ...m, content: m.content.split('\n')[0].slice(0, 60) };
+        }));
+
         const result: SimilarityMap = await scoreMemsBySimilarity(db.pool, content, tokens);
         const index: SimilarityIndex = makeSimilarityIndex(result);
 
@@ -74,12 +84,12 @@ async function main() {
             console.table(abbrev);
         }
 
-        const exchangeHistory = await loadMementoSet(db.pool, index[XCHG]);
-        exchangeHistory.forEach(xchg => {
-            const { content } = xchg;
-            console.log(content);
-            console.log('\n-------------------\n\n');
-        });
+        // const exchangeHistory = await loadMementoSet(db.pool, index[XCHG]);
+        // exchangeHistory.forEach(xchg => {
+        //     const { content } = xchg;
+        //     console.log(content);
+        //     console.log('\n-------------------\n\n');
+        // });
 
         console.log(`Total tokens: ${totalTokens}`);
     }
