@@ -1,4 +1,4 @@
-// Path: packages/memento-db/src/extractKeywordsFromMessage.ts
+// Path: packages/memento-db/src/extractKeywordsFromContent.ts
 
 import { sql, type DatabasePool } from 'slonik';
 import { z } from 'zod';
@@ -16,27 +16,27 @@ export type ExtractKeywordsArgs = {
     numKeywords?: number,
 };
 
-export async function extractKeywordsFromMessage(dbPool: DatabasePool, args: ExtractKeywordsArgs): Promise<ExtractKeywordsFromContentResult[]> {
+export async function extractKeywordsFromContent(dbPool: DatabasePool, args: ExtractKeywordsArgs): Promise<ExtractKeywordsFromContentResult[]> {
     const {content, numKeywords=5 } = args;
     const query = sql.type(ExtractKeywordsFromContentResult)`
         WITH msg_stats AS (
             SELECT
             lexeme,
-            ROUND(COUNT(*) * 1.0 / (SELECT COUNT(*) FROM unnest(to_tsvector('english', ${content}))), 4) AS tf
+            COUNT(*) / (SELECT COUNT(*) FROM unnest(to_tsvector('english', ${content}))) AS tf
             FROM unnest(to_tsvector('english', ${content}))
             GROUP BY lexeme
         ),
         corpus_stats AS (
             SELECT
             word AS lexeme,
-            ROUND(LOG((SELECT COUNT(*) FROM memento) / ndoc)::NUMERIC, 4) AS idf
+            LOG((SELECT COUNT(*) FROM memento) / ndoc)::NUMERIC AS idf
             FROM ts_stat('SELECT tssearch FROM memento')
         )
         SELECT
             msg_stats.lexeme,
             msg_stats.tf,
             corpus_stats.idf,
-            ROUND(msg_stats.tf * corpus_stats.idf, 4) AS tf_idf
+            msg_stats.tf * corpus_stats.idf AS tf_idf
         FROM msg_stats
         JOIN corpus_stats ON msg_stats.lexeme = corpus_stats.lexeme
         ORDER BY tf_idf DESC
@@ -62,9 +62,9 @@ export type SelectMementosSimilarArgs = ExtractKeywordsArgs & {
     maxTokens?: number,
 };
 
-export async function selectMementosSimilarToContent(dbPool: DatabasePool, args : SelectMementosSimilarArgs): Promise<MementosSimilarToContent[]> {
+export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : SelectMementosSimilarArgs): Promise<MementosSimilarToContent[]> {
     const { content, maxTokens=5000, numKeywords=5 } = args;
-    const keywords = await extractKeywordsFromMessage(dbPool, {content, numKeywords});
+    const keywords = await extractKeywordsFromContent(dbPool, {content, numKeywords});
 
     const keywordQuery = keywords.map((keyword) => keyword.lexeme).join(' | ');
     console.log('keywordQuery:', keywordQuery);

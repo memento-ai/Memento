@@ -1,7 +1,7 @@
 // Path: packages/memento-db/src/tests/selectSimilarMemsUtil.ts
 
 import { Command } from 'commander';
-import { extractKeywordsFromMessage, selectMementosSimilarToContent } from '../extractKeywordsFromMessage';
+import { extractKeywordsFromContent, selectMemsByKeywordSearch } from '../selectMemsByKeywordSearch';
 import { loadMementoSet, makeSimilarityIndex, selectMemsBySemanticSimilarity } from '../selectMemsBySemanticSimilarity';
 import { MementoDb } from '../mementoDb';
 import { MemKindValues } from '@memento-ai/types';
@@ -33,10 +33,10 @@ async function main() {
 
     const db: MementoDb = await MementoDb.create(database);
 
-    const keywords = await extractKeywordsFromMessage(db.pool, {content});
+    const keywords = await extractKeywordsFromContent(db.pool, {content});
     console.table(keywords);
 
-    const mementosSimilarToContent = await selectMementosSimilarToContent(db.pool, {content, maxTokens: tokens});
+    const mementosSimilarToContent = await selectMemsByKeywordSearch(db.pool, {content, maxTokens: tokens});
     console.table(mementosSimilarToContent.map(m => {
         return { ...m, content: m.content.split('\n')[0].slice(0, 60) };
     }));
