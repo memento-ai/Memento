@@ -8,7 +8,7 @@ import { DOC, DSUM, createMem } from '@memento-ai/types'
 import { summarizeAndStoreDocuments, type Summarizer } from './summarizeDocument';
 import { sql } from 'slonik';
 import { z } from 'zod';
-import { $, type ShellOutput } from 'bun';
+import { $ } from 'bun';
 
 const dlog = debug("ingester");
 

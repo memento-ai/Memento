@@ -21,7 +21,7 @@ program
     .option('-p, --provider <provider>', 'The provider to use [anthropic, ollama, openai')
     .option('-m, --model <model>', 'The model to use for summarization')
     .option('-C, --cwd <dir>', 'Use the specified directory as the current working directory (default: .)')
-    .option('-D, --directory <dir>', 'The directory from which to recursively ingest files (default: packages)');
+    .option('-D, --directory <dir>', 'The directory from which to recursively ingest files (default: .)');
 
 program.parse(process.argv);
 
@@ -47,7 +47,7 @@ async function main() {
 
     cleanSlate = cleanSlate ?? false;
     cwd = cwd ?? '.';
-    directory = directory ?? 'packages';
+    directory = directory ?? '.';
 
     if (!provider) {
         console.error(`You must specify an LLM provider (${ProviderNames.join(', ')}`);
