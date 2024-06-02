@@ -15,7 +15,7 @@ export const ConversationMetaArgs = z.object({
     role: Role,
     source: z.literal('conversation'),  // should also use 'function' or 'result' for the function output return on behalf of user
     priority: z.number().default(1),
-    docid: z.string().optional(),       // the id of the exchange mememto
+    docid: z.string().optional(),       // the id of the exchange memento
 });
 export type ConversationMetaArgs = z.input<typeof ConversationMetaArgs>;
 
