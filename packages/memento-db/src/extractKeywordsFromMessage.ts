@@ -59,11 +59,11 @@ export const MementosSimilarToContent = z.object({
 export type MementosSimilarToContent = z.infer<typeof MementosSimilarToContent>;
 
 export type SelectMementosSimilarArgs = ExtractKeywordsArgs & {
-    numMementos?: number,
+    maxTokens?: number,
 };
 
 export async function selectMementosSimilarToContent(dbPool: DatabasePool, args : SelectMementosSimilarArgs): Promise<MementosSimilarToContent[]> {
-    const { content, numMementos=10, numKeywords=5 } = args;
+    const { content, maxTokens=5000, numKeywords=5 } = args;
     const keywords = await extractKeywordsFromMessage(dbPool, {content, numKeywords});
 
     const keywordQuery = keywords.map((keyword) => keyword.lexeme).join(' | ');
@@ -72,18 +72,37 @@ export async function selectMementosSimilarToContent(dbPool: DatabasePool, args 
     const query = sql.type(MementosSimilarToContent)`
         WITH query AS (
             SELECT to_tsquery('english', ${keywordQuery}) AS query
+        ),
+        ranked_mementos AS (
+            SELECT
+                m.id,
+                m.kind,
+                m.content,
+                m.source,
+                m.tokens,
+            ts_rank(m.tssearch, query.query) AS rank
+            FROM memento m, query
+            WHERE m.tssearch @@ query.query
+            ORDER BY rank DESC
+        ),
+        mementos_with_running_sum AS (
+            SELECT
+                id,
+                kind,
+                content,
+                rank,
+                tokens,
+                SUM(tokens) OVER (ORDER BY rank DESC) AS total_tokens
+            FROM ranked_mementos
         )
         SELECT
-            m.id,
-            m.kind,
-            m.content,
-            m.source,
-            m.tokens,
-            ts_rank(m.tssearch, query.query) AS rank
-        FROM memento m, query
-        WHERE m.tssearch @@ query.query
-        ORDER BY rank DESC
-        LIMIT ${numMementos};`;
+            id,
+            kind,
+            content,
+            rank
+        FROM mementos_with_running_sum
+        WHERE total_tokens <= ${maxTokens}
+        ORDER BY rank DESC;`;
 
     return dbPool.connect(async (connection) => {
         const result = await connection.query(query);
