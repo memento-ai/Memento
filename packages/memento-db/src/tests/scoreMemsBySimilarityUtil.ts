@@ -42,6 +42,13 @@ async function main() {
     }));
 
     const result: SimilarityMap = await scoreMemsBySimilarity(db.pool, content, tokens);
+    const semanticallySimilarMementos = Object.values(result).sort((a, b) => b.similarity - a.similarity);
+    console.table(semanticallySimilarMementos.map(m => {
+        const content = m.content.split('\n')[0].slice(0, 60);
+        const { id, kind, similarity, source } = m;
+        return { id, kind, similarity, source, content};
+    }));
+
     const index: SimilarityIndex = makeSimilarityIndex(result);
 
     let totalTokens = 0;

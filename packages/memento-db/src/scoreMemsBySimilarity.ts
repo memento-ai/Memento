@@ -24,10 +24,8 @@ export type SimilarityScore = z.TypeOf<typeof SimilarityScore>;
 export type SimilarityMap = Record<string, SimilarityScore>;
 export type SimilarityIndex = Record<MemKind, Set<string>>;
 
-export type PartialSimilarityIndex = Partial<SimilarityIndex>;
-
 function makeEmptySimilarityIndex(): SimilarityIndex {
-    const index: PartialSimilarityIndex = {};
+    const index: Partial<SimilarityIndex> = {};
     for (const kind of MemKindValues) {
         index[kind] = new Set();
     }
