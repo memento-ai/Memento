@@ -1,4 +1,4 @@
-// Path: packages/memento-db/src/scoreMemsBySimilarity.ts
+// Path: packages/memento-db/src/selectMemsBySemanticSimilarity.ts
 
 import { sql, type QueryResult, type DatabasePool } from 'slonik';
 import pgvector from 'pgvector';
@@ -104,7 +104,7 @@ export async function loadMementoSet(dbPool: DatabasePool, idSet: Set<string>): 
     return result.rows.map((row: PartialMemento) => row);
 }
 
-export async function scoreMemsBySimilarity(dbPool: DatabasePool, userMessage: string, tokensLimit: number): Promise<SimilarityMap> {
+export async function selectMemsBySemanticSimilarity(dbPool: DatabasePool, userMessage: string, tokensLimit: number): Promise<SimilarityMap> {
     const queryEmbedding = await embedding.generateOne(userMessage);
     const queryVector = pgvector.toSql(queryEmbedding);
 

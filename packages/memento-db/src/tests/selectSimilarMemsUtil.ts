@@ -1,18 +1,18 @@
-// Path: packages/memento-db/src/tests/scoreMemsBySimilarityUtil.ts
+// Path: packages/memento-db/src/tests/selectSimilarMemsUtil.ts
 
 import { Command } from 'commander';
 import { extractKeywordsFromMessage, selectMementosSimilarToContent } from '../extractKeywordsFromMessage';
-import { loadMementoSet, makeSimilarityIndex, scoreMemsBySimilarity } from '../scoreMemsBySimilarity';
+import { loadMementoSet, makeSimilarityIndex, selectMemsBySemanticSimilarity } from '../selectMemsBySemanticSimilarity';
 import { MementoDb } from '../mementoDb';
 import { MemKindValues } from '@memento-ai/types';
 import c from 'ansi-colors';
-import type { SimilarityIndex, SimilarityMap } from '../scoreMemsBySimilarity';
+import type { SimilarityIndex, SimilarityMap } from '../selectMemsBySemanticSimilarity';
 
 const program = new Command();
 
 program
     .version('0.0.1')
-    .description(`A utility to see how scoreMemsBySimilarity performs.`)
+    .description(`A utility to experiment with semantic and keyword similarity.`)
     .requiredOption('-d, --database <dbname>', 'The name of the database to use')
     .requiredOption('-c, --content <string>', 'The content to score')
     .option('-t, --tokens <int>', 'The total number of tokens to select', '10000');
@@ -20,7 +20,7 @@ program
 program.parse(process.argv);
 
 async function main() {
-    console.info('Running scoreMemsBySimilarity utility...');
+    console.info('Running selectMemsBySemanticSimilarity utility...');
     const options = program.opts();
 
     let { database, tokens, content } = options;
@@ -41,7 +41,7 @@ async function main() {
         return { ...m, content: m.content.split('\n')[0].slice(0, 60) };
     }));
 
-    const result: SimilarityMap = await scoreMemsBySimilarity(db.pool, content, tokens);
+    const result: SimilarityMap = await selectMemsBySemanticSimilarity(db.pool, content, tokens);
     const semanticallySimilarMementos = Object.values(result).sort((a, b) => b.similarity - a.similarity);
     console.table(semanticallySimilarMementos.map(m => {
         const content = m.content.split('\n')[0].slice(0, 60);
