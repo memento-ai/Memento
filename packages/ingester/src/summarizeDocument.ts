@@ -29,19 +29,12 @@ export abstract class SummarizerAgent extends Agent implements Summarizer {
 
     async generatePrompt() : Promise<string> {
         const system: string = stripCommonIndent(`
-            Your task is to generate a summary of the given document.
-            The document's entire content is provided in the user message. Your reponse should be a summary of the document.
-            The document and the summary will be stored in a PostgreSQL database for Retrieval Augmented Generation.
-            Each document will be indexed for both full text search (tsvector) and semantic similarity (pgvector).
-            Your goal is to generate a summary that captures the essence of the document in a concise manner,
-            such that the document and the summary will have similar tsvector and pgvector representations.
-            This is the only purpose of the summary - to serve as a surrogate for the full document during retrieval.
-            Note carefully:
-            1. The summary will NOT be presented to human users.
-            2. Do NOT include any helpful preamble or commentary.
-            2a. Specifically, do NOT start the summary with \`Here is a summary of the document:\` or similar.
-            3. Do NOT include any information that is not obtained from the document.
-            4. Be concise and factual.
+            # Instructions
+            Your task is to generate a response that is a *concise* summary of the given document.
+            The document's entire content is provided in the user message.
+            Your *entire* reponse will be stored in a database as the summary of the document.
+            Your response should therefore not contain any text that is not part of the intended summary.
+            Be concise and factual.
         `);
         return system;
     }
@@ -111,11 +104,21 @@ export interface SummarizeAndStoreDocumentsArgs {
 
 export async function summarizeAndStoreDocuments(args: SummarizeAndStoreDocumentsArgs): Promise<DocAndSummaryResult> {
     const { db, source, content, summarizer } = args;
-    const summary = (await summarizer.summarize({content, source})).content;
+    let summary = (await summarizer.summarize({content, source})).content;
     if (!summary) {
         console.error("Error summarizing document");
         throw new Error("Error summarizing document");
     }
+
+    const lines = summary.split("\n");
+    if (lines[0].startsWith("Here is a")) {
+        lines.shift();
+        if (lines[0].trim() === "") {
+            lines.shift();
+        }
+    }
+    summary = lines.join("\n");
+
     dlog("Summary:", summary.slice(0, 200) + "...");
     const result: DocAndSummaryResult = await db.addDocAndSummary({content, source, summary});
     dlog("Document and summary stored:", result);
