@@ -2,9 +2,10 @@
 
 import { Command } from 'commander';
 import debug from 'debug';
-import { scoreMemsBySimilarity, type SimilarityMap } from '../scoreMemsBySimilarity';
+import { extractExchangeHistory, loadMementoSet, makeSimilarityIndex, scoreMemsBySimilarity, type SimilarityIndex, type SimilarityMap } from '../scoreMemsBySimilarity';
 import { MementoDb } from '../mementoDb';
 import c from 'ansi-colors';
+import { MemKindValues, XCHG } from '@memento-ai/types';
 
 const program = new Command();
 
@@ -58,10 +59,29 @@ async function main() {
         process.stdout.write(`${c.blue('Assistant: ')}`);
         const content: string = lines.join('\n')
         const result: SimilarityMap = await scoreMemsBySimilarity(db.pool, content, tokens);
+        const index: SimilarityIndex = makeSimilarityIndex(result);
 
-        for (const key in result) {
-            console.log(key, result[key]);
+        let totalTokens = 0;
+        for (const kind of MemKindValues) {
+            const mementos = await loadMementoSet(db.pool, index[kind]);
+            if (mementos.length === 0) continue;
+            const abbrev = mementos.map(m => {
+                let { content, tokens } = m;
+                totalTokens += tokens;
+                content = content.split('\n')[0].slice(0, 60);
+                return {...m, content};
+            });
+            console.table(abbrev);
         }
+
+        const exchangeHistory = await loadMementoSet(db.pool, index[XCHG]);
+        exchangeHistory.forEach(xchg => {
+            const { content } = xchg;
+            console.log(content);
+            console.log('\n-------------------\n\n');
+        });
+
+        console.log(`Total tokens: ${totalTokens}`);
     }
 
 }
