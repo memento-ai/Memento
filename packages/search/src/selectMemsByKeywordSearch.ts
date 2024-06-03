@@ -5,7 +5,7 @@ import { sql } from 'slonik';
 import type { DatabasePool } from 'slonik';
 import type { MementoSearchArgs } from './mementoSearchTypes';
 import { extractKeywordsFromContent } from './extractKeywordsFromContent';
-import { softmaxNormalize } from './softmaxNormalize';
+import { linearNormalize, softmaxNormalize } from './normalize';
 
 // Keyword search assigns a score in the range [0, 1] to each memento.
 // The higher the score, the more relevant the memento is to the query content.
@@ -66,5 +66,5 @@ export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : Mem
         return result.rows.map((row) => row);
     });
 
-    return softmaxNormalize(result, (m) => m.score);
+    return linearNormalize(result, (m) => m.score);
 }

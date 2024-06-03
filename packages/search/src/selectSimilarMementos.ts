@@ -5,7 +5,7 @@ import type { MementoSearchResult,  MementoSearchArgs } from './mementoSearchTyp
 import { selectMemsByKeywordSearch } from './selectMemsByKeywordSearch';
 import { selectMemsBySemanticSimilarity } from './selectMemsBySemanticSimilarity';
 import { DOC, SYN, CONV } from '@memento-ai/types';
-import { softmaxNormalize } from './softmaxNormalize';
+import { linearNormalize, normalize, softmaxNormalize } from './normalize';
 import debug from 'debug';
 
 const dlog = debug('search');
@@ -109,6 +109,6 @@ export async function selectSimilarMementos(dbPool: DatabasePool, args: MementoS
 
     dlog(`Combined tokens after filtering: ${tokens}`);
 
-    // Finally, let's renormalize the scores to sum to 1.0.
-    return softmaxNormalize(result, (m) => m.score);
+    // Finally, let's renormalize the scores to sum to 1.0, using the simple normalize function (not softmax).
+    return linearNormalize(result, (m) => m.score);
 }

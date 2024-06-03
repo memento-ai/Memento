@@ -6,7 +6,7 @@ import { sql } from 'slonik';
 import pgvector from 'pgvector';
 import type { MementoSearchArgs } from './mementoSearchTypes';
 import type { QueryResult, DatabasePool } from 'slonik';
-import { softmaxNormalize } from './softmaxNormalize';
+import { linearNormalize, softmaxNormalize } from './normalize';
 
 // Semantic similarity assigns a score in the range [0, 1] to each memento.
 // The higher the score, the more semantically similar the memento is to the query content.
@@ -54,17 +54,5 @@ export async function selectMemsBySemanticSimilarity(dbPool: DatabasePool, args:
         return result.rows.map((row: MementoSearchResult) => row);
     });
 
-    return softmaxNormalize(result, (m) => m.score);
+    return linearNormalize(result, (m) => m.score);
 }
-
-
-// result.rows.forEach((row) => {
-//     try {
-//         const similarity: SimilarityScore = zodParse(SimilarityScore, row);
-//         resultMap[similarity.id] = similarity;
-//     } catch (error) {
-//         console.error('Error parsing similarity result:', error);
-//         console.error(row);
-//         throw error;
-//     }
-// });
