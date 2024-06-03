@@ -1,61 +1,17 @@
 // Path: packages/search/src/selectMemsByKeywordSearch.ts
 
-import { MementoSearchResult } from './mementoSearchResult';
+import { MementoSearchResult } from './mementoSearchTypes';
 import { sql } from 'slonik';
-import { z } from 'zod';
 import type { DatabasePool } from 'slonik';
+import type { MementoSearchArgs } from './mementoSearchTypes';
+import { extractKeywordsFromContent } from './extractKeywordsFromContent';
+import { softmaxNormalize } from './softmaxNormalize';
 
-export const ExtractKeywordsFromContentResult = z.object({
-    lexeme: z.string(),
-    tf: z.number(),
-    idf: z.number(),
-    tf_idf: z.number(),
-});
-export type ExtractKeywordsFromContentResult = z.infer<typeof ExtractKeywordsFromContentResult>;
+// Keyword search assigns a score in the range [0, 1] to each memento.
+// The higher the score, the more relevant the memento is to the query content.
+// The [0, 1] range is achieved by normalizing the rank score with the normalization method 32.
 
-export type ExtractKeywordsArgs = {
-    content: string,
-    numKeywords?: number,
-};
-
-export async function extractKeywordsFromContent(dbPool: DatabasePool, args: ExtractKeywordsArgs): Promise<ExtractKeywordsFromContentResult[]> {
-    const {content, numKeywords=5 } = args;
-    const query = sql.type(ExtractKeywordsFromContentResult)`
-        WITH msg_stats AS (
-            SELECT
-            lexeme,
-            COUNT(*) / (SELECT COUNT(*) FROM unnest(to_tsvector('english', ${content}))) AS tf
-            FROM unnest(to_tsvector('english', ${content}))
-            GROUP BY lexeme
-        ),
-        corpus_stats AS (
-            SELECT
-            word AS lexeme,
-            LOG((SELECT COUNT(*) FROM memento) / ndoc)::NUMERIC AS idf
-            FROM ts_stat('SELECT tssearch FROM memento')
-        )
-        SELECT
-            msg_stats.lexeme,
-            msg_stats.tf,
-            corpus_stats.idf,
-            msg_stats.tf * corpus_stats.idf AS tf_idf
-        FROM msg_stats
-        JOIN corpus_stats ON msg_stats.lexeme = corpus_stats.lexeme
-        ORDER BY tf_idf DESC
-        LIMIT ${numKeywords};
-        `;
-
-    return dbPool.connect(async (connection) => {
-        const result = await connection.query(query);
-        return result.rows.map((row) => row);
-    });
-}
-
-export type SelectMementosSimilarArgs = ExtractKeywordsArgs & {
-    maxTokens?: number,
-};
-
-export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : SelectMementosSimilarArgs): Promise<MementoSearchResult[]> {
+export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : MementoSearchArgs): Promise<MementoSearchResult[]> {
     const { content, maxTokens=5000, numKeywords=5 } = args;
     const keywords = await extractKeywordsFromContent(dbPool, {content, numKeywords});
 
@@ -69,37 +25,46 @@ export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : Sel
             SELECT
                 m.id,
                 m.kind,
-                m.content,
+                m.docid,
+                m.summaryid,
                 m.source,
                 m.tokens,
-            ts_rank(m.tssearch, query.query) AS rank
+                m.content,
+                ts_rank(m.tssearch, query.query, 32) AS score   -- 32 is the normalization method
             FROM memento m, query
             WHERE m.tssearch @@ query.query
-            ORDER BY rank DESC
+            ORDER BY score DESC
         ),
         mementos_with_running_sum AS (
             SELECT
                 id,
                 kind,
-                content,
+                docid,
+                summaryid,
                 source,
-                rank,
                 tokens,
-                SUM(tokens) OVER (ORDER BY rank DESC) AS total_tokens
+                content,
+                score,
+                SUM(tokens) OVER (ORDER BY score DESC) AS total_tokens
             FROM ranked_mementos
         )
         SELECT
             id,
             kind,
-            content,
+            docid,
+            summaryid,
             source,
-            rank
+            tokens,
+            content,
+            score
         FROM mementos_with_running_sum
         WHERE total_tokens <= ${maxTokens}
-        ORDER BY rank DESC;`;
+        ORDER BY score DESC;`;
 
-    return dbPool.connect(async (connection) => {
+    const result = await dbPool.connect(async (connection) => {
         const result = await connection.query(query);
         return result.rows.map((row) => row);
     });
+
+    return softmaxNormalize(result, (m) => m.score);
 }

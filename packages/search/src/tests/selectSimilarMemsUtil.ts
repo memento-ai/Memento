@@ -1,12 +1,12 @@
 // Path: packages/search/src/tests/selectSimilarMemsUtil.ts
 
 import { Command } from 'commander';
-import { extractKeywordsFromContent, selectMemsByKeywordSearch } from '../selectMemsByKeywordSearch';
-import { loadMementoSet, makeSimilarityIndex, selectMemsBySemanticSimilarity } from '../selectMemsBySemanticSimilarity';
+import { extractKeywordsFromContent } from '../extractKeywordsFromContent';
 import { MementoDb } from '@memento-ai/memento-db';
-import { MemKindValues } from '@memento-ai/types';
+import { selectMemsByKeywordSearch } from '../selectMemsByKeywordSearch';
+import { selectMemsBySemanticSimilarity } from '../selectMemsBySemanticSimilarity';
 import c from 'ansi-colors';
-import type { SimilarityIndex, SimilarityMap } from '../selectMemsBySemanticSimilarity';
+import { selectSimilarMementos } from '../selectSimilarMementos';
 
 const program = new Command();
 
@@ -37,38 +37,29 @@ async function main() {
     console.info(c.bold('Keywords:'));
     console.table(keywords);
 
-    const mementosSimilarToContent = await selectMemsByKeywordSearch(db.pool, {content, maxTokens: tokens});
-    console.table(mementosSimilarToContent.map(m => {
-        return { ...m, content: m.content.split('\n')[0].slice(0, 60) };
+    const keywordSearchMems = await selectMemsByKeywordSearch(db.pool, {content, maxTokens: tokens});
+
+    console.info(c.bold('Keyword similar mementos:'));
+    console.table(keywordSearchMems.map(m => {
+        const { created_at, ...rest} = {...m, content: m.content.split('\n')[0].slice(0, 60) };
+        return rest;
     }));
 
-    const result: SimilarityMap = await selectMemsBySemanticSimilarity(db.pool, content, tokens);
-    const semanticallySimilarMementos = Object.values(result).sort((a, b) => b.similarity - a.similarity);
+    const semanticSearchMems = await selectMemsBySemanticSimilarity(db.pool, { content, maxTokens: tokens });
 
     console.info(c.bold('Semantically similar mementos:'));
-    console.table(semanticallySimilarMementos.map(m => {
-        const content = m.content.split('\n')[0].slice(0, 60);
-        const { id, kind, similarity, source } = m;
-        return { id, kind, similarity, source, content};
+    console.table(semanticSearchMems.map(m => {
+        const { created_at, ...rest} = {...m, content: m.content.split('\n')[0].slice(0, 60) };
+        return rest;
     }));
 
-    const index: SimilarityIndex = makeSimilarityIndex(result);
+    const fullSearchMems = await selectSimilarMementos(db.pool, { content, maxTokens: tokens });
 
-    let totalTokens = 0;
-    for (const kind of MemKindValues) {
-        const mementos = await loadMementoSet(db.pool, index[kind]);
-        if (mementos.length === 0) continue;
-        const abbrev = mementos.map(m => {
-            let { content, tokens } = m;
-            totalTokens += tokens;
-            content = content.split('\n')[0].slice(0, 60);
-            return {...m, content};
-        });
-        console.info(c.bold(`SimilarityIndex mementos of kind ${kind}:`));
-        console.table(abbrev);
-    }
-
-    console.log(`Total tokens: ${totalTokens}`);
+    console.info(c.bold('Full search similar mementos:'));
+    console.table(fullSearchMems.map(m => {
+        const { created_at, ...rest} = {...m, content: m.content.split('\n')[0].slice(0, 60) };
+        return rest;
+    }));
 }
 
 main().catch(console.error);
