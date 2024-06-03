@@ -14,5 +14,5 @@ CREATE OR REPLACE VIEW memento AS
         meta.priority as priority,
         meta.role as role,
         meta.source as source,
-        meta.summaryId as summaryid
+        meta.summaryid as summaryid
     FROM meta LEFT JOIN mem ON mem.id = meta.memid;

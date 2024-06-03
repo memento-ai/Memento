@@ -36,12 +36,12 @@ describe("summarizeDocument", () => {
         const content = await Bun.file(source).text();
 
         const docAndSummaryResult: DocAndSummaryResult = await summarizeAndStoreDocuments({db, source, content, summarizer});
-        const { docId, summaryId } = docAndSummaryResult;
+        const { docid, summaryid } = docAndSummaryResult;
 
-        dlog(`Summarized document ${docId} with summary ${summaryId}`)
+        dlog(`Summarized document ${docid} with summary ${summaryid}`)
 
         const result = await db.pool.connect(async (conn) => conn.query(sql.unsafe`
-            SELECT meta.id, meta.kind, meta.docId, meta.summaryId,mem.tokens, LEFT(mem.content, 30)
+            SELECT meta.id, meta.kind, meta.docid, meta.summaryid,mem.tokens, LEFT(mem.content, 30)
             FROM meta
             LEFT JOIN mem
             ON meta.memId = mem.id

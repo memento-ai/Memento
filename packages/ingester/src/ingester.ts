@@ -17,7 +17,7 @@ export const SUPPORTED_EXTENSIONS = ['.ts', '.sql', '.md'];
 const DocumentIdTuple = z.object({
   id: z.string(),
   memid: z.string(),
-  summaryId: z.string(),
+  summaryid: z.string(),
   tokens: z.number(),
 });
 
@@ -31,16 +31,16 @@ export async function ingestFile(db: MementoDb, filePath: string, summarizer?: S
     let result: DocAndSummaryResult | undefined = undefined;
     let skip: boolean = false;
     await db.pool.connect(async (conn) => {
-        const row = await conn.maybeOne(sql.type(DocumentIdTuple)`SELECT id, summaryId, memid, tokens FROM memento WHERE source = ${source} AND kind = ${DOC};`);
+        const row = await conn.maybeOne(sql.type(DocumentIdTuple)`SELECT id, summaryid, memid, tokens FROM memento WHERE source = ${source} AND kind = ${DOC};`);
         if (row) {
-            const { id, memid, summaryId, tokens } = row;
+            const { id, memid, summaryid, tokens } = row;
             if (memid === mem.id) {
                 dlog(`Document ${source} with ${tokens} tokens unchanged since previous ingestas id=${id}`);
                 skip = true;
-                result = { docId: id, summaryId }
+                result = { docid: id, summaryid }
             } else {
                 dlog(`Document ${source} already ingested as id=${id}, deleting and re-ingesting.`);
-                await conn.query(sql.unsafe`DELETE FROM meta WHERE id=${id} OR docId=${id};`)
+                await conn.query(sql.unsafe`DELETE FROM meta WHERE id=${id} OR docid=${id};`)
             }
         }
     });
@@ -51,7 +51,7 @@ export async function ingestFile(db: MementoDb, filePath: string, summarizer?: S
 
     dlog(`Ingesting file: ${source} with length: ${content.length}`)
     result = await summarizeAndStoreDocuments({db, source, content, summarizer});
-    dlog(`Summarized document ${result.docId} with summary ${result.summaryId}`)
+    dlog(`Summarized document ${result.docid} with summary ${result.summaryid}`)
     return result;
 }
 

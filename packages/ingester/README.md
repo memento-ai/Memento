@@ -18,7 +18,7 @@ import { ingestFile, createMockSummarizer } from '@memento-ai/ingester';
 const db = await MementoDb.create('my-database');
 const summarizer = createMockSummarizer();
 
-const { docId, summaryId } = await ingestFile(db, 'path/to/file.ts', summarizer);
+const { docid, summaryid } = await ingestFile(db, 'path/to/file.ts', summarizer);
 ```
 
 ### Ingesting a Directory
@@ -49,7 +49,7 @@ import { summarizeAndStoreDocuments, createModelSummarizer } from '@memento-ai/i
 const db = await MementoDb.create('my-database');
 const summarizer = createModelSummarizer({ provider: 'anthropic', model: 'haiku' });
 
-const { docId, summaryId } = await summarizeAndStoreDocuments({
+const { docid, summaryid } = await summarizeAndStoreDocuments({
   db,
   source: 'path/to/file.ts',
   content: 'The content of the file',

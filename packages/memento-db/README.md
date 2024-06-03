@@ -30,7 +30,7 @@ const convId = await db.addConversationMem({
 });
 
 // Add a document and summary memento
-const { docId, summaryId } = await db.addDocAndSummary({
+const { docid, summaryid } = await db.addDocAndSummary({
   content: 'This is a test document',
   summary: 'This document summarizes some information',
   source: 'test-source'
@@ -44,7 +44,7 @@ const xchgId = await db.addConvExchangeMementos({
 
 // Link a conversation exchange to a synopsis
 await db.linkExchangeSynopsis({
-  xchg_id: xchgId, 
+  xchg_id: xchgId,
   synopsis_id: 'synopsis-123'
 });
 

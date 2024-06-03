@@ -37,7 +37,7 @@ export type AddSysArgs = {
 
 export type AddFragArgs = {
     content: string;
-    docId: string;
+    docid: string;
 }
 
 export type AddDocAndSummaryArgs = {
@@ -69,6 +69,6 @@ export const SimilarityResult = z.object({
 export type SimilarityResult = z.TypeOf<typeof SimilarityResult>;
 
 export interface DocAndSummaryResult {
-    docId: string;
-    summaryId: string;
+    docid: string;
+    summaryid: string;
 }

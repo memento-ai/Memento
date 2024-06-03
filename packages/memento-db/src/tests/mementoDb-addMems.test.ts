@@ -35,7 +35,7 @@ describe("MementoDb", () => {
     });
 
     it("can add a fragment mem", async () => {
-        const id = await db.addFragmentMem({content: "test fragment mem", docId: "testDoc"});
+        const id = await db.addFragmentMem({content: "test fragment mem", docid: "testDoc"});
         expect(id).toBeTruthy();
     });
 

@@ -50,7 +50,7 @@ BEGIN
     );
 
     -- Update the meta records to link them
-    UPDATE meta SET docId = p_doc_meta_id WHERE id = p_sum_meta_id;
-    UPDATE meta SET summaryId = p_sum_meta_id WHERE id = p_doc_meta_id;
+    UPDATE meta SET docid = p_doc_meta_id WHERE id = p_sum_meta_id;
+    UPDATE meta SET summaryid = p_sum_meta_id WHERE id = p_doc_meta_id;
 END;
 $$;

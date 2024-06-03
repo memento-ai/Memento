@@ -24,9 +24,9 @@ export const MemBaseMetaData = RequiredMetaBase.extend({
     priority: z.optional(z.number()).default(0),
     pinned: z.optional(z.boolean()).default(false),
     role: z.optional(Role),
-    docId: z.optional(z.string()),
+    docid: z.optional(z.string()),
     source: z.optional(z.string()),
-    summaryId: z.optional(z.string()),
+    summaryid: z.optional(z.string()),
 });
 export type MemBaseMetaData = z.TypeOf<typeof MemBaseMetaData>;
 
@@ -39,14 +39,14 @@ export type ConversationMetaData = z.TypeOf<typeof ConversationMetaData>;
 
 export const FragmentMetaData = RequiredMetaBase.extend({
     kind: z.literal(FRAG),
-    docId: z.string(),
+    docid: z.string(),
 });
 export type FragmentMetaData = z.TypeOf<typeof FragmentMetaData>;
 
 export const DocumentMetaData = RequiredMetaBase.extend({
     kind: z.literal(DOC),
     source: z.string(),
-    summaryId: z.string()
+    summaryid: z.string()
 });
 export type DocumentMetaData = z.TypeOf<typeof DocumentMetaData>;
 
@@ -60,7 +60,7 @@ export type ConvSummaryMetaData = z.TypeOf<typeof ConvSummaryMetaData>;
 
 export const DocSummaryMetaData = RequiredMetaBase.extend({
     kind: z.literal(DSUM),
-    docId: z.string()
+    docid: z.string()
 });
 export type DocSummaryMetaData = z.TypeOf<typeof DocSummaryMetaData>;
 

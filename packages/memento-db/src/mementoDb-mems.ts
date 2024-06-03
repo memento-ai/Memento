@@ -24,10 +24,10 @@ export async function addConversationMem(pool: DatabasePool, args_: AddConvArgs)
 }
 
 export async function addFragmentMem(pool: DatabasePool, args_: AddFragArgs): Promise<ID> {
-    const { content, docId } = args_;
+    const { content, docid } = args_;
     const args = zodParse(FragmentMetaArgs, {
         kind: FRAG,
-        docId
+        docid
     });
     return await addMemento({ pool: pool, metaId: nanoid(), content, metaArgs: args });
 }
@@ -36,11 +36,11 @@ export async function addFragmentMem(pool: DatabasePool, args_: AddFragArgs): Pr
 /// This method trusts that `summary` is a valid summary of `content`.
 export async function addDocAndSummary(pool: DatabasePool, args_: AddDocAndSummaryArgs): Promise<DocAndSummaryResult> {
     const { content, source, summary } = args_;
-    const docId = nanoid();
-    const summaryId = nanoid();
-    await addMemento({ pool: pool, metaId: docId, content, metaArgs: zodParse(DocumentMetaArgs, { kind: DOC, docId, source, summaryId }) });
-    await addMemento({ pool: pool, metaId: summaryId, content: summary, metaArgs: zodParse(DocSummaryMetaArgs, { kind: DSUM, docId, summaryId, source }) });
-    return { docId, summaryId };
+    const docid = nanoid();
+    const summaryid = nanoid();
+    await addMemento({ pool: pool, metaId: docid, content, metaArgs: zodParse(DocumentMetaArgs, { kind: DOC, docid, source, summaryid }) });
+    await addMemento({ pool: pool, metaId: summaryid, content: summary, metaArgs: zodParse(DocSummaryMetaArgs, { kind: DSUM, docid, summaryid, source }) });
+    return { docid, summaryid };
 };
 
 export async function addConvSummaryMem(pool: DatabasePool, args_: AddConvSummaryArgs): Promise<ID> {

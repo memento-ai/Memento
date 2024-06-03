@@ -14,7 +14,7 @@ export const XCHG = 'xchg' as const;
 export const MemKindMap = {
     conv: CONV,     // Conversation mem: content of one message from user or assistant
     doc: DOC,       // Document mem: content of one whole document as ingested from the file system
-    frag: FRAG,     // Fragment mem: a portion of a the associated document identified by docId
+    frag: FRAG,     // Fragment mem: a portion of a the associated document identified by docid
     dsum: DSUM,     // Document summary mem: condensed summary of a document constructed at ingest time
     csum: CSUM,     // Conversation summary mem: summaries created and updated by the assistant to aid in long-term continuity
     syn: SYN,        // Message exchange synopsis (assistant's inner monologue)
