@@ -56,7 +56,7 @@ async function main() {
     const fullSearchMems = await selectSimilarMementos(db.pool, { content, maxTokens: tokens });
 
     console.info(c.bold('Full search similar mementos:'));
-    console.table(fullSearchMems.map(m => {
+    console.table(Object.values(fullSearchMems).map(m => {
         const { created_at, ...rest} = {...m, content: m.content.split('\n')[0].slice(0, 60) };
         return rest;
     }));

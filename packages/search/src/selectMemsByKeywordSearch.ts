@@ -1,15 +1,16 @@
 // Path: packages/search/src/selectMemsByKeywordSearch.ts
 
+import { extractKeywordsFromContent } from './extractKeywordsFromContent';
+import { linearNormalize } from './normalize';
 import { MementoSearchResult } from './mementoSearchTypes';
 import { sql } from 'slonik';
 import type { DatabasePool } from 'slonik';
 import type { MementoSearchArgs } from './mementoSearchTypes';
-import { extractKeywordsFromContent } from './extractKeywordsFromContent';
-import { linearNormalize, softmaxNormalize } from './normalize';
 
 // Keyword search assigns a score in the range [0, 1] to each memento.
 // The higher the score, the more relevant the memento is to the query content.
-// The [0, 1] range is achieved by normalizing the rank score with the normalization method 32.
+// The [0, 1] range is achieved by normalizing the rank score with the normalization method 32
+// and then linearly normalizing the scores to use the full the range [0, 1].
 
 export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : MementoSearchArgs): Promise<MementoSearchResult[]> {
     const { content, maxTokens=5000, numKeywords=5 } = args;
@@ -30,6 +31,7 @@ export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : Mem
                 m.source,
                 m.tokens,
                 m.content,
+                m.created_at,
                 ts_rank(m.tssearch, query.query, 32) AS score   -- 32 is the normalization method
             FROM memento m, query
             WHERE m.tssearch @@ query.query
@@ -44,6 +46,7 @@ export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : Mem
                 source,
                 tokens,
                 content,
+                created_at,
                 score,
                 SUM(tokens) OVER (ORDER BY score DESC) AS total_tokens
             FROM ranked_mementos
@@ -56,6 +59,7 @@ export async function selectMemsByKeywordSearch(dbPool: DatabasePool, args : Mem
             source,
             tokens,
             content,
+            created_at,
             score
         FROM mementos_with_running_sum
         WHERE total_tokens <= ${maxTokens}

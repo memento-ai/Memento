@@ -31,5 +31,8 @@ export const MementoSearchResult = MemBaseMetaData.pick({
 }))
 .extend({
     score: z.number(),  // The score of the search result, either the rank or similarity.
+})
+.required({
+    created_at: true,
 });
 export type MementoSearchResult = z.infer<typeof MementoSearchResult>;

@@ -1,15 +1,16 @@
 // Path: packages/search/src/selectMemsBySemanticSimilarity.ts
 
 import { embedding } from '@memento-ai/embedding';
+import { linearNormalize } from './normalize';
 import { MementoSearchResult } from './mementoSearchTypes';
 import { sql } from 'slonik';
 import pgvector from 'pgvector';
 import type { MementoSearchArgs } from './mementoSearchTypes';
 import type { QueryResult, DatabasePool } from 'slonik';
-import { linearNormalize, softmaxNormalize } from './normalize';
 
-// Semantic similarity assigns a score in the range [0, 1] to each memento.
+// Semantic similarity assigns a score in the range [0, 1] to each memento using cosign similarity.
 // The higher the score, the more semantically similar the memento is to the query content.
+// The full [0, 1] range is achieved by linearly normalizing the scores.
 
 export async function selectMemsBySemanticSimilarity(dbPool: DatabasePool, args: MementoSearchArgs): Promise<MementoSearchResult[]> {
 
@@ -21,20 +22,20 @@ export async function selectMemsBySemanticSimilarity(dbPool: DatabasePool, args:
         const result: QueryResult<MementoSearchResult> = await conn.query(sql.type(MementoSearchResult)`
             WITH cte AS (
                 SELECT
-                    m.id,
-                    mt.kind,
-                    mt.source,
-                    mt.docid,
-                    mt.summaryid,
-                    mt.created_at,
-                    m.tokens,
-                    m.content,
-                    1.0 - (m.embed_vector <=> ${queryVector}) AS score,
-                    SUM(m.tokens) OVER (ORDER BY m.embed_vector <=> ${queryVector} ASC) AS cumulative_tokens
+                    meta.id as id,
+                    kind,
+                    source,
+                    docid,
+                    summaryid,
+                    created_at,
+                    tokens,
+                    content,
+                    1.0 - (embed_vector <=> ${queryVector}) AS score,
+                    SUM(tokens) OVER (ORDER BY embed_vector <=> ${queryVector} ASC) AS cumulative_tokens
                 FROM
-                    mem m
+                    meta
                 JOIN
-                    meta mt ON m.id = mt.memid
+                    mem ON meta.memid = mem.id
             )
             SELECT
                 id,

@@ -1,12 +1,12 @@
 // Path: packages/search/src/selectSimilarMementos.ts
 
-import type { DatabasePool } from 'slonik';
-import type { MementoSearchResult,  MementoSearchArgs } from './mementoSearchTypes';
+import { DOC, SYN, CONV } from '@memento-ai/types';
+import { linearNormalize } from './normalize';
 import { selectMemsByKeywordSearch } from './selectMemsByKeywordSearch';
 import { selectMemsBySemanticSimilarity } from './selectMemsBySemanticSimilarity';
-import { DOC, SYN, CONV } from '@memento-ai/types';
-import { linearNormalize, normalize, softmaxNormalize } from './normalize';
 import debug from 'debug';
+import type { DatabasePool } from 'slonik';
+import type { MementoSearchResult,  MementoSearchArgs } from './mementoSearchTypes';
 
 const dlog = debug('search');
 
@@ -16,69 +16,13 @@ const dlog = debug('search');
 // Both searches are limited to maxTokens tokens.
 // The union will of the two searches will also be limited to maxTokens tokens.
 
-export async function selectSimilarMementos(dbPool: DatabasePool, args: MementoSearchArgs): Promise<MementoSearchResult[]> {
-    const { content, maxTokens=5000, numKeywords=5 } = args;
+export type MementoSimilarityMap = Record<string, MementoSearchResult>;
 
-    let keywordSelection: MementoSearchResult[] = await selectMemsByKeywordSearch(dbPool, {content, maxTokens, numKeywords});
-    let similaritySelection: MementoSearchResult[] = await selectMemsBySemanticSimilarity(dbPool, {content, maxTokens});
-
-    // We need to make a new MementoSearchResult[] that contains the union of the two selections,
-    // but with the score being some kind of combination of the two scores.
-    // Both scores are in the range [0, 1].
-
-    // However, even though the theoretical range is [0, 1], in practice the cosign distance function used by semantic search
-    // makes better of of the 0..1 range than the ts_rank score.
-
-    // So, in both search functions, we normalize the scores to be in the range [0, 1] and to sum to 1.0 using softmaxNormalize.
-
-    // Some mementos may be in one selection but not the other. When this happens, the missing score is treated as zero.
-    // i.e. the probability of the memento being in the selection is zero.
-    // The combined score is the arithmetic mean of the two scores.
-
-    let result: MementoSearchResult[] = [];
-    let kMap: Record<string, MementoSearchResult> = {};
-    let sMap: Record<string, MementoSearchResult> = {};
-
-    let kScoreSum = keywordSelection.reduce((acc, m) => acc + m.score, 0);
-    let sScoreSum = similaritySelection.reduce((acc, m) => acc + m.score, 0);
-
-    dlog(`Keyword score sum: ${kScoreSum}`);
-    dlog(`Similarity score sum: ${sScoreSum}`);
-
-    let kTokenSum = keywordSelection.reduce((acc, m) => acc + m.tokens, 0);
-    let sTokenSum = similaritySelection.reduce((acc, m) => acc + m.tokens, 0);
-
-    dlog(`Keyword token sum: ${kTokenSum}`);
-    dlog(`Similarity token sum: ${sTokenSum}`);
-
-    let idSet: Set<string> = new Set<string>();
-    for (let m of keywordSelection) {
-        idSet.add(m.id);
-        kMap[m.id] = m;
-    }
-    for (let m of similaritySelection) {
-        idSet.add(m.id);
-        sMap[m.id] = m;
-    }
-    let idArray: string[] = Array.from(idSet);
-    for (let id of idArray) {
-        let kScore = kMap[id] ? kMap[id].score : 0;
-        let sScore = sMap[id] ? sMap[id].score : 0;
-        let entry = kMap[id] ?? sMap[id];
-        let score = (kScore + sScore) / 2;
-        result.push({...entry, score});
-    }
-
+function trimResult(result: MementoSearchResult[], idSet: Set<string>, maxTokens: number): MementoSearchResult[] {
     let tokens = result.reduce((acc, m) => acc + m.tokens, 0);
     if (tokens <= maxTokens) {
         return result;
     }
-    dlog(`Combined tokens at start: ${tokens}`);
-
-    // We need to trim the result to maxTokens tokens.
-    // The first step should be to remove redundant mementos.
-    // Each of the three kinds 'dsum', 'conv', 'syn' has a `docid` field which is the id of the "source memento",
-    // i.e. these three kinds are "derived" from or contained within a "source" memento.
 
     result = result.filter((m: MementoSearchResult) => {
         if (m.kind===DOC || m.kind===SYN || m.kind===CONV) {
@@ -95,7 +39,6 @@ export async function selectSimilarMementos(dbPool: DatabasePool, args: MementoS
         return result;
     }
 
-    // We stil have too many tokens, so we need to trim the result to maxTokens tokens.
     result.sort((a, b) => b.score - a.score);
 
     tokens = 0;
@@ -108,7 +51,56 @@ export async function selectSimilarMementos(dbPool: DatabasePool, args: MementoS
     }
 
     dlog(`Combined tokens after filtering: ${tokens}`);
+    return result;
+}
 
-    // Finally, let's renormalize the scores to sum to 1.0, using the simple normalize function (not softmax).
-    return linearNormalize(result, (m) => m.score);
+export async function selectSimilarMementos(dbPool: DatabasePool, args: MementoSearchArgs): Promise<MementoSimilarityMap> {
+    const { content, maxTokens=5000, numKeywords=5 } = args;
+
+    let keywordSelection: MementoSearchResult[] = await selectMemsByKeywordSearch(dbPool, {content, maxTokens, numKeywords});
+    let similaritySelection: MementoSearchResult[] = await selectMemsBySemanticSimilarity(dbPool, {content, maxTokens});
+
+    // We need to make a new MementoSearchResult[] that contains the union of the two selections,
+    // but with the score being some kind of combination of the two scores.
+    // We achieve that easily given that both scores are already normalized to be in the full range of [0, 1].
+
+    // Some mementos may be in one selection but not the other. When this happens, the missing score is treated as zero.
+    // The combined score is simply the arithmetic mean of the two scores.
+
+    let combined: MementoSearchResult[] = [];
+    let kMap: Record<string, MementoSearchResult> = {};
+    let sMap: Record<string, MementoSearchResult> = {};
+
+    let kTokenSum = keywordSelection.reduce((acc, m) => acc + m.tokens, 0);
+    let sTokenSum = similaritySelection.reduce((acc, m) => acc + m.tokens, 0);
+
+    dlog(`Keyword token sum: ${kTokenSum}`);
+    dlog(`Similarity token sum: ${sTokenSum}`);
+
+    let idSet: Set<string> = new Set<string>();
+    for (let m of keywordSelection) {
+        idSet.add(m.id);
+        kMap[m.id] = m;
+    }
+    for (let m of similaritySelection) {
+        idSet.add(m.id);
+        sMap[m.id] = m;
+    }
+    for (let id of idSet) {
+        let kScore = id in kMap ? kMap[id].score : 0;
+        let sScore = id in sMap ? sMap[id].score : 0;
+        let entry = kMap[id] ?? sMap[id];
+        let score = (kScore + sScore) / 2;
+        combined.push({...entry, score});
+    }
+
+    combined = trimResult(combined, idSet, maxTokens);
+    combined = linearNormalize(combined, (m) => m.score);
+
+    let result: Record<string, MementoSearchResult> = {};
+    for (let m of combined) {
+        result[m.id] = m;
+    }
+
+    return result;
 }
