@@ -48,9 +48,6 @@ await db.linkExchangeSynopsis({
   synopsis_id: 'synopsis-123'
 });
 
-// Retrieve pinned conversation summary mementos
-const pinnedCsumMems = await db.searchPinnedCsumMems(2000);
-
 // Get the last user and assistant messages
 const lastUserMessage = await db.get_last_user_message();
 const lastAssistantMessage = await db.get_last_assistant_message();
@@ -64,9 +61,10 @@ const lastAssistantMessage = await db.get_last_assistant_message();
 - `addConvExchangeMementos`: Add a conversation exchange memento (user-assistant message pair).
 - `linkExchangeSynopsis`: Link a conversation exchange memento to a synopsis memento.
 - `getConversation`: Retrieve the conversation history as an array of messages.
-- `searchPinnedCsumMems`: Retrieve pinned conversation summary mementos.
 - `getSynopses`: Retrieve a list of synopses (short summaries) from the database.
 - `get_last_user_message`: Get the last user message in the conversation.
 - `get_last_assistant_message`: Get the last assistant message in the conversation.
 
-See the `src` directory for example usage of the `MementoDb` class and its methods, as well as unit tests demonstrating the functionality.
+The package also includes utility functions for computing cosine similarity between conversation summaries (`checkCsumSimilarity`) and a script for identifying and removing duplicate conversation summaries (`computeCsumSimilarities`).
+
+See the `src` directory for the full implementation of the `MementoDb` class and its methods, as well as unit tests demonstrating the functionality.
