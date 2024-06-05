@@ -3,7 +3,6 @@
 import Handlebars from "handlebars";
 import { stripCommonIndent } from "@memento-ai/utils";
 import type { Memento } from "@memento-ai/types";
-import type { SimilarityResult } from "@memento-ai/memento-db";
 
 import { core_system } from "./prompt-partials/core_system";
 import { pronouns } from "./prompt-partials/pronouns";
@@ -11,13 +10,15 @@ import { function_calling } from "./prompt-partials/function_calling";
 import { sql_schema } from "./prompt-partials/sql_schema";
 import { additional_context } from "./prompt-partials/additional_context";
 import { continuity_response } from "./prompt-partials/continuity_response";
+import type { MementoSearchResult } from "@memento-ai/search";
 
 export type MementoPromptTemplateArgs = {
     functions: string,
     databaseSchema: string,
-    pinnedCsumMems: Memento[],
-    synopses: string[],
-    selectedMems: SimilarityResult[]
+    dsumMems: MementoSearchResult[],
+    docMems: MementoSearchResult[],
+    synMems: MementoSearchResult[],
+    xchgMems: MementoSearchResult[],
     continuityResponseContent: string | null
 };
 
@@ -42,7 +43,7 @@ const mementoPromptTemplateText = stripCommonIndent(`
 
     {{> sql_schema databaseSchema=databaseSchema }}
 
-    {{> additional_context pinnedCsumMems=pinnedCsumMems synopses=synopses selectedMems=selectedMems }}
+    {{> additional_context docMems=docMems dsumMems=dsumMems csumMems=csumMems synMems=synMems xchgMems=xchgMems}}
 
     {{> continuity_response continuityResponseContent=continuityResponseContent }}
 

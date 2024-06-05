@@ -8,7 +8,7 @@ import type { Memento } from "@memento-ai/types";
 // TODO: functionCallingInstructions can be computed just once and then reused
 
 
-export function functionCallingInstructions(databaseSchema: string) : string {
+export function functionCallingInstructions() : string {
     return `
 ${Object.values(registry)
     .map(config => generateFunctionDescription(config))

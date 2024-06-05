@@ -1,14 +1,14 @@
 // Path: packages/memento-agent/src/prompt-partials/additional_context.ts
 
-import type { SimilarityResult } from "@memento-ai/memento-db";
-import type { Memento } from "@memento-ai/types";
+import type { MementoSearchResult } from "@memento-ai/search";
 import { stripCommonIndent } from "@memento-ai/utils";
 import Handlebars from "handlebars";
 
 export type AdditionalContextTemplateArgs = {
-    pinnedCsumMems: Memento[],
-    synopses: string[],
-    selectedMems: SimilarityResult[]
+    dsumMems: MementoSearchResult[],
+    docMems: MementoSearchResult[],
+    synMems: MementoSearchResult[],
+    xchgMems: MementoSearchResult[],
 };
 
 const additional_context_text = stripCommonIndent(`
@@ -16,28 +16,50 @@ const additional_context_text = stripCommonIndent(`
     The Memento system automatically retieves information it believes may be relevant to the current conversation.
     This additional context information is dynamically generated each time the user sends a new message.
 
-    ### Pinned Conversation Summaries
-    {{#each pinnedCsumMems}}
-    - {
-        metaid: "{{id}}"
-        priority: {{priority}}
-        pinned: {{pinned}}
-        content: "{{content}}"
-    }
-    {{/each}}
+    {{#if docMems}}
+    ### Document Mementos
+    {{#each docMems}}
+    #### {{source}}
+    \`\`\`
+    {{{content}}}
+    \`\`\`
 
-    ### Synopses
-    {{#each synopses}}
-    - {{this}}
     {{/each}}
+    {{/if}}
 
-    ### Selected Mems
-    {{#each selectedMems}}
-    - {
-        kind: "{{kind}}"
-        content: "{{content}}"
-    }
+    {{#if dsumMems}}
+    ### Document Summary Mementos
+    {{#each dsumMems}}
+    #### {{source}}
+    \`\`\`
+    {{{content}}}
+    \`\`\`
+
     {{/each}}
+    {{/if}}
+
+    {{#if csumMems}}
+    ### Conversation Summary Mementos
+    {{#each csumMems}}
+    #### {{id}}
+    {{{content}}}
+    {{/each}}
+    {{/if}}
+
+    {{#if synMems}}
+    ### Synopsis Mementos
+    {{#each synMems}}
+    - {{{content}}}
+    {{/each}}
+    {{/if}}
+
+    {{#if xchgMems}}
+    ### Exchange Mementos
+    {{#each xchgMems}}
+    #### {{ created_at }}
+    {{{content}}}
+    {{/each}}
+    {{/if}}
 `);
 
 export const additional_context = Handlebars.compile<AdditionalContextTemplateArgs>(additional_context_text);

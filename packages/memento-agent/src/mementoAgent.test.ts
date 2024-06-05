@@ -2,14 +2,14 @@
 
 import { expect, it, describe, beforeEach, afterEach, beforeAll, afterAll} from "bun:test";
 import { createConversation, type ConversationInterface, type Provider } from "@memento-ai/conversation";
-import { createMementoDb, dropDatabase, getDatabaseSchema } from "@memento-ai/postgres-db";
-import { functionCallingInstructions, additionalContext } from "./dynamicPrompt";
+import { createMementoDb, dropDatabase } from "@memento-ai/postgres-db";
+import { additionalContext } from "./dynamicPrompt";
 import { getProjectRoot, stripCommonIndent } from "@memento-ai/utils";
 import { ingestDirectory } from "@memento-ai/ingester";
 import { MementoAgent, type MementoAgentArgs } from "./mementoAgent";
 import { MementoDb } from "@memento-ai/memento-db";
 import { nanoid } from "nanoid";
-import { AssistantMessage, type Message } from "@memento-ai/types";
+import { AssistantMessage } from "@memento-ai/types";
 import { type SendArgs } from "@memento-ai/agent";
 import { type Interceptor } from "slonik";
 import debug from "debug";
