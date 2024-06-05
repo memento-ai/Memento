@@ -6,15 +6,11 @@ import { getDatabaseSchema, type ID } from "@memento-ai/postgres-db";
 import { mementoPromptTemplate, type MementoPromptTemplateArgs } from "./mementoPromptTemplate";
 import { FunctionHandler, registry, type FunctionCallResult } from "@memento-ai/function-calling";
 import { retrieveContext } from "./retrieveContext";
-import { constructUserMessage, USER } from "@memento-ai/types";
+import { constructUserMessage } from "@memento-ai/types";
 import type { Message, UserMessage, AssistantMessage } from "@memento-ai/types";
 import { Writable } from "node:stream";
 import type { ContinuityAgent } from "@memento-ai/continuity-agent";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
-import debug from "debug";
-import { gatherContent } from "./dynamicContent";
-
-const dlog = debug("mementoAgent");
 
 export type MementoAgentArgs = AgentArgs & {
     outStream?: Writable;

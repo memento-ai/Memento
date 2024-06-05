@@ -1,10 +1,9 @@
 // Path: packages/memento-agent/src/mementoAgent.test.ts
 
-import { expect, it, describe, beforeEach, afterEach, beforeAll, afterAll} from "bun:test";
+import { expect, it, describe, beforeEach, afterEach} from "bun:test";
 import { createConversation, type ConversationInterface, type Provider } from "@memento-ai/conversation";
 import { createMementoDb, dropDatabase } from "@memento-ai/postgres-db";
-import { additionalContext } from "./dynamicPrompt";
-import { getProjectRoot, stripCommonIndent } from "@memento-ai/utils";
+import { getProjectRoot } from "@memento-ai/utils";
 import { ingestDirectory } from "@memento-ai/ingester";
 import { MementoAgent, type MementoAgentArgs } from "./mementoAgent";
 import { MementoDb } from "@memento-ai/memento-db";
@@ -83,40 +82,10 @@ describe("MementoAgent", () => {
         let args = sendArgs("What are the various kinds of MemMetaData?");
         let message: AssistantMessage = await mementoAgent.run(args);
         expect(message.content).toBeTruthy();
-    }, timeout);
-});
 
-describe('Can create the initial message for extra context', () => {
-    let db: MementoDb;
-    let dbname: string;
-    beforeAll(async () => {
-        dbname = `test_${nanoid()}`;
-        await createMementoDb(dbname, interceptors);
-        db = await MementoDb.create(dbname, interceptors);
-        expect(db).toBeTruthy();
-        expect(db.name).toBe(dbname);
-        expect(db.pool).toBeTruthy();
-    });
-
-    afterAll(async () => {
-        await db.close();
-        await dropDatabase(dbname);
-    });
-
-    it('creates additionalContext', async () => {
-        await ingestDirectory({db, dirPath: `${getProjectRoot()}/packages/encoding`});
-        const result = await db.searchMemsBySimilarity(stripCommonIndent(`
-            import { get_encoding } from "tiktoken";
-
-            const enc = get_encoding("cl100k_base");
-        `), 2000);
-        const message = additionalContext([], [], result);
-
-        // Some static text that should appear:
-        expect(message).toInclude("The following is additional context selected from the database that might be useful");
-
-        // The similarity search is crafted such that it should return as the best hit this source file.
-        // But note that it is a long enough file (~1200 tokens) that the test might be flaky.
-        expect(result[0].source).toInclude('packages/encoding/src/encoding.ts');
+        // geneatePrompt() is normally called from run(). We can call it directly here because run() has been called.
+        const prompt = await mementoAgent.generatePrompt();
+        expect(prompt).toInclude("The Memento system automatically retieves information it believes may be relevant to the current conversation.");
+        expect(prompt).toInclude('packages/types/src/metaSchema.ts');
     }, timeout);
 });
