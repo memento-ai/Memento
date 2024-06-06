@@ -1,13 +1,16 @@
 # @memento-ai/search
+
 ## Description
-The `@memento-ai/search` package provides functionality for searching and retrieving relevant mementos (pieces of information) from a Memento database using keyword-based and semantic similarity-based search techniques. It allows users to find mementos that are similar to a given content based on keyword matching and semantic similarity using vector embeddings.
+The `@memento-ai/search` package provides functionality for searching and retrieving relevant mementos (pieces of information) from a Memento database. It allows users to find mementos that are similar to a given content based on keyword matching and semantic similarity using vector embeddings.
+
 ## Key Features
-- Extract keywords from a given content using TF-IDF scoring
-- Search for mementos similar to a given content based on keyword matching
-- Search for mementos semantically similar to a given content using vector embeddings
-- Combine keyword-based and semantic similarity-based search results to retrieve the most relevant mementos
-- Normalize search scores using softmax to ensure scores sum to 1
-- Limit search results based on a maximum token count to control the amount of information returned
+- Extract keywords from a given content using TF-IDF scoring.
+- Search for mementos similar to a given content based on keyword matching.
+- Search for mementos semantically similar to a given content using vector embeddings.
+- Combine keyword-based and semantic similarity-based search results to retrieve the most relevant mementos.
+- Normalize search scores using softmax or linear normalization to ensure scores are in the range [0, 1].
+- Limit search results based on a maximum token count to control the amount of information returned.
+
 ## Usage and Examples
 To use the `@memento-ai/search` package, you need to have a Memento database set up with a PostgreSQL connection pool.
 

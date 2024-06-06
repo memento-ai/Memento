@@ -57,7 +57,7 @@ const content = `
   "name": "getCurrentTime",
   "input": {}
 }
-\`\`\`
+\`\`\``;
 
 const functionCalls: FunctionCallRequest[] = Array.from(extractFunctionCalls(content));
 ```
