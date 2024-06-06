@@ -5,7 +5,7 @@ import { type ConversationOptions } from './factory';
 import { ASSISTANT, USER, type Message, AssistantMessage } from '@memento-ai/types';
 import { Writable } from 'node:stream';
 import Anthropic from '@anthropic-ai/sdk';
-import type { MessageCreateParams } from '@anthropic-ai/sdk/resources/messages.mjs';
+import type { MessageCreateParams, MessageDeltaUsage, MessageStream } from '@anthropic-ai/sdk/resources/messages.mjs';
 import debug from 'debug';
 
 const dlog = debug('anthropic');
@@ -169,21 +169,26 @@ export class AnthropicConversation implements ConversationInterface {
             temperature: this.session.temperature,
         };
         dlog(body);
-        let response: ResponseMessage
+        let response: Anthropic.Messages.Message
         if (!body.stream) {
             response = await this.session.anthropic.messages.create(body);
         } else {
             const outStream = this.stream as Writable;
-            const eventStream = this.session.anthropic.messages.stream(body);
-            for await (const event of eventStream) {
+            const eventStream: MessageStream = this.session.anthropic.messages.stream(body);
+            let event: Anthropic.Messages.MessageStreamEvent;
+            let usage: MessageDeltaUsage = { output_tokens: 0 };
+            for await (event of eventStream) {
                 if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
                     outStream.write(event.delta.text);
+                } else if (event.type === 'message_delta') {
+                    usage = event.usage;
                 }
             }
             outStream.write('\n');
             response = await eventStream.finalMessage();
-            const { usage } = response;
-            ulog('usage:', usage);
+            const { output_tokens } = usage;
+            const { input_tokens } = response.usage;
+            ulog('usage:', { input_tokens, output_tokens });
         }
         const content = response.content.map(item => item.text).join("");
         const message: AssistantMessage = {
