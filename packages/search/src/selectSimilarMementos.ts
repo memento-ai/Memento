@@ -57,6 +57,8 @@ function trimResult(result: MementoSearchResult[], idSet: Set<string>, maxTokens
 export async function selectSimilarMementos(dbPool: DatabasePool, args: MementoSearchArgs): Promise<MementoSimilarityMap> {
     const { content, maxTokens=5000, numKeywords=5 } = args;
 
+    dlog(`Selecting maximum of ${maxTokens} tokens.`)
+
     let keywordSelection: MementoSearchResult[] = await selectMemsByKeywordSearch(dbPool, {content, maxTokens, numKeywords});
     let similaritySelection: MementoSearchResult[] = await selectMemsBySemanticSimilarity(dbPool, {content, maxTokens});
 
