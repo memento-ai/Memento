@@ -12,54 +12,59 @@ export type AdditionalContextTemplateArgs = {
 };
 
 const additional_context_text = stripCommonIndent(`
-    ## Additional Context
+    <additional_context>
+    # Additional Context
     The Memento system automatically retieves information it believes may be relevant to the current conversation.
     This additional context information is dynamically generated each time the user sends a new message.
 
     {{#if docMems}}
-    ### Document Mementos
+    <document_mementos>
     {{#each docMems}}
-    #### {{source}}
-    \`\`\`
+    <document source="{{source}}">
     {{{content}}}
-    \`\`\`
-
     {{/each}}
+    </document_mementos>
     {{/if}}
 
     {{#if dsumMems}}
-    ### Document Summary Mementos
+    <document_summary_mementos>
     {{#each dsumMems}}
-    #### {{source}}
-    \`\`\`
+    <dsum source="{{source}}">
     {{{content}}}
-    \`\`\`
-
+    </dsum>
     {{/each}}
+    </document_summary_mementos>
     {{/if}}
 
     {{#if csumMems}}
-    ### Conversation Summary Mementos
+    <conversation_summary_mementos>
     {{#each csumMems}}
-    #### {{id}}
+    <csum id="{{id}}">
     {{{content}}}
+    </csum>
     {{/each}}
+    </conversation_summary_mementos>
     {{/if}}
 
     {{#if synMems}}
-    ### Synopsis Mementos
+    <synopsis_mementos>
     {{#each synMems}}
-    - {{{content}}}
+    <syn>{{{content}}}</syn>
     {{/each}}
+    </synopsis_mementos>
     {{/if}}
 
     {{#if xchgMems}}
-    ### Exchange Mementos
+    <exchange_mementos>
     {{#each xchgMems}}
-    #### {{ created_at }}
+    <xchg created_at="{{created_at}}">
     {{{content}}}
+    </xchg>
     {{/each}}
+    </exchange_mementos>
     {{/if}}
+
+    </additional_context>
 `);
 
 export const additional_context = Handlebars.compile<AdditionalContextTemplateArgs>(additional_context_text);

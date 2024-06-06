@@ -8,7 +8,7 @@ export type SqlSchemaPromptTemplateArgs = {
 };
 
 const sql_schema_text = stripCommonIndent(`
-    ## SQL Schema
+    <sql_schema>
     The database schema definitions are defined by the following SQL statements.
     Only SQL queries that conform to these schemas are valid.
 
@@ -17,7 +17,8 @@ const sql_schema_text = stripCommonIndent(`
     \`\`\`
 
     The function queryMementoView can be used to execute any read-only SQL query on this schema.
-    You should prefer to use the memento view but you may also query the mem or meta tables directly.
+    You should prefer to use the memento view but you may also query the mem and/or meta tables directly.
+    </sql_schema>
 `);
 
 export const sql_schema = Handlebars.compile<SqlSchemaPromptTemplateArgs>(sql_schema_text);

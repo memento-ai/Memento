@@ -9,9 +9,9 @@ export type ContinuityResponseTemplateArgs = {
 
 const continuity_response_text = stripCommonIndent(`
     {{#if continuityResponseContent}}
-    ## Continuity Agent Response
-    This is the Continuity Agent's response to the previous message exchange.
+    <continuity_response>
     {{continuityResponseContent}}
+    </continuity_response>
     {{/if}}
 `);
 

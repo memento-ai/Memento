@@ -34,7 +34,7 @@ Handlebars.registerPartial('additional_context', additional_context);
 Handlebars.registerPartial('continuity_response', continuity_response);
 
 const mementoPromptTemplateText = stripCommonIndent(`
-    # System Prompt
+    <system>
     {{> core_system }}
 
     {{> pronouns }}
@@ -57,8 +57,7 @@ const mementoPromptTemplateText = stripCommonIndent(`
        If you want to invoke a function, the code fence block must be the only content in the message.
        Save any commentary or explanation for a subsequent message.
 
-    # This is the end of the system prompt. #
-    ---
+    </system>
 `);
 
 export const mementoPromptTemplate = Handlebars.compile<MementoPromptTemplateArgs>(mementoPromptTemplateText);
