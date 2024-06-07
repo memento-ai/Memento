@@ -1,6 +1,6 @@
 // Path: packages/continuity-agent/src/continuityPromptTemplate.ts
 
-import type { ConvSummaryMetaData } from "@memento-ai/types";
+import type { ConvSummaryMemento } from "@memento-ai/types";
 import { stripCommonIndent } from "@memento-ai/utils";
 import Handlebars from "handlebars";
 
@@ -109,7 +109,7 @@ const continuityPromptTemplateText = stripCommonIndent(`
 export type ContinuityPromptTemplateArgs = {
     functions: string,
     synopses: string[],
-    mementos: ConvSummaryMetaData[]
+    mementos: ConvSummaryMemento[]
 };
 
 export const continuityPromptTemplate = Handlebars.compile<ContinuityPromptTemplateArgs>(continuityPromptTemplateText);

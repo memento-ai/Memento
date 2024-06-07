@@ -27,7 +27,4 @@ export async function copyIngestedMementos(fromPool: DatabasePool, toPool: Datab
             INSERT INTO meta (id, memid, kind, source, docid, summaryid) VALUES (${metav.id}, ${metav.memid}, ${metav.kind}, ${metav.source}, ${metav.docid}, ${metav.summaryid})
             ON CONFLICT (id) DO UPDATE SET memid = EXCLUDED.memid, kind = EXCLUDED.kind, source = EXCLUDED.source, docid = EXCLUDED.docid, summaryid = EXCLUDED.summaryid`);
     }
-
-    await fromPool.end();
-    await toPool.end();
 }

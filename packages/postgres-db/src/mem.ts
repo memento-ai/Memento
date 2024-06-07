@@ -29,34 +29,34 @@ export async function insertMeta(conn: CommonQueryMethods, memId: string, metaId
     let results: QueryResult<any>;
     switch (kind) {
         case CONV: {
-            const { role, source, priority } = zodParse(ConversationMetaArgs, metaArgs);
+            const { role, source, priority, docid } = zodParse(ConversationMetaArgs, metaArgs);
             results = await conn.query(sql.unsafe`
-                INSERT INTO meta (id, memid, kind, role, source, priority)
-                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${role}, ${source}, ${priority ?? null})
+                INSERT INTO meta (id, memid, kind, role, source, priority, docid)
+                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${role}, ${source}, ${priority ?? null}, ${docid ?? null})
                 RETURNING id`);
             break;
         }
         case FRAG: {
-            const { docId } = zodParse(FragmentMetaArgs, metaArgs);
+            const { docid } = zodParse(FragmentMetaArgs, metaArgs);
             results = await conn.query(sql.unsafe`
-                INSERT INTO meta (id, memid, kind, docId)
-                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${docId})
+                INSERT INTO meta (id, memid, kind, docid)
+                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${docid})
                 RETURNING id`);
             break;
         }
         case DOC: {
-            const { summaryId, source } = zodParse(DocumentMetaArgs, metaArgs);
+            const { summaryid, source } = zodParse(DocumentMetaArgs, metaArgs);
             results = await conn.query(sql.unsafe`
                 INSERT INTO meta (id, memid, kind, source, summaryid)
-                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${source}, ${summaryId})
+                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${source}, ${summaryid})
                 RETURNING id`);
             break;
         }
         case DSUM: {
-            const { docId, source } = zodParse(DocSummaryMetaArgs, metaArgs);
+            const { docid, source } = zodParse(DocSummaryMetaArgs, metaArgs);
             results = await conn.query(sql.unsafe`
-                INSERT INTO meta (id, memid, kind, docId, source)
-                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${docId}, ${source})
+                INSERT INTO meta (id, memid, kind, docid, source)
+                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${docid}, ${source})
                 RETURNING id`);
             break;
         }

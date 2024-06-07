@@ -3,14 +3,11 @@
 import { addConvSummaryMem, addConversationMem, addDocAndSummary, addFragmentMem, addSynopsisMem, addConvExchangeMementos, linkExchangeSynopsis } from './mementoDb-mems';
 import { connectDatabase, connectReadonlyDatabase, get_csum_mementos, get_last_assistant_message, get_last_user_message, getConversation, type ID } from '@memento-ai/postgres-db';
 import { registry, type FunctionRegistry } from "@memento-ai/function-calling";
-import { searchMemsBySimilarity } from './searchMemsBySimilarity';
-import { searchPinnedCsumMems } from './searchPinnedCsumMems';
 import { getSynopses } from './getSynopses';
-import { SimilarityResult } from './mementoDb-types';
 import { type DatabasePool, type CommonQueryMethods, type Interceptor } from 'slonik';
 import debug from 'debug';
 import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddConvSummaryArgs, AddSynopsisArgs, Context, AddConvExchangeArgs } from './mementoDb-types';
-import { type Message, ConvSummaryMetaData, ConvSummaryMemento } from '@memento-ai/types';
+import { type Message, ConvSummaryMemento } from '@memento-ai/types';
 
 const dlog = debug("mementoDb");
 
@@ -121,15 +118,7 @@ export class MementoDb {
         return await getConversation(this.pool, maxMessagePairs);
     }
 
-    async searchMemsBySimilarity(userMessage: string, tokensLimit: number): Promise<SimilarityResult[]> {
-        return searchMemsBySimilarity(this.pool, userMessage, tokensLimit);
-    }
-
-    async searchPinnedCsumMems(tokenLimit: number): Promise<ConvSummaryMemento[]> {
-        return await searchPinnedCsumMems(this.pool, tokenLimit);
-    }
-
-    async get_csum_mementos(conn: CommonQueryMethods): Promise<ConvSummaryMetaData[]> {
+    async get_csum_mementos(conn: CommonQueryMethods): Promise<ConvSummaryMemento[]> {
         return get_csum_mementos(conn);
     }
 

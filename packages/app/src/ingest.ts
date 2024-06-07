@@ -3,9 +3,11 @@
 import { Command } from 'commander';
 import { connectDatabase, createMementoDb, delete_unreferenced_mems, wipeDatabase } from '@memento-ai/postgres-db';
 import { copyIngestedMementos } from '@memento-ai/utils';
-import { ingestDirectory, createModelSummarizer, SUPPORTED_EXTENSIONS } from '@memento-ai/ingester';
+import { DocumentMemento } from '@memento-ai/types';
+import { ingestDirectory, createModelSummarizer, SUPPORTED_EXTENSIONS, dropIngestedFiles } from '@memento-ai/ingester';
 import { isProvider, ProviderNames } from '@memento-ai/conversation';
 import { MementoDb } from '@memento-ai/memento-db';
+import { sql } from 'slonik';
 import type { DatabasePool } from 'slonik';
 import type { ProviderAndModel, Summarizer } from '@memento-ai/ingester';
 
@@ -19,7 +21,7 @@ program
     .option('-p, --provider <provider>', 'The provider to use [anthropic, ollama, openai')
     .option('-m, --model <model>', 'The model to use for summarization')
     .option('-C, --cwd <dir>', 'Use the specified directory as the current working directory (default: .)')
-    .option('-D, --directory <dir>', 'The directory from which to recursively ingest files (default: packages)');
+    .option('-D, --directory <dir>', 'The directory from which to recursively ingest files (default: .)');
 
 program.parse(process.argv);
 
@@ -32,6 +34,11 @@ type Options = {
     directory?: string,
 };
 
+const Documents = DocumentMemento.pick({
+    id: true,
+    tokens: true,
+    source: true,
+});
 
 async function main() {
     const options: Options = program.opts() as Options;
@@ -40,7 +47,7 @@ async function main() {
 
     cleanSlate = cleanSlate ?? false;
     cwd = cwd ?? '.';
-    directory = directory ?? 'packages';
+    directory = directory ?? '.';
 
     if (!provider) {
         console.error(`You must specify an LLM provider (${ProviderNames.join(', ')}`);
@@ -92,23 +99,27 @@ async function main() {
         process.exit(1);
     }
 
-
     const db: MementoDb = await MementoDb.create(template_db_name);
     const dirPath = directory ?? 'packages';
 
     await ingestDirectory({db, dirPath, summarizer, log: true});
     await delete_unreferenced_mems(db.pool);
 
-
-
     if (cleanSlate) {
         await wipeDatabase(database);
     }
 
     const target: MementoDb = await MementoDb.create(database);
+    await dropIngestedFiles(target);
     await copyIngestedMementos(db.pool, target.pool);
-
     await db.close();
+
+    await delete_unreferenced_mems(target.pool);
+
+    const result = await target.pool.query(sql.type(Documents)`SELECT id, source, tokens FROM memento WHERE kind = 'doc' ORDER BY tokens DESC LIMIT 10`);
+    console.table(result.rows);
+
+    await target.close();
 }
 
 main().catch(console.error);

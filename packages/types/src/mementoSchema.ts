@@ -1,18 +1,25 @@
 // Path: packages/types/src/mementoSchema.ts
 
 import { z } from 'zod';
-import { Mem } from './memSchema';
-import { ConvSummaryMetaData, ConversationMetaData, DocSummaryMetaData, DocumentMetaData, FragmentMetaData, SynopsisMetaData } from './metaSchema';
+import { ConvSummaryMetaData, ConversationMetaData, DocSummaryMetaData, DocumentMetaData,
+    FragmentMetaData, SynopsisMetaData, ConvExchangeMetaData } from './metaSchema';
 
 // A "Memento" is record in the `memento` view.
 // It combines a Meta data record with the linked Mem content record
 
-export const ConversationMemento = z.union([ ConversationMetaData, Mem]);
-export const DocumentMemento = z.union([ DocumentMetaData, Mem ]);
-export const FragmentMemento = z.union([ FragmentMetaData, Mem ]);
-export const DocSummaryMemento = z.union([ DocSummaryMetaData, Mem ]);
-export const ConvSummaryMemento = z.union([ ConvSummaryMetaData, Mem ]);
-export const SynopsisMemento = z.union([ SynopsisMetaData, Mem ]);
+export const MemBase = z.object({
+    content: z.string(),
+    tokens: z.number().optional(),
+});
+export type MemBase = z.infer<typeof MemBase>;
+
+export const ConversationMemento = ConversationMetaData.merge(MemBase);
+export const DocumentMemento = DocumentMetaData.merge(MemBase);
+export const FragmentMemento = FragmentMetaData.merge(MemBase);
+export const DocSummaryMemento = DocSummaryMetaData.merge(MemBase);
+export const ConvSummaryMemento = ConvSummaryMetaData.merge(MemBase);
+export const SynopsisMemento = SynopsisMetaData.merge(MemBase);
+export const ConvExchangeMemento = ConvExchangeMetaData.merge(MemBase);
 
 export type ConversationMemento = z.infer<typeof ConversationMemento>;
 export type DocumentMemento = z.infer<typeof DocumentMemento>;
@@ -20,13 +27,15 @@ export type FragmentMemento = z.infer<typeof FragmentMemento>;
 export type DocSummaryMemento = z.infer<typeof DocSummaryMemento>;
 export type ConvSummaryMemento = z.infer<typeof ConvSummaryMemento>;
 export type SynopsisMemento = z.infer<typeof SynopsisMemento>;
+export type ConvExchangeMemento = z.infer<typeof ConvExchangeMemento>;
 
-export const Memento = z.union([
+export const Memento = z.discriminatedUnion('kind', [
     ConversationMemento,
     DocumentMemento,
     FragmentMemento,
     DocSummaryMemento,
     ConvSummaryMemento,
     SynopsisMemento,
+    ConvExchangeMemento
 ]);
 export type Memento = z.infer<typeof Memento>;

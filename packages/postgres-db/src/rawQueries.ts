@@ -5,7 +5,7 @@
 import { sql, type CommonQueryMethods, type QueryResult, type DatabasePool } from 'slonik';
 import { raw } from 'slonik-sql-tag-raw';
 import { getProjectRoot } from '@memento-ai/utils';
-import { ConvSummaryMetaData, Message } from '@memento-ai/types';
+import { ConvSummaryMemento, ConvSummaryMetaData, Message } from '@memento-ai/types';
 
 export async function executeFileQuery(conn: CommonQueryMethods, fileName: string): Promise<QueryResult<any>> {
     const root = getProjectRoot();
@@ -20,8 +20,8 @@ export async function delete_unreferenced_mems(conn: CommonQueryMethods) {
     await executeFileQuery(conn, 'delete_unreferenced_mems.sql')
 }
 
-export async function get_csum_mementos(conn: CommonQueryMethods): Promise<ConvSummaryMetaData[]>  {
-    const query = sql.type(ConvSummaryMetaData)`
+export async function get_csum_mementos(conn: CommonQueryMethods): Promise<ConvSummaryMemento[]>  {
+    const query = sql.type(ConvSummaryMemento)`
 SELECT id as metaId, kind , tokens, content, priority, pinned
 FROM memento
 WHERE kind = 'csum'

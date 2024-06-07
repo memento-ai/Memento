@@ -63,24 +63,24 @@ describe('Memento schema tests', () => {
     it('can parse a FragmentMetaArgs', () => {
         const fragmentMeta: FragmentMetaArgs = FragmentMetaArgs.parse({
             kind: FRAG,
-            docId: '123',
+            docid: '123',
         });
 
         expect(fragmentMeta.kind).toBe('frag');
-        expect(fragmentMeta.docId).toBe('123');
+        expect(fragmentMeta.docid).toBe('123');
     });
 
     it('can parse a DocumentMetaArgs', () => {
         const documentMeta: DocumentMetaArgs = DocumentMetaArgs.parse({
             kind: DOC,
-            docId: '123',
-            summaryId: '456',
+            docid: '123',
+            summaryid: '456',
             source: 'testSource'
         });
 
         expect(documentMeta.kind).toBe('doc');
-        // expect(documentMeta.docId).toBe('123');
-        expect(documentMeta.summaryId).toBe('456');
+        // expect(documentMeta.docid).toBe('123');
+        expect(documentMeta.summaryid).toBe('456');
         expect(documentMeta.source).toBe('testSource');
     });
 
@@ -100,15 +100,15 @@ describe('Memento schema tests', () => {
     it('can parse a DocSummaryMetaArgs', () => {
         const docSummaryMeta: DocSummaryMetaArgs = DocSummaryMetaArgs.parse({
             kind: DSUM,
-            docId: '123',
+            docid: '123',
             source: 'testSource',
-            summaryId: '456',
+            summaryid: '456',
         });
 
         expect(docSummaryMeta.kind).toBe('dsum');
-        expect(docSummaryMeta.docId).toBe('123');
+        expect(docSummaryMeta.docid).toBe('123');
         expect(docSummaryMeta.source).toBe('testSource');
-        // expect(docSummaryMeta.summaryId).toBe('456');
+        // expect(docSummaryMeta.summaryid).toBe('456');
     });
 
     it('can parse a SynopsisMetaArgs', () => {

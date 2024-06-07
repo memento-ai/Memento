@@ -1,21 +1,27 @@
 # @memento-ai/embedding
+
 ## Description
 The `@memento-ai/embedding` package provides functionality for generating text embeddings using the Ollama language model. Embeddings are vector representations of text that can be useful for various natural language processing tasks, such as text similarity, clustering, and classification.
+
 ## Key Features
 - Generate embeddings for one or more text inputs
 - Support for different Ollama models (default: 'nomic-embed-text')
 - Efficient batch processing of multiple text inputs
+
 ## Usage and Examples
+
 ### Importing the Package
 ```typescript
 import { MyEmbeddingFunction } from '@memento-ai/embedding';
 ```
+
 ### Creating an Instance
 ```typescript
 const embedding = new MyEmbeddingFunction();
 // or with a custom model
 const embedding = new MyEmbeddingFunction('custom-model');
 ```
+
 ### Generating Embeddings
 ```typescript
 // Generate embeddings for multiple texts
@@ -27,6 +33,7 @@ console.log(embeddings); // [[...], [...]]
 const singleEmbedding = await embedding.generateOne('hello world');
 console.log(singleEmbedding); // [...]
 ```
+
 ### Example Usage
 ```typescript
 import { MyEmbeddingFunction } from '@memento-ai/embedding';

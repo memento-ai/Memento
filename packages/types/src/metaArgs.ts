@@ -15,20 +15,20 @@ export const ConversationMetaArgs = z.object({
     role: Role,
     source: z.literal('conversation'),  // should also use 'function' or 'result' for the function output return on behalf of user
     priority: z.number().default(1),
+    docid: z.string().optional(),       // the id of the exchange memento
 });
 export type ConversationMetaArgs = z.input<typeof ConversationMetaArgs>;
 
 export const DocumentMetaArgs = z.object({
     kind: z.literal(DOC),
-    // docId: z.string(),              // the id of the document. Must be provided to ensure doc and dsum are linked correctly
-    summaryId: z.string(),          // the id of the associated summary
+    summaryid: z.string(),          // the id of the associated summary
     source: z.string(),
 });
 export type DocumentMetaArgs = z.input<typeof DocumentMetaArgs>;
 
 export const FragmentMetaArgs = z.object({
     kind: z.literal(FRAG),
-    docId: z.string(),
+    docid: z.string(),
 });
 export type FragmentMetaArgs = z.input<typeof FragmentMetaArgs>;
 
@@ -47,7 +47,7 @@ export type ConvSummaryMetaArgs = z.input<typeof ConvSummaryMetaArgs>;
 
 export const DocSummaryMetaArgs = z.object({
     kind: z.literal(DSUM),
-    docId: z.string(),      // the id of the meta for the associated document
+    docid: z.string(),      // the id of the meta for the associated document
     source: z.string(),     // The source of the document -- usually a file path
 });
 export type DocSummaryMetaArgs = z.input<typeof DocSummaryMetaArgs>;

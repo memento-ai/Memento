@@ -6,14 +6,11 @@ import { getDatabaseSchema, type ID } from "@memento-ai/postgres-db";
 import { mementoPromptTemplate, type MementoPromptTemplateArgs } from "./mementoPromptTemplate";
 import { FunctionHandler, registry, type FunctionCallResult } from "@memento-ai/function-calling";
 import { retrieveContext } from "./retrieveContext";
-import { constructUserMessage, USER } from "@memento-ai/types";
+import { constructUserMessage } from "@memento-ai/types";
 import type { Message, UserMessage, AssistantMessage } from "@memento-ai/types";
 import { Writable } from "node:stream";
 import type { ContinuityAgent } from "@memento-ai/continuity-agent";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
-import debug from "debug";
-
-const dlog = debug("mementoAgent");
 
 export type MementoAgentArgs = AgentArgs & {
     outStream?: Writable;
@@ -38,7 +35,6 @@ export class MementoAgent extends FunctionCallingAgent
     continuityAgent?: ContinuityAgent;
     synopsisAgent?: SynopsisAgent;
     max_message_pairs: number;
-    lastUserMessage: UserMessage;
     max_csum_tokens: number;
     max_similarity_tokens: number;
     max_synopses_tokens: number;
@@ -55,7 +51,6 @@ export class MementoAgent extends FunctionCallingAgent
         this.outStream = outStream;
         this.continuityAgent = continuityAgent;
         this.synopsisAgent = synopsisAgent;
-        this.lastUserMessage = { content: "", role: USER };
         this.max_message_pairs = max_message_pairs?? 5;
         this.max_csum_tokens = max_csum_tokens ?? 1000;
         this.max_similarity_tokens = max_similarity_tokens ?? 2000;
@@ -87,6 +82,7 @@ export class MementoAgent extends FunctionCallingAgent
             this.continuityResponseContent = await awaitAsyncAgentActions({ continuityResponsePromise: this.continuityResponsePromise });
             this.continuityResponsePromise = null;
         }
+
 
         let priorMessages: Message[] = await this.DB.getConversation(this.max_message_pairs);
         let userMessage: UserMessage = constructUserMessage(content);
