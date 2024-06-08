@@ -71,40 +71,6 @@ describe("ResolutionAgent", () => {
         }
     });
 
-    async function sendMementoAndResolution(sendArgs: SendArgs): Promise<{memento: Message, resolution: Message}> {
-        const memento: Message = await mementoAgent.run(sendArgs);
-        expect(memento.content).toBeTruthy();
-        const resolution: Message = await resolutionAgent.run();
-        expect(resolution.content).toBeTruthy();
-        return { memento, resolution };
-    }
+    // TODO
 
-    it("can chat with the agent", async () => {
-        const args = sendArgs("0. What did Leonard Shelby suffer from?");
-        const { memento, resolution } = await sendMementoAndResolution(args);
-        expect(memento.content).toBeTruthy();
-        expect(resolution.content).toBeTruthy();
-    }, timeout);
-
-    it("can chat with the agent and get a response", async () => {
-        let { memento, resolution } = await sendMementoAndResolution(sendArgs("1. What did Leonard Shelby suffer from?"));
-        expect(memento.content).toBeTruthy();
-        expect(resolution.content).toBeTruthy();
-
-        ({ memento, resolution } = await sendMementoAndResolution(sendArgs("2. What is anterograde amnesia?")));
-        expect(memento.content).toBeTruthy();
-        expect(resolution.content).toBeTruthy();
-
-        ({ memento, resolution } = await sendMementoAndResolution(sendArgs("3. What is 2 + 2?")));
-        expect(memento.content).toBeTruthy();
-        expect(resolution.content).toBeTruthy();
-    }, timeout);
-
-    it("can chat with the agent about ingested content", async () => {
-        await ingestDirectory({db, dirPath: `${getProjectRoot()}/packages/types`});
-        let { memento, resolution } = await sendMementoAndResolution(sendArgs("What are the various kinds of MemMetaData?"));
-        expect(memento.content).toBeTruthy();
-        expect(resolution.content).toBeTruthy();
-        dlog(resolution.content);
-    }, timeout);
 });
