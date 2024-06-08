@@ -1,13 +1,13 @@
 // Path: packages/memento-db/src/mementoDb.ts
 
-import { addConvSummaryMem, addConversationMem, addDocAndSummary, addFragmentMem, addSynopsisMem, addConvExchangeMementos, linkExchangeSynopsis } from './mementoDb-mems';
-import { connectDatabase, connectReadonlyDatabase, get_csum_mementos, get_last_assistant_message, get_last_user_message, getConversation, type ID } from '@memento-ai/postgres-db';
+import { addConversationMem, addDocAndSummary, addFragmentMem, addSynopsisMem, addConvExchangeMementos, linkExchangeSynopsis } from './mementoDb-mems';
+import { connectDatabase, connectReadonlyDatabase, get_last_assistant_message, get_last_user_message, getConversation, type ID } from '@memento-ai/postgres-db';
 import { registry, type FunctionRegistry } from "@memento-ai/function-calling";
 import { getSynopses } from './getSynopses';
-import { type DatabasePool, type CommonQueryMethods, type Interceptor } from 'slonik';
+import { type DatabasePool, type Interceptor } from 'slonik';
 import debug from 'debug';
-import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddConvSummaryArgs, AddSynopsisArgs, Context, AddConvExchangeArgs } from './mementoDb-types';
-import { type Message, ConvSummaryMemento } from '@memento-ai/types';
+import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddSynopsisArgs, Context, AddConvExchangeArgs } from './mementoDb-types';
+import { type Message } from '@memento-ai/types';
 
 const dlog = debug("mementoDb");
 
@@ -106,20 +106,12 @@ export class MementoDb {
         return addDocAndSummary(this.pool, args_);
     };
 
-    async addConvSummaryMem(args_: AddConvSummaryArgs): Promise<ID> {
-        return addConvSummaryMem(this.pool, args_);
-    }
-
     async addSynopsisMem(args_: AddSynopsisArgs): Promise<ID> {
         return addSynopsisMem(this.pool, args_);
     }
 
     async getConversation(maxMessagePairs: number = 10): Promise<Message[]> {
         return await getConversation(this.pool, maxMessagePairs);
-    }
-
-    async get_csum_mementos(conn: CommonQueryMethods): Promise<ConvSummaryMemento[]> {
-        return get_csum_mementos(conn);
     }
 
     async getSynopses(tokenLimit: number): Promise<string[]> {

@@ -55,17 +55,8 @@ This is an example of a function call request:
 
 \`\`\`function
 {
-    "name": "updateSummaries",
-    "input": {
-        "updates": [
-            {
-                "metaId": "test/summary",
-                "content": "This is the new content for the summary.",
-                "priority": 1,
-                "pinned": true
-            }
-        ]
-    }
+    "name": "gitListFiles",
+    "input": {}
 }
 \`\`\`
 

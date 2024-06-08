@@ -17,14 +17,12 @@ import getCurrentTime, { GetCurrentTime } from './getCurrentTime';
 import gitListFiles, { GitListFiles } from './gitListFiles';
 import queryMementoView, { QueryMementoView } from './queryMementoView';
 import readSourceFile, { ReadSourceFile } from './readSourceFile';
-import updateSummaries, { UpdateSummaries } from './updateSummaries';
 
 registerFunction(registry, addSynopsis);
 registerFunction(registry, getCurrentTime);
 registerFunction(registry, gitListFiles);
 registerFunction(registry, queryMementoView);
 registerFunction(registry, readSourceFile);
-registerFunction(registry, updateSummaries);
 
 export const RegisteredFunctions = z.discriminatedUnion('name', [
     AddSynopsis,
@@ -32,6 +30,5 @@ export const RegisteredFunctions = z.discriminatedUnion('name', [
     GitListFiles,
     QueryMementoView,
     ReadSourceFile,
-    UpdateSummaries
 ]);
 export type RegisteredFunctions = z.infer<typeof RegisteredFunctions>;

@@ -9,16 +9,13 @@ import { retrieveContext } from "./retrieveContext";
 import { constructUserMessage } from "@memento-ai/types";
 import type { Message, UserMessage, AssistantMessage } from "@memento-ai/types";
 import { Writable } from "node:stream";
-import type { ContinuityAgent } from "@memento-ai/continuity-agent";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
 
 export type MementoAgentArgs = AgentArgs & {
     outStream?: Writable;
-    continuityAgent?: ContinuityAgent;
     synopsisAgent?: SynopsisAgent;
     max_message_pairs?: number;
     max_response_tokens?: number;
-    max_csum_tokens?: number;
     max_similarity_tokens?: number;
     max_synopses_tokens?: number;
 }
@@ -32,33 +29,27 @@ export class MementoAgent extends FunctionCallingAgent
 {
     databaseSchema: string;
     outStream?: Writable;
-    continuityAgent?: ContinuityAgent;
     synopsisAgent?: SynopsisAgent;
     max_message_pairs: number;
-    max_csum_tokens: number;
     max_similarity_tokens: number;
     max_synopses_tokens: number;
     asyncResults: Promise<FunctionCallResult[]>;
-    continuityResponsePromise: Promise<string> | null = null;
-    continuityResponseContent: string | null = null;
     functionHandler: FunctionHandler;
+    asyncResponsePromise: Promise<string>;
 
     constructor(args: MementoAgentArgs)
     {
-        const { conversation, db, outStream, continuityAgent, synopsisAgent, max_message_pairs, max_csum_tokens, max_similarity_tokens, max_synopses_tokens } = args;
+        const { conversation, db, outStream, synopsisAgent, max_message_pairs, max_similarity_tokens, max_synopses_tokens } = args;
         super({ conversation, db, registry });
         this.databaseSchema = getDatabaseSchema();
         this.outStream = outStream;
-        this.continuityAgent = continuityAgent;
         this.synopsisAgent = synopsisAgent;
         this.max_message_pairs = max_message_pairs?? 5;
-        this.max_csum_tokens = max_csum_tokens ?? 1000;
         this.max_similarity_tokens = max_similarity_tokens ?? 2000;
         this.max_synopses_tokens = max_synopses_tokens ?? 2000;
         this.asyncResults = Promise.resolve([]);
-        this.continuityResponsePromise = null;
-        this.continuityResponseContent = null;
         this.functionHandler = new FunctionHandler({ agent: this });
+        this.asyncResponsePromise = Promise.resolve("");
     }
 
     close(): Promise<void> {
@@ -78,11 +69,8 @@ export class MementoAgent extends FunctionCallingAgent
         // When there is function calling, there may be multiple requests sent to chat providers
         // but only the first user message and the last assistant message will be stored in the database.
 
-        if (!!this.continuityAgent && !!this.continuityResponsePromise) {
-            this.continuityResponseContent = await awaitAsyncAgentActions({ continuityResponsePromise: this.continuityResponsePromise });
-            this.continuityResponsePromise = null;
-        }
-
+        // Any async actions should be handled here.
+        const asyncResult = await awaitAsyncAgentActions({ asyncActionsPromise: this.asyncResponsePromise});
 
         let priorMessages: Message[] = await this.DB.getConversation(this.max_message_pairs);
         let userMessage: UserMessage = constructUserMessage(content);
@@ -101,11 +89,10 @@ export class MementoAgent extends FunctionCallingAgent
         const startAsyncAgentActionsArgs = {
             synopsisAgent: this.synopsisAgent,
             xchgId,
-            continuityAgent: this.continuityAgent,
             db: this.DB,
             max_message_pairs: this.max_message_pairs
         };
-        this.continuityResponsePromise = startAsyncAgentActions(startAsyncAgentActionsArgs);
+        this.asyncResponsePromise = startAsyncAgentActions(startAsyncAgentActionsArgs);
 
         return assistantMessage;
     }

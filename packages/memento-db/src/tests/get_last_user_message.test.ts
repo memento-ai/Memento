@@ -4,8 +4,7 @@ import { createMementoDb, dropDatabase } from "@memento-ai/postgres-db";
 import { expect, it, describe, beforeEach, afterEach} from "bun:test";
 import { nanoid } from "nanoid";
 import { MementoDb } from "../mementoDb";
-import { USER, ASSISTANT, type ConvSummaryMetaData } from "@memento-ai/types";
-import type { CommonQueryMethods } from "slonik";
+import { USER, ASSISTANT } from "@memento-ai/types";
 
 describe("get last user or assistant message", () => {
 

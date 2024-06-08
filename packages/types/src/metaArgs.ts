@@ -2,13 +2,10 @@
 
 import { z } from 'zod';
 import { Role } from './role';
-import { CONV, DOC, FRAG, DSUM, CSUM, SYN, XCHG } from './memKind';
+import { CONV, DOC, FRAG, DSUM, SYN, XCHG } from './memKind';
 
 /// ==== Args objects are used to specify the required arguments to create the `meta` record.
 // Since this is for a meta record, the content is not needed
-
-// Note: For most of these *MetaArgs, we do not specify any `id` field, as the id is usually a nanoid generated automatically.
-// The ConvSummaryMetaArgs is an exception, as it is the only type of `meta` record where the id is not a nanoid.
 
 export const ConversationMetaArgs = z.object({
     kind: z.literal(CONV),
@@ -37,14 +34,6 @@ export const MetaId = z.string().regex(/^[a-z0-9-]+$/, 'The metaId must be kebab
     .describe('The metaId of the conversation summary. Lower-case, kebab-case, alphanumeric. Will be truncated to 21 characters.');
 export type MetaId = z.TypeOf<typeof MetaId>;
 
-export const ConvSummaryMetaArgs = z.object({
-    metaId: MetaId,
-    kind: z.literal(CSUM),
-    priority: z.number().optional().default(0),
-    pinned: z.boolean().optional().default(false),
-});
-export type ConvSummaryMetaArgs = z.input<typeof ConvSummaryMetaArgs>;
-
 export const DocSummaryMetaArgs = z.object({
     kind: z.literal(DSUM),
     docid: z.string(),      // the id of the meta for the associated document
@@ -63,5 +52,5 @@ export const ConvExchangeMetaArgs = z.object({
 export type ConvExchangeMetaArgs = z.input<typeof ConvExchangeMetaArgs>;
 
 export const MetaArgs = z.discriminatedUnion('kind', [
-    ConversationMetaArgs, DocumentMetaArgs, FragmentMetaArgs, DocSummaryMetaArgs, ConvSummaryMetaArgs, SynopsisMetaArgs, ConvExchangeMetaArgs]);
+    ConversationMetaArgs, DocumentMetaArgs, FragmentMetaArgs, DocSummaryMetaArgs, SynopsisMetaArgs, ConvExchangeMetaArgs]);
 export type MetaArgs = z.input<typeof MetaArgs>;

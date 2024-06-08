@@ -5,7 +5,7 @@ The `@memento-ai/memento-agent` package is a key component of the Memento system
 It implements the `MementoAgent`, the agent that mediates the conversation between the 'user' and the 'assistant'.
 
 It performs the important function of constructing the system prompt with dynamically generated
-additional context produced by the SynopsisAgent and the ContinuityAgent along with additional content retrieved from the database using heuristics and semantic search.
+additional context produced by the SynopsisAgent along with additional content retrieved from the database using heuristics and semantic search.
 
 ## Key Features
 - Integrates with a database to store and retrieve conversation history and relevant information.

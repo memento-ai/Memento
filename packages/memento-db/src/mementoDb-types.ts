@@ -46,13 +46,6 @@ export type AddDocAndSummaryArgs = {
     summary: string
 }
 
-export type AddConvSummaryArgs = {
-    metaId: string;
-    content: string;
-    pinned?: boolean;
-    priority?: number;
-}
-
 export type AddSynopsisArgs = {
     content: string;
 }

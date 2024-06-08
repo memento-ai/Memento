@@ -36,16 +36,6 @@ const additional_context_text = stripCommonIndent(`
     </document_summary_mementos>
     {{/if}}
 
-    {{#if csumMems}}
-    <conversation_summary_mementos>
-    {{#each csumMems}}
-    <csum id="{{id}}">
-    {{{content}}}
-    </csum>
-    {{/each}}
-    </conversation_summary_mementos>
-    {{/if}}
-
     {{#if synMems}}
     <synopsis_mementos>
     {{#each synMems}}

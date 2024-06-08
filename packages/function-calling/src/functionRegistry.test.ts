@@ -61,20 +61,6 @@ Function: readSourceFile
         context: An optional context object. Leave unspecified -- Memento will provide.
         filePath: The path to the source file to read.
     Output: The content of the source file as a single string.
-
-Function: updateSummaries
-    Purpose: Updates or inserts one or more conversation summaries.
-    Async: Whether the function should be executed asynchronously
-    Input: The input for updateSummaries
-        context: An optional context object. Leave unspecified -- Memento will provide.
-        updates: An array of UpdateOneSummaryInput objects
-    Output: An array of Errors or metaIds for the updated conversation summaries.
-    Nested Types:
-        UpdateOneSummaryInput: Update or create one conversation summary
-            metaId: The metaId of the conversation summary. Lower-case, kebab-case, alphanumeric. Will be truncated to 21 characters.
-            content: The new content for the conversation summary. Omit if only changing pinned or priority.
-            pinned: Whether the conversation summary is pinned
-            priority: The priority of the conversation summary
 `.trim()
 
         const expectedLines = expected.split('\n');

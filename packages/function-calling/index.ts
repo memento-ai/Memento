@@ -5,6 +5,5 @@ export * from './src/functionHandler';
 export * from './src/functionRegistry';
 export * from './src/functions/addSynopsis';
 export * from './src/functions/index';
-export * from './src/functions/updateSummaries';
 export * from './src/extractFunctionCalls';
 export * from './src/functionCallingTypes';
