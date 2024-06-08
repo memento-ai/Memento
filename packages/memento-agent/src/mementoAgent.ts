@@ -10,9 +10,11 @@ import { constructUserMessage } from "@memento-ai/types";
 import type { Message, UserMessage, AssistantMessage } from "@memento-ai/types";
 import { Writable } from "node:stream";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
+import type { ResolutionAgent } from "@memento-ai/resolution-agent";
 
 export type MementoAgentArgs = AgentArgs & {
     outStream?: Writable;
+    resolutionAgent?: ResolutionAgent;
     synopsisAgent?: SynopsisAgent;
     max_message_pairs?: number;
     max_response_tokens?: number;
@@ -29,6 +31,7 @@ export class MementoAgent extends FunctionCallingAgent
 {
     databaseSchema: string;
     outStream?: Writable;
+    resolutionAgent?: ResolutionAgent;
     synopsisAgent?: SynopsisAgent;
     max_message_pairs: number;
     max_similarity_tokens: number;
@@ -39,10 +42,11 @@ export class MementoAgent extends FunctionCallingAgent
 
     constructor(args: MementoAgentArgs)
     {
-        const { conversation, db, outStream, synopsisAgent, max_message_pairs, max_similarity_tokens, max_synopses_tokens } = args;
+        const { conversation, db, outStream, resolutionAgent, synopsisAgent, max_message_pairs, max_similarity_tokens, max_synopses_tokens } = args;
         super({ conversation, db, registry });
         this.databaseSchema = getDatabaseSchema();
         this.outStream = outStream;
+        this.resolutionAgent = resolutionAgent;
         this.synopsisAgent = synopsisAgent;
         this.max_message_pairs = max_message_pairs?? 5;
         this.max_similarity_tokens = max_similarity_tokens ?? 2000;
@@ -87,6 +91,7 @@ export class MementoAgent extends FunctionCallingAgent
         }
 
         const startAsyncAgentActionsArgs = {
+            resolutionAgent: this.resolutionAgent,
             synopsisAgent: this.synopsisAgent,
             xchgId,
             db: this.DB,

@@ -1,13 +1,17 @@
 // Path: packages/memento-db/src/mementoDb-mems.ts
 
-import { addMemento, addMementoWithConn, type ID } from '@memento-ai/postgres-db';
-import { ConversationMetaArgs, CONV, FragmentMetaArgs, FRAG, DocumentMetaArgs, DOC, DocSummaryMetaArgs, DSUM, SYN, SynopsisMetaArgs, XCHG, ConvExchangeMetaArgs, createMem, Mem, USER, ASSISTANT } from '@memento-ai/types';
+import { addMemento, addMementoWithConn } from '@memento-ai/postgres-db';
+import { CONV, DOC, DSUM, FRAG, RES, SYN, XCHG, USER, ASSISTANT } from '@memento-ai/types';
+import { createMem, Mem } from '@memento-ai/types';
+import { ConversationMetaArgs, ConvExchangeMetaArgs, DocumentMetaArgs, DocSummaryMetaArgs, FragmentMetaArgs, ResolutionMetaArgs, SynopsisMetaArgs } from '@memento-ai/types';
 import { nanoid } from 'nanoid';
-import { type AddConvArgs, type AddFragArgs, type AddDocAndSummaryArgs, type DocAndSummaryResult, type AddSynopsisArgs, type AddConvExchangeArgs } from './mementoDb-types';
-import debug from 'debug';
-import { sql, type DatabasePool } from 'slonik';
+import { sql } from 'slonik';
+import type  { DatabasePool } from 'slonik';
 import { zodParse } from '@memento-ai/utils';
-import type { LinkExchangeArgs } from '..';
+import debug from 'debug';
+import type { AddConvArgs, AddConvExchangeArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddFragArgs, AddResolutionArgs, AddSynopsisArgs } from './mementoDb-types';
+import type { ID } from '@memento-ai/postgres-db';
+import type { LinkExchangeArgs } from './mementoDb';
 
 const dlog = debug("mementoDb:mems");
 
@@ -42,6 +46,15 @@ export async function addDocAndSummary(pool: DatabasePool, args_: AddDocAndSumma
     await addMemento({ pool: pool, metaId: summaryid, content: summary, metaArgs: zodParse(DocSummaryMetaArgs, { kind: DSUM, docid, summaryid, source }) });
     return { docid, summaryid };
 };
+
+export async function addResolutionMem(pool: DatabasePool, args_: AddResolutionArgs): Promise<ID> {
+    const { content } = args_;
+    const metaArgs = zodParse(ResolutionMetaArgs, {
+        kind: RES,
+    });
+    const metaId = nanoid();
+    return await addMemento({ pool, metaId, content, metaArgs });
+}
 
 export async function addSynopsisMem(pool: DatabasePool, args_: AddSynopsisArgs): Promise<ID> {
     const { content } = args_;

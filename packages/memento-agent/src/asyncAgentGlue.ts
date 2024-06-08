@@ -39,5 +39,27 @@ export function startAsyncAgentActions(
         });
     }
 
+    if (!!resolutionAgent) {
+        promise = resolutionAgent.run()
+        .then(async (response: string) => {
+            const message: Message = { content: response, role: ASSISTANT };
+            const { content } = message;
+            const regex = /<resolution>(.*)<\/resolution>/g;
+            const matches = content.matchAll(regex);
+            for await (const match of matches) {
+                const resolution = match[1];
+                if (!resolution || resolution.length === 0) {
+                    console.info("Empty resolution");
+                    continue;
+                }
+                else {
+                    console.info("New resolution:", resolution);
+                    await db.addResolutionMem({content: resolution});
+                }
+            }
+            return message.content;
+        });
+    }
+
     return promise;
 }
