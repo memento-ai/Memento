@@ -8,6 +8,10 @@ The `@memento-ai/ingester` package provides functionality for ingesting and summ
 - Configurable summarizer for generating document summaries
 - Automatically deletes ingested files from the database if they no longer exist on the file system
 - Retrieves a list of ingested files
+- Supports multiple summarizer types:
+  - Mock summarizer for testing
+  - Chat-based summarizer using a conversation interface
+  - Model-based summarizer using a specified provider and model
 
 ## Usage and Examples
 ### Ingesting a File
@@ -39,6 +43,15 @@ import { getIngestedFiles } from '@memento-ai/ingester';
 
 const db = await MementoDb.create('my-database');
 const ingestedFiles = await getIngestedFiles(db);
+```
+
+### Dropping Ingested Files
+```typescript
+import { MementoDb } from '@memento-ai/memento-db';
+import { dropIngestedFiles } from '@memento-ai/ingester';
+
+const db = await MementoDb.create('my-database');
+await dropIngestedFiles(db);
 ```
 
 ### Summarizing a Document

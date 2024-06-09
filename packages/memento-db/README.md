@@ -1,16 +1,17 @@
 # @memento-ai/memento-db
 ## Description
-The `@memento-ai/memento-db` package provides a TypeScript interface for interacting with a PostgreSQL database to store and retrieve "mementos" - pieces of information that are part of a conversational history. It includes functionality for adding different types of mementos (conversations, fragments, documents, and summaries), and searching for similar mementos.
+The `@memento-ai/memento-db` package provides a TypeScript interface for interacting with a PostgreSQL database to store and retrieve "mementos" - pieces of information that are part of a conversational history. It includes functionality for adding different types of mementos (conversations, fragments, documents, summaries, resolutions, and synopses), searching for similar mementos, and retrieving conversation history.
 
 ## Key Features
 - Add conversation mementos (user and assistant messages)
 - Add fragment mementos (excerpts from documents)
 - Add documents and their summaries
 - Add conversation exchange mementos (user-assistant message pairs)
+- Add resolution mementos 
+- Add synopsis mementos
 - Link conversation exchange mementos to synopsis mementos
 - Retrieve the conversation history
-- Search for mementos similar to a given user message using semantic similarity
-- Retrieve pinned conversation summary mementos
+- Retrieve resolution mementos
 - Retrieve synopses (short summaries) from the database
 - Get the last user and assistant messages in a conversation
 
@@ -49,6 +50,22 @@ await db.linkExchangeSynopsis({
   synopsis_id: 'synopsis-123'
 });
 
+// Add a resolution memento
+const resId = await db.addResolutionMem({
+  content: 'This is a resolution memento'
+});
+
+// Add a synopsis memento
+const synId = await db.addSynopsisMem({
+  content: 'This is a synopsis memento'
+});
+
+// Get the conversation history
+const conversation = await db.getConversation();
+
+// Get resolution mementos
+const resolutions = await db.getResolutions();
+
 // Get the last user and assistant messages
 const lastUserMessage = await db.get_last_user_message();
 const lastAssistantMessage = await db.get_last_assistant_message();
@@ -59,8 +76,11 @@ const lastAssistantMessage = await db.get_last_assistant_message();
 - `addFragmentMem`: Add a fragment memento to the database.
 - `addDocAndSummary`: Add a document and its summary to the database.
 - `addConvExchangeMementos`: Add a conversation exchange memento (user-assistant message pair).
+- `addResolutionMem`: Add a resolution memento to the database.
+- `addSynopsisMem`: Add a synopsis memento to the database.
 - `linkExchangeSynopsis`: Link a conversation exchange memento to a synopsis memento.
 - `getConversation`: Retrieve the conversation history as an array of messages.
+- `getResolutions`: Retrieve resolution mementos from the database.
 - `getSynopses`: Retrieve a list of synopses (short summaries) from the database.
 - `get_last_user_message`: Get the last user message in the conversation.
 - `get_last_assistant_message`: Get the last assistant message in the conversation.

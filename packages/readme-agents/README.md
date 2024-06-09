@@ -22,7 +22,8 @@ import { getProjectRoot } from '@memento-ai/utils';
 
 const projectRoot = getProjectRoot();
 const pkg = 'package-name'; // Replace with the desired package name
-const agent = new AddPackageReadmeAgent({ projectRoot, pkg, provider: 'anthropic', model: 'haiku' });
+const { provider, model } = defaultProviderAndModel;
+const agent = new AddPackageReadmeAgent({ projectRoot, pkg, provider, model });
 const readme = await agent.run();
 console.log(readme);
 ```
@@ -38,7 +39,8 @@ import { AddProjectReadmeAgent } from '@memento-ai/readme-agents';
 import { getProjectRoot } from '@memento-ai/utils';
 
 const projectRoot = getProjectRoot();
-const agent = new AddProjectReadmeAgent({ projectRoot, provider: 'anthropic', model: 'haiku' });
+const { provider, model } = defaultProviderAndModel;
+const agent = new AddProjectReadmeAgent({ projectRoot, provider, model });
 const readme = await agent.run();
 console.log(readme);
 ```

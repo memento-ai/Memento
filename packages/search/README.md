@@ -48,10 +48,10 @@ const semanticSearchResults = await selectMemsBySemanticSimilarity(db.pool, {
 
 The `selectMemsByKeywordSearch` function performs a keyword-based search using the extracted keywords from the given content, while the `selectMemsBySemanticSimilarity` function performs a semantic similarity-based search using vector embeddings.
 
-The package also provides utility functions for normalizing search scores and combining search results:
+The package also provides utility functions for normalizing search scores, combining search results, and converting search results to a similarity map:
 
 ```typescript
-import { linearNormalize, combineMementoResults } from '@memento-ai/search';
+import { linearNormalize, combineMementoResults, asSimilarityMap } from '@memento-ai/search';
 
 const normalizedResults = linearNormalize(searchResults, (item) => item.score);
 const combinedResults = combineMementoResults({
@@ -59,13 +59,14 @@ const combinedResults = combineMementoResults({
   rhs: semanticSearchResults,
   maxTokens: 5000
 });
+const similarityMap = await asSimilarityMap(searchResults);
 ```
 
-These functions ensure that the search scores are in the range [0, 1] and can be used to adjust the relative importance of different search results. The `combineMementoResults` function combines the results of two memento searches into a single search result list, handling cases where mementos are present in one selection but not the other.
+These functions ensure that the search scores are in the range [0, 1] and can be used to adjust the relative importance of different search results. The `combineMementoResults` function combines the results of two memento searches into a single search result list, handling cases where mementos are present in one selection but not the other. The `asSimilarityMap` function converts the search results into a map where the keys are the memento IDs and the values are the corresponding search result objects.
 
 ### selectSimilarMemsUtil.ts
 
-The `selectSimilarMemsUtil.ts` file provides a command-line utility to experiment with semantic and keyword similarity searches. It can be used to observe examples of keyword and semantic search individually and when combined.
+The `selectSimilarMemsUtil.ts` source file provides a very useful command-line utility for experimenting with semantic and keyword similarity searches. It can be used to observe examples of keyword and semantic search individually and when combined.
 
 To use the utility, run the following command:
 
@@ -74,5 +75,7 @@ bun run packages/search/src/selectSimilarMemsUtil.ts -d <dbname> -t 10000 -c 'Te
 ```
 
 Replace `<dbname>` with the name of your Memento database and provide the desired search content after the `-c` flag.
+
+Output from selectSimilarMemsUtil is presented in easy to read tabular form using `console.table(...)`.
 
 For more detailed usage and examples, please refer to the source code and tests in the `src` directory.

@@ -59,19 +59,15 @@ import { cleanUpLastUserMem } from '@memento-ai/postgres-db';
 // Clean up the last user message if the application crashed before responding
 await cleanUpLastUserMem(pool);
 ```
-### Retrieving the Last User Message
+### Retrieving the Last User and Assistant Messages
 ```typescript
-import { get_last_user_message } from '@memento-ai/postgres-db';
+import { get_last_user_message, get_last_assistant_message } from '@memento-ai/postgres-db';
 
 // Retrieve the last user message
 const lastUserMessage = await get_last_user_message(pool);
 console.log(lastUserMessage);
-```
-### Retrieving the Last Assistant Message
-```typescript
-import { get_last_assistant_message } from '@memento-ai/postgres-db';
 
-// Retrieve the last assistant message
+// Retrieve the last assistant message 
 const lastAssistantMessage = await get_last_assistant_message(conn);
 console.log(lastAssistantMessage);
 ```
