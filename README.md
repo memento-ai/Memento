@@ -11,7 +11,7 @@ Memento innovates by:
 1. Storing the full conversation history and relevant documents in a PostgreSQL database.
 2. Generating concise summaries to capture key points and context after conversational exchanges.
 3. Using semantic search to retrieve relevant summaries and context before responding.
-4. Allowing the AI to create new summaries to extend and refine the contextual knowledge.
+4. Allowing agents to create new summaries to extend and refine the contextual knowledge.
 
 This permits Memento to reconstruct the overall narrative arc of the conversation, maintaining a coherent understanding of the discussion themes and the user's goals over an extended period.
 
