@@ -4,6 +4,7 @@ import { additional_context } from "./prompt-partials/additional_context";
 import { core_system } from "./prompt-partials/core_system";
 import { function_calling } from "./prompt-partials/function_calling";
 import { pronouns } from "./prompt-partials/pronouns";
+import { resolutions } from "./prompt-partials/resolutions";
 import { sql_schema } from "./prompt-partials/sql_schema";
 import { stripCommonIndent } from "@memento-ai/utils";
 import Handlebars from "handlebars";
@@ -12,6 +13,7 @@ import type { MementoSearchResult } from "@memento-ai/search";
 export type MementoPromptTemplateArgs = {
     functions: string,
     databaseSchema: string,
+    resolutions: string[]
     dsumMems: MementoSearchResult[],
     docMems: MementoSearchResult[],
     synMems: MementoSearchResult[],
@@ -27,6 +29,7 @@ Handlebars.registerPartial('pronouns', pronouns);
 Handlebars.registerPartial('function_calling', function_calling);
 Handlebars.registerPartial('sql_schema', sql_schema);
 Handlebars.registerPartial('additional_context', additional_context);
+Handlebars.registerPartial('resolutions', resolutions);
 
 const mementoPromptTemplateText = stripCommonIndent(`
     <system>
@@ -40,16 +43,17 @@ const mementoPromptTemplateText = stripCommonIndent(`
 
     {{> additional_context docMems=docMems dsumMems=dsumMems synMems=synMems xchgMems=xchgMems}}
 
+    {{> resolutions resolutions=resolutions}}
+
     ## Warnings
 
     1. Please review the discussion above in the section 'Applying Daniel Kahneman's Dual Process Theory to your functioning'.
-       Do not make function calls to retrieve additional information from the database unless you are certain it is necessary,
-       and generally you should only do so after asking the user if they would like you to do so.
+       Do not make function calls to retrieve additional information from the database unless you are certain it is necessary.
+       Generally you should only do so after asking the user if they would like you to do so.
 
     2. Please review the discussion above in the section '**Important** Rules for Function Invocation'.
        If you want to invoke a function, the code fence block must be the only content in the message.
        Save any commentary or explanation for a subsequent message.
-
     </system>
 `);
 
