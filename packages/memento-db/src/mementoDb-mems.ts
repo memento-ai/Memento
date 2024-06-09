@@ -1,15 +1,14 @@
 // Path: packages/memento-db/src/mementoDb-mems.ts
 
-import { addMemento, addMementoWithConn } from '@memento-ai/postgres-db';
-import { CONV, DOC, DSUM, FRAG, RES, SYN, XCHG, USER, ASSISTANT } from '@memento-ai/types';
-import { createMem, Mem } from '@memento-ai/types';
-import { ConversationMetaArgs, ConvExchangeMetaArgs, DocumentMetaArgs, DocSummaryMetaArgs, FragmentMetaArgs, ResolutionMetaArgs, SynopsisMetaArgs } from '@memento-ai/types';
+import { addMemento } from '@memento-ai/postgres-db';
+import { CONV, DOC, DSUM, FRAG, RES, SYN } from '@memento-ai/types';
+import { ConversationMetaArgs, DocumentMetaArgs, DocSummaryMetaArgs, FragmentMetaArgs, ResolutionMetaArgs, SynopsisMetaArgs } from '@memento-ai/types';
 import { nanoid } from 'nanoid';
 import { sql } from 'slonik';
 import type  { DatabasePool } from 'slonik';
 import { zodParse } from '@memento-ai/utils';
 import debug from 'debug';
-import type { AddConvArgs, AddConvExchangeArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddFragArgs, AddResolutionArgs, AddSynopsisArgs } from './mementoDb-types';
+import type { AddConvArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddFragArgs, AddResolutionArgs, AddSynopsisArgs } from './mementoDb-types';
 import type { ID } from '@memento-ai/postgres-db';
 import type { LinkExchangeArgs } from './mementoDb';
 
@@ -36,8 +35,6 @@ export async function addFragmentMem(pool: DatabasePool, args_: AddFragArgs): Pr
     return await addMemento({ pool: pool, metaId: nanoid(), content, metaArgs: args });
 }
 
-/// addDocAndSummary: uses a transation to add both a 'doc' and a 'dsum'.
-/// This method trusts that `summary` is a valid summary of `content`.
 export async function addDocAndSummary(pool: DatabasePool, args_: AddDocAndSummaryArgs): Promise<DocAndSummaryResult> {
     const { content, source, summary } = args_;
     const docid = nanoid();
@@ -63,53 +60,6 @@ export async function addSynopsisMem(pool: DatabasePool, args_: AddSynopsisArgs)
     });
     const metaId = nanoid();
     return await addMemento({ pool, metaId, content, metaArgs });
-}
-
-// This adds multiple mementos in one transaction:
-// - a conversation exchange memento
-// - a conv memento for the user message
-// - a conv memento for the assistant message
-export async function addConvExchangeMementos(pool: DatabasePool, args_: AddConvExchangeArgs): Promise<ID> {
-    const { userContent, asstContent } = args_;
-
-    const result = await pool.connect(async conn => {
-        const userMem: Mem = await createMem(userContent);
-        const asstMem: Mem = await createMem(asstContent);
-        const xchgMem: Mem = await createMem(`# User:\n${userContent.trim()}\n\n---\n\n# Assistant:\n${asstContent.trim()}\n`);
-
-        const userMetaId = nanoid();
-        const asstMetaId = nanoid();
-        const xchgMetaId = nanoid();
-
-        const userMetaArgs = zodParse(ConversationMetaArgs, {
-            kind: CONV,
-            role: USER,
-            source: 'conversation',
-            docid: xchgMetaId,
-        });
-
-        const asstMetaArgs = zodParse(ConversationMetaArgs, {
-            kind: CONV,
-            role: ASSISTANT,
-            source: 'conversation',
-            docid: xchgMetaId,
-        });
-
-        const xchgMetaArgs = zodParse(ConvExchangeMetaArgs, {
-            kind: XCHG,
-        });
-
-        const userID = await addMementoWithConn({ conn, mem: userMem, metaId: userMetaId, metaArgs: userMetaArgs });
-        const asstID = await addMementoWithConn({ conn, mem: asstMem, metaId: asstMetaId, metaArgs: asstMetaArgs });
-        const xchgID = await addMementoWithConn({ conn, mem: xchgMem, metaId: xchgMetaId, metaArgs: xchgMetaArgs });
-
-        dlog('Added conversation exchange mementos:', { userID, asstID, xchgID });
-
-        return xchgID;
-    });
-
-    return result;
-
 }
 
 export async function linkExchangeSynopsis(pool: DatabasePool, { xchg_id, synopsis_id }: LinkExchangeArgs): Promise<void> {

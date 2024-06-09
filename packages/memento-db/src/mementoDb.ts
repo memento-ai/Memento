@@ -1,6 +1,7 @@
 // Path: packages/memento-db/src/mementoDb.ts
 
-import { addConversationMem, addDocAndSummary, addFragmentMem, addResolutionMem, addSynopsisMem, addConvExchangeMementos, linkExchangeSynopsis } from './mementoDb-mems';
+import { addConversationMem, addDocAndSummary, addFragmentMem, addResolutionMem, addSynopsisMem, linkExchangeSynopsis } from './mementoDb-mems';
+import { addConvExchangeMementos } from './mementoDb-addConvXchg';
 import { connectDatabase, connectReadonlyDatabase, get_last_assistant_message, get_last_user_message, getConversation, type ID } from '@memento-ai/postgres-db';
 import { getSynopses } from './getSynopses';
 import { registry, type FunctionRegistry } from "@memento-ai/function-calling";
@@ -144,7 +145,7 @@ export class MementoDb {
             FROM
                 memento
             WHERE
-                content_type = "res"
+                kind = 'res'
             ORDER BY
                 created_at ASC
             `;
