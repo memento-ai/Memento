@@ -6,7 +6,6 @@ import { Message } from '@memento-ai/types';
 import debug from 'debug';
 import c from 'ansi-colors';
 import { count_tokens } from '@memento-ai/encoding';
-import { stripCommonIndent } from '@memento-ai/utils';
 import { resolutionPromptTemplate } from './resolutionPromptTemplate';
 import { lastUserMessageTemplate } from './resolutionLastUserMessage';
 
@@ -23,6 +22,8 @@ export class ResolutionAgent extends Agent {
         const user = (await this.getLatestUserMessage()).content;
         const asst = (await this.getLatestAssistantMessage()).content;
         const content = lastUserMessageTemplate({user, asst});
+
+
         const response = await this.send({content});
         const tokens = count_tokens(response.content);
         dlog(c.green(`tokens:${tokens}, synopsis:${response.content}`));
@@ -38,6 +39,7 @@ export class ResolutionAgent extends Agent {
     }
 
     async generatePrompt(): Promise<string> {
-        return resolutionPromptTemplate({});
+        const resolutions = await this.DB.getResolutions();
+        return resolutionPromptTemplate({ resolutions });
     }
 }
