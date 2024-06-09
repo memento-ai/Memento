@@ -4,8 +4,7 @@ The `@memento-ai/memento-agent` package is a key component of the Memento system
 
 It implements the `MementoAgent`, the agent that mediates the conversation between the 'user' and the 'assistant'.
 
-It performs the important function of constructing the system prompt with dynamically generated
-additional context produced by the SynopsisAgent along with additional content retrieved from the database using heuristics and semantic search.
+It performs the important function of constructing the system prompt with dynamically generated additional context produced by the SynopsisAgent along with additional content retrieved from the database using heuristics and semantic search.
 
 ## Key Features
 - Integrates with a database to store and retrieve conversation history and relevant information.
@@ -14,6 +13,7 @@ additional context produced by the SynopsisAgent along with additional content r
 - Provides a dynamic prompt system that includes instructions for function calling and additional context from the database.
 - Handles asynchronous function calls, allowing for background updates to the database while continuing the conversation.
 - Supports configurable token limits for various types of content, such as conversation summaries, similarity search results, and synopses.
+
 ## Usage and Examples
 The Memento Agent is designed to be used as part of the Memento system and is initialized with a conversation object, a database connection, and optional configuration parameters such as maximum token limits for various types of content.
 
