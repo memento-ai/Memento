@@ -2,13 +2,12 @@
 
 import { expect, it, describe} from "bun:test";
 
-import { CONV, CSUM, DOC, DSUM, FRAG, SYN,  } from "./memKind";
+import { CONV, DOC, DSUM, FRAG, SYN,  } from "./memKind";
 import { Mem } from "./memSchema";
 import { Message } from "./message";
 import { USER, ASSISTANT,  } from "./role";
 import {
     ConversationMetaArgs,
-    ConvSummaryMetaArgs,
     DocSummaryMetaArgs,
     DocumentMetaArgs,
     FragmentMetaArgs,
@@ -79,22 +78,8 @@ describe('Memento schema tests', () => {
         });
 
         expect(documentMeta.kind).toBe('doc');
-        // expect(documentMeta.docid).toBe('123');
         expect(documentMeta.summaryid).toBe('456');
         expect(documentMeta.source).toBe('testSource');
-    });
-
-    it('can parse a ConvSummaryMetaArgs', () => {
-        const convSummaryMeta: ConvSummaryMetaArgs = ConvSummaryMetaArgs.parse({
-            metaId: '123-abc',
-            kind: CSUM,
-            priority: 0,
-            pinned: false
-        });
-
-        expect(convSummaryMeta.kind).toBe('csum');
-        expect(convSummaryMeta.priority).toBe(0);
-        expect(convSummaryMeta.pinned).toBe(false);
     });
 
     it('can parse a DocSummaryMetaArgs', () => {
@@ -108,7 +93,6 @@ describe('Memento schema tests', () => {
         expect(docSummaryMeta.kind).toBe('dsum');
         expect(docSummaryMeta.docid).toBe('123');
         expect(docSummaryMeta.source).toBe('testSource');
-        // expect(docSummaryMeta.summaryid).toBe('456');
     });
 
     it('can parse a SynopsisMetaArgs', () => {

@@ -47,14 +47,10 @@ console.log(conversation);
 ```
 ### Executing Raw SQL Queries
 ```typescript
-import { executeFileQuery, get_csum_mementos } from '@memento-ai/postgres-db';
+import { executeFileQuery } from '@memento-ai/postgres-db';
 
 // Execute a raw SQL query from a file
 await executeFileQuery(conn, 'delete_unreferenced_mems.sql');
-
-// Execute a raw SQL query with a typed result
-const convSummaries = await get_csum_mementos(conn);
-console.log(convSummaries);
 ```
 ### Cleaning Up Orphaned User Messages
 ```typescript

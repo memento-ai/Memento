@@ -14,7 +14,6 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@memento-ai/continuity-agent": "workspace:*",
     "@memento-ai/conversation": "workspace:*",
     "@memento-ai/function-calling": "workspace:*",
     "@memento-ai/postgres-db": "workspace:*",

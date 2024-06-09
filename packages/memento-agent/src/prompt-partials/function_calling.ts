@@ -19,17 +19,8 @@ const function_calling_text = stripCommonIndent(`
 
     \`\`\`function
     {
-        "name": "updateSummaries",
-        "input": {
-            "updates": [
-                {
-                    "metaId": "test-summary",
-                    "content": "This is the new content for the summary.",
-                    "priority": 1,
-                    "pinned": true
-                }
-            ]
-        }
+        "name": "gitListFiles",
+        "input": {}
     }
     \`\`\`
     </example>

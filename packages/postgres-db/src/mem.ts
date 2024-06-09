@@ -1,6 +1,6 @@
 // Path: packages/postgres-db/src/mem.ts
 
-import { CONV, CSUM, ConvExchangeMetaArgs, ConvSummaryMetaArgs, ConversationMetaArgs, DOC, DSUM, DocSummaryMetaArgs, DocumentMetaArgs, FRAG, FragmentMetaArgs, Mem, MetaArgs, SYN, SynopsisMetaArgs, XCHG, createMem } from '@memento-ai/types';
+import { CONV, ConvExchangeMetaArgs, ConversationMetaArgs, DOC, DSUM, DocSummaryMetaArgs, DocumentMetaArgs, FRAG, FragmentMetaArgs, Mem, MetaArgs, SYN, SynopsisMetaArgs, XCHG, createMem } from '@memento-ai/types';
 import { sql, type DatabasePool, type CommonQueryMethods, type QueryResult } from 'slonik';
 import debug from 'debug';
 import { zodParse } from '@memento-ai/utils';
@@ -57,19 +57,6 @@ export async function insertMeta(conn: CommonQueryMethods, memId: string, metaId
             results = await conn.query(sql.unsafe`
                 INSERT INTO meta (id, memid, kind, docid, source)
                 VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${docid}, ${source})
-                RETURNING id`);
-            break;
-        }
-        case CSUM: {
-            const { pinned, priority } = zodParse(ConvSummaryMetaArgs, metaArgs);
-            results = await conn.query(sql.unsafe`
-                INSERT INTO meta (id, memid, kind, pinned, priority)
-                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${pinned ?? null}, ${priority ?? null})
-                ON CONFLICT (id) DO UPDATE SET
-                    memid = EXCLUDED.memid,
-                    kind = EXCLUDED.kind,
-                    pinned = EXCLUDED.pinned,
-                    priority = EXCLUDED.priority
                 RETURNING id`);
             break;
         }

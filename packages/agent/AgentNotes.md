@@ -33,16 +33,6 @@ SynopsisAgent.run()
     Agent.send({content});      // hardcoded prompt
         Agent.forward()
 
-## ContinuityAgent
-ContinuityAgent.run()
-    const priorConveration: Message[] = await this.DB.getConversation(maxMessagePairs);
-    const prompt = await this.generatePrompt();
-    this.doSendMessage({ prompt, messages: priorConveration });
-        preamble mostly preconditions
-        messages.push({role: USER, content: lastUserMessage});
-        const assistantMessage = await Agent.forward({ prompt, messages });
-        postamble for function calling
-
 ## MementoAgent
 MementoAgent.run({ content }: SendArgs)     // content is the user's message content
     this.recursiveSend()

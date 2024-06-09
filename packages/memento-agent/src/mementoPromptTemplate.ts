@@ -1,15 +1,12 @@
 // Path: packages/memento-agent/src/mementoPromptTemplate.ts
 
-import Handlebars from "handlebars";
-import { stripCommonIndent } from "@memento-ai/utils";
-import type { Memento } from "@memento-ai/types";
-
-import { core_system } from "./prompt-partials/core_system";
-import { pronouns } from "./prompt-partials/pronouns";
-import { function_calling } from "./prompt-partials/function_calling";
-import { sql_schema } from "./prompt-partials/sql_schema";
 import { additional_context } from "./prompt-partials/additional_context";
-import { continuity_response } from "./prompt-partials/continuity_response";
+import { core_system } from "./prompt-partials/core_system";
+import { function_calling } from "./prompt-partials/function_calling";
+import { pronouns } from "./prompt-partials/pronouns";
+import { sql_schema } from "./prompt-partials/sql_schema";
+import { stripCommonIndent } from "@memento-ai/utils";
+import Handlebars from "handlebars";
 import type { MementoSearchResult } from "@memento-ai/search";
 
 export type MementoPromptTemplateArgs = {
@@ -19,7 +16,6 @@ export type MementoPromptTemplateArgs = {
     docMems: MementoSearchResult[],
     synMems: MementoSearchResult[],
     xchgMems: MementoSearchResult[],
-    continuityResponseContent: string | null
 };
 
 Handlebars.registerHelper('obj', function(context) {
@@ -31,7 +27,6 @@ Handlebars.registerPartial('pronouns', pronouns);
 Handlebars.registerPartial('function_calling', function_calling);
 Handlebars.registerPartial('sql_schema', sql_schema);
 Handlebars.registerPartial('additional_context', additional_context);
-Handlebars.registerPartial('continuity_response', continuity_response);
 
 const mementoPromptTemplateText = stripCommonIndent(`
     <system>
@@ -43,9 +38,7 @@ const mementoPromptTemplateText = stripCommonIndent(`
 
     {{> sql_schema databaseSchema=databaseSchema }}
 
-    {{> additional_context docMems=docMems dsumMems=dsumMems csumMems=csumMems synMems=synMems xchgMems=xchgMems}}
-
-    {{> continuity_response continuityResponseContent=continuityResponseContent }}
+    {{> additional_context docMems=docMems dsumMems=dsumMems synMems=synMems xchgMems=xchgMems}}
 
     ## Warnings
 

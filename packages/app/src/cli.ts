@@ -5,7 +5,6 @@ import { Command } from 'commander';
 import { createConversation, type ConversationInterface, type ConversationOptions } from '@memento-ai/conversation';
 import { MementoAgent, type MementoAgentArgs } from '@memento-ai/memento-agent';
 import { SynopsisAgent } from '@memento-ai/synopsis-agent';
-import { ContinuityAgent } from '@memento-ai/continuity-agent';
 import { MementoDb } from '@memento-ai/memento-db';
 import { type Writable } from 'node:stream';
 import c from 'ansi-colors';
@@ -63,13 +62,10 @@ const db: MementoDb = await MementoDb.create(database);
 
 const conversation: ConversationInterface = createConversation(provider, mementoConversationOptions);
 
-const continuityAgent = new ContinuityAgent({ db });
-
 const synopsisAgent = new SynopsisAgent({ db, conversation: createConversation('anthropic', { model: 'haiku', temperature: 0.0, logging: {name: 'synopsis'} }) });
 
 const mementoChatArgs: MementoAgentArgs = {
     conversation,
-    continuityAgent,
     synopsisAgent,
     db,
     outStream,

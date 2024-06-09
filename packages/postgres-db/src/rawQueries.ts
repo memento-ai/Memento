@@ -1,11 +1,9 @@
 // Path: packages/postgres-db/src/rawQueries.ts
 
-// PATH: packages/postgres-db/sql/get_csum_mementos.sql
-
 import { sql, type CommonQueryMethods, type QueryResult, type DatabasePool } from 'slonik';
 import { raw } from 'slonik-sql-tag-raw';
 import { getProjectRoot } from '@memento-ai/utils';
-import { ConvSummaryMemento, ConvSummaryMetaData, Message } from '@memento-ai/types';
+import { Message } from '@memento-ai/types';
 
 export async function executeFileQuery(conn: CommonQueryMethods, fileName: string): Promise<QueryResult<any>> {
     const root = getProjectRoot();
@@ -18,17 +16,6 @@ export async function executeFileQuery(conn: CommonQueryMethods, fileName: strin
 
 export async function delete_unreferenced_mems(conn: CommonQueryMethods) {
     await executeFileQuery(conn, 'delete_unreferenced_mems.sql')
-}
-
-export async function get_csum_mementos(conn: CommonQueryMethods): Promise<ConvSummaryMemento[]>  {
-    const query = sql.type(ConvSummaryMemento)`
-SELECT id as metaId, kind , tokens, content, priority, pinned
-FROM memento
-WHERE kind = 'csum'
-ORDER BY pinned DESC NULLS LAST, priority DESC;
-`;
-    const result = await conn.any(query);
-    return result.map(row => row);
 }
 
 export async function get_last_user_message(pool: DatabasePool): Promise<Message> {

@@ -31,7 +31,6 @@ The Memento monorepo contains the following packages:
 
 - `@memento-ai/agent`: Provides an abstract `Agent` class that represents a conversational agent or a specialized tool.
 - `@memento-ai/app`: Provides a command-line interface (CLI) for the Memento AI system and a utility for ingesting files into the Memento database.
-- `@memento-ai/continuity-agent`: Responsible for maintaining high-level continuity and context across extended conversations.
 - `@memento-ai/conversation`: Provides an abstraction for interacting with different language models, such as OpenAI, Anthropic, and Ollama.
 - `@memento-ai/embedding`: Provides functionality for generating text embeddings using the Ollama language model.
 - `@memento-ai/encoding`: Provides utility functions for encoding and decoding text using the `cl100k_base` encoding.

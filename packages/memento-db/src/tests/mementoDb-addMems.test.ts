@@ -44,11 +44,6 @@ describe("MementoDb", () => {
         expect(result).toBeTruthy();
     });
 
-    it("can add a conversation summary mem", async () => {
-        const id = await db.addConvSummaryMem({content: "test conversation summary", metaId: "test-summary", pinned: true, priority: 1});
-        expect(id).toBeTruthy();
-    });
-
     it("can add a user/assistant exchange", async () => {
         const args: AddConvExchangeArgs = {
             userContent: "test user exchange",

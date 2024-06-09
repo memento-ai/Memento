@@ -1,9 +1,9 @@
 // Path: packages/memento-db/src/mementoDb-mems.ts
 
 import { addMemento, addMementoWithConn, type ID } from '@memento-ai/postgres-db';
-import { ConversationMetaArgs, CONV, FragmentMetaArgs, FRAG, DocumentMetaArgs, DOC, DocSummaryMetaArgs, DSUM, ConvSummaryMetaArgs, CSUM, SYN, SynopsisMetaArgs, XCHG, ConvExchangeMetaArgs, createMem, Mem, USER, ASSISTANT } from '@memento-ai/types';
+import { ConversationMetaArgs, CONV, FragmentMetaArgs, FRAG, DocumentMetaArgs, DOC, DocSummaryMetaArgs, DSUM, SYN, SynopsisMetaArgs, XCHG, ConvExchangeMetaArgs, createMem, Mem, USER, ASSISTANT } from '@memento-ai/types';
 import { nanoid } from 'nanoid';
-import { type AddConvArgs, type AddFragArgs, type AddDocAndSummaryArgs, type DocAndSummaryResult, type AddConvSummaryArgs, type AddSynopsisArgs, type AddConvExchangeArgs } from './mementoDb-types';
+import { type AddConvArgs, type AddFragArgs, type AddDocAndSummaryArgs, type DocAndSummaryResult, type AddSynopsisArgs, type AddConvExchangeArgs } from './mementoDb-types';
 import debug from 'debug';
 import { sql, type DatabasePool } from 'slonik';
 import { zodParse } from '@memento-ai/utils';
@@ -42,18 +42,6 @@ export async function addDocAndSummary(pool: DatabasePool, args_: AddDocAndSumma
     await addMemento({ pool: pool, metaId: summaryid, content: summary, metaArgs: zodParse(DocSummaryMetaArgs, { kind: DSUM, docid, summaryid, source }) });
     return { docid, summaryid };
 };
-
-export async function addConvSummaryMem(pool: DatabasePool, args_: AddConvSummaryArgs): Promise<ID> {
-    const { metaId, content, pinned, priority } = args_;
-    const _metaArgs: ConvSummaryMetaArgs = {
-        kind: CSUM,
-        metaId,
-        pinned,
-        priority,
-    };
-    const metaArgs = zodParse(ConvSummaryMetaArgs, _metaArgs);
-    return await addMemento({ pool, metaId, content, metaArgs });
-}
 
 export async function addSynopsisMem(pool: DatabasePool, args_: AddSynopsisArgs): Promise<ID> {
     const { content } = args_;

@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { Role } from './role';
-import { CONV, DOC, FRAG, DSUM, CSUM, SYN, MemKind, XCHG } from './memKind';
+import { CONV, DOC, FRAG, DSUM, SYN, MemKind, XCHG } from './memKind';
 import { MetaId } from './metaArgs';
 
 // The various *MetaData types are the logical database schema for each of the mem kinds.
@@ -50,14 +50,6 @@ export const DocumentMetaData = RequiredMetaBase.extend({
 });
 export type DocumentMetaData = z.TypeOf<typeof DocumentMetaData>;
 
-export const ConvSummaryMetaData = RequiredMetaBase.extend({
-    kind: z.literal(CSUM),
-    metaid: MetaId,
-    priority: z.number().default(0),
-    pinned: z.boolean().default(false),
-});
-export type ConvSummaryMetaData = z.TypeOf<typeof ConvSummaryMetaData>;
-
 export const DocSummaryMetaData = RequiredMetaBase.extend({
     kind: z.literal(DSUM),
     docid: z.string()
@@ -76,7 +68,6 @@ export type ConvExchangeMetaData = z.TypeOf<typeof ConvExchangeMetaData>;
 
 export const MemMetaData = z.discriminatedUnion('kind', [
     ConversationMetaData,
-    ConvSummaryMetaData,
     DocSummaryMetaData,
     DocumentMetaData,
     FragmentMetaData,

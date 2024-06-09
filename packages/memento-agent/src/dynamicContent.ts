@@ -28,7 +28,8 @@ function indexMementosByKind(mementos: MementoSimilarityMap): AdditionalContextI
     let mementosByKind: AdditionalContextIndex = makeAdditionalContextIndex();
 
     for (let [id, memento] of Object.entries(mementos)) {
-        mementosByKind[memento.kind][id] = memento;
+        if ((memento.kind as any) !== 'csum')
+            mementosByKind[memento.kind][id] = memento;
     }
 
     return mementosByKind;
