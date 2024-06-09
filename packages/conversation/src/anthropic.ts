@@ -7,46 +7,13 @@ import { Writable } from 'node:stream';
 import Anthropic from '@anthropic-ai/sdk';
 import type { MessageCreateParams, MessageDeltaUsage, MessageStream } from '@anthropic-ai/sdk/resources/messages.mjs';
 import debug from 'debug';
+import { getModel } from './anthropic_models';
 
 const dlog = debug('anthropic');
 const ulog = debug('anthropic:usage');
 
-const haiku = "claude-3-haiku-20240307";
-const sonnet = "claude-3-sonnet-20240229";
-const opus = "claude-3-opus-20240229";
-
-const modelAliases: Record<string, string> = {
-    haiku,
-    opus,
-    sonnet
-}
-
-function getModel(model?: string): string {
-    if (!model) {
-        // default to haiku for cheaper pricing
-        return haiku;
-    }
-
-    // Is the string a known alias
-    if (model in modelAliases) {
-        return modelAliases[model];
-    }
-
-    // Is the string a known model
-    const knownModels = [haiku, sonnet, opus];
-    const found = knownModels.find(m => m === model);
-
-    if (found) {
-        return found;
-    }
-
-    throw new Error(`Unknown model: ${model}`);
-}
-
 type ChatMessage = Anthropic.Messages.MessageParam;
 type ChatMessages = ChatMessage[];
-type ResponseMessage = Anthropic.Messages.Message;
-type Usage = Anthropic.Messages.Usage;
 
 function asClaude(message: Message): ChatMessage {
     return {
@@ -122,11 +89,6 @@ export class AnthropicConversation implements ConversationInterface {
         this.session = createChatSession(args);
     }
 
-    // This API assumes that all the data we want to send with the request is already
-    // present in args:
-    // 1. The system prompt
-    // 2. The conversation history in messages
-    // 3. The new user message as the last entry in messages.
     async sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {
         // Validate and prepare the messages
 
@@ -151,7 +113,6 @@ export class AnthropicConversation implements ConversationInterface {
             }
         }
 
-        // Make the API request to Anthropic
         const message: AssistantMessage = await this.sendRequest(args);
         return message;
     }

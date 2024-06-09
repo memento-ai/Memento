@@ -2,7 +2,7 @@
 
 import { expect, it, describe} from "bun:test";
 
-import { CONV, DOC, DSUM, FRAG, SYN,  } from "./memKind";
+import { CONV, DOC, DSUM, FRAG, RES, SYN,  } from "./memKind";
 import { Mem } from "./memSchema";
 import { Message } from "./message";
 import { USER, ASSISTANT,  } from "./role";
@@ -11,6 +11,7 @@ import {
     DocSummaryMetaArgs,
     DocumentMetaArgs,
     FragmentMetaArgs,
+    ResolutionMetaArgs,
     SynopsisMetaArgs,
 } from "./metaArgs";
 
@@ -101,6 +102,14 @@ describe('Memento schema tests', () => {
         });
 
         expect(synopsisArgs.kind).toBe('syn');
+    });
+
+    it('can parse a ResolutionMetaArgs', () => {
+        const resolutionArgs: ResolutionMetaArgs = ResolutionMetaArgs.parse({
+            kind: RES,
+        });
+
+        expect(resolutionArgs.kind).toBe('res');
     });
 
 });

@@ -1,5 +1,4 @@
 # @memento-ai/search
-
 ## Description
 The `@memento-ai/search` package provides functionality for searching and retrieving relevant mementos (pieces of information) from a Memento database. It allows users to find mementos that are similar to a given content based on keyword matching and semantic similarity using vector embeddings.
 
@@ -46,5 +45,15 @@ const semanticSearchResults = await selectMemsBySemanticSimilarity(db.pool, {
 ```
 
 The `selectMemsByKeywordSearch` function performs a keyword-based search using the extracted keywords from the given content, while the `selectMemsBySemanticSimilarity` function performs a semantic similarity-based search using vector embeddings.
+
+The package also provides utility functions for normalizing search scores:
+
+```typescript
+import { softmaxNormalize, sumNormalize, linearNormalize } from '@memento-ai/search';
+
+const normalizedResults = softmaxNormalize(searchResults, (item) => item.score);
+```
+
+These normalization functions ensure that the search scores are in the range [0, 1] and can be used to adjust the relative importance of different search results.
 
 For more detailed usage and examples, please refer to the source code and tests in the `src` directory.

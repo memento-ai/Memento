@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { Role } from './role';
-import { CONV, DOC, FRAG, DSUM, SYN, XCHG } from './memKind';
+import { CONV, DOC, FRAG, DSUM, SYN, XCHG, RES } from './memKind';
 
 /// ==== Args objects are used to specify the required arguments to create the `meta` record.
 // Since this is for a meta record, the content is not needed
@@ -46,11 +46,16 @@ export const SynopsisMetaArgs = z.object({
 });
 export type SynopsisMetaArgs = z.input<typeof SynopsisMetaArgs>;
 
+export const ResolutionMetaArgs = z.object({
+    kind: z.literal(RES)
+});
+export type ResolutionMetaArgs = z.input<typeof ResolutionMetaArgs>;
+
 export const ConvExchangeMetaArgs = z.object({
     kind: z.literal(XCHG),
 });
 export type ConvExchangeMetaArgs = z.input<typeof ConvExchangeMetaArgs>;
 
 export const MetaArgs = z.discriminatedUnion('kind', [
-    ConversationMetaArgs, DocumentMetaArgs, FragmentMetaArgs, DocSummaryMetaArgs, SynopsisMetaArgs, ConvExchangeMetaArgs]);
+    ConversationMetaArgs, DocumentMetaArgs, FragmentMetaArgs, DocSummaryMetaArgs, ResolutionMetaArgs, SynopsisMetaArgs, ConvExchangeMetaArgs]);
 export type MetaArgs = z.input<typeof MetaArgs>;

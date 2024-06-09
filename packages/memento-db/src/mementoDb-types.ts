@@ -46,6 +46,10 @@ export type AddDocAndSummaryArgs = {
     summary: string
 }
 
+export type AddResolutionArgs = {
+    content: string;
+}
+
 export type AddSynopsisArgs = {
     content: string;
 }

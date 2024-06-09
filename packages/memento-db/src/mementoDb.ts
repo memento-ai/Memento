@@ -1,13 +1,16 @@
 // Path: packages/memento-db/src/mementoDb.ts
 
-import { addConversationMem, addDocAndSummary, addFragmentMem, addSynopsisMem, addConvExchangeMementos, linkExchangeSynopsis } from './mementoDb-mems';
+import { addConversationMem, addDocAndSummary, addFragmentMem, addResolutionMem, addSynopsisMem, linkExchangeSynopsis } from './mementoDb-mems';
+import { addConvExchangeMementos } from './mementoDb-addConvXchg';
 import { connectDatabase, connectReadonlyDatabase, get_last_assistant_message, get_last_user_message, getConversation, type ID } from '@memento-ai/postgres-db';
-import { registry, type FunctionRegistry } from "@memento-ai/function-calling";
 import { getSynopses } from './getSynopses';
-import { type DatabasePool, type Interceptor } from 'slonik';
+import { registry, type FunctionRegistry } from "@memento-ai/function-calling";
+import { sql } from 'slonik';
+import { z } from 'zod';
 import debug from 'debug';
+import type {  DatabasePool, Interceptor } from 'slonik';
 import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddSynopsisArgs, Context, AddConvExchangeArgs } from './mementoDb-types';
-import { type Message } from '@memento-ai/types';
+import type { Message } from '@memento-ai/types';
 
 const dlog = debug("mementoDb");
 
@@ -15,6 +18,11 @@ export type LinkExchangeArgs = {
     xchg_id: string;
     synopsis_id: string;
 };
+
+export const Resolution = z.object({
+    content: z.string()
+});
+export type Resolution = z.infer<typeof Resolution>;
 
 export class MementoDb {
     name: string;
@@ -106,6 +114,10 @@ export class MementoDb {
         return addDocAndSummary(this.pool, args_);
     };
 
+    async addResolutionMem(args_: Resolution): Promise<ID> {
+        return addResolutionMem(this.pool, args_);
+    }
+
     async addSynopsisMem(args_: AddSynopsisArgs): Promise<ID> {
         return addSynopsisMem(this.pool, args_);
     }
@@ -124,5 +136,20 @@ export class MementoDb {
 
     async get_last_assistant_message(): Promise<Message> {
         return get_last_assistant_message(this.pool);
+    }
+
+    async getResolutions(): Promise<string[]> {
+        const query = sql.type(Resolution)`
+            SELECT
+                content
+            FROM
+                memento
+            WHERE
+                kind = 'res'
+            ORDER BY
+                created_at ASC
+            `;
+        const result = await this.pool.query(query);
+        return result.rows.map((row) => Resolution.parse(row).content);
     }
 }

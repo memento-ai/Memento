@@ -1,6 +1,6 @@
 // Path: packages/postgres-db/src/mem.ts
 
-import { CONV, ConvExchangeMetaArgs, ConversationMetaArgs, DOC, DSUM, DocSummaryMetaArgs, DocumentMetaArgs, FRAG, FragmentMetaArgs, Mem, MetaArgs, SYN, SynopsisMetaArgs, XCHG, createMem } from '@memento-ai/types';
+import { CONV, ConvExchangeMetaArgs, ConversationMetaArgs, DOC, DSUM, DocSummaryMetaArgs, DocumentMetaArgs, FRAG, FragmentMetaArgs, Mem, MetaArgs, RES, ResolutionMetaArgs, SYN, SynopsisMetaArgs, XCHG, createMem } from '@memento-ai/types';
 import { sql, type DatabasePool, type CommonQueryMethods, type QueryResult } from 'slonik';
 import debug from 'debug';
 import { zodParse } from '@memento-ai/utils';
@@ -57,6 +57,14 @@ export async function insertMeta(conn: CommonQueryMethods, memId: string, metaId
             results = await conn.query(sql.unsafe`
                 INSERT INTO meta (id, memid, kind, docid, source)
                 VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${docid}, ${source})
+                RETURNING id`);
+            break;
+        }
+        case RES: {
+            const { kind } = zodParse(ResolutionMetaArgs, metaArgs);
+            results = await conn.query(sql.unsafe`
+                INSERT INTO meta (id, memid, kind)
+                VALUES (${metaId}, ${memId}, ${kind})
                 RETURNING id`);
             break;
         }

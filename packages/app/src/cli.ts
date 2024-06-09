@@ -9,6 +9,7 @@ import { MementoDb } from '@memento-ai/memento-db';
 import { type Writable } from 'node:stream';
 import c from 'ansi-colors';
 import debug from 'debug';
+import { ResolutionAgent } from '@memento-ai/resolution-agent';
 
 const program = new Command();
 
@@ -62,10 +63,12 @@ const db: MementoDb = await MementoDb.create(database);
 
 const conversation: ConversationInterface = createConversation(provider, mementoConversationOptions);
 
+const resolutionAgent = new ResolutionAgent({ db, conversation: createConversation('anthropic', { model: 'haiku', temperature: 0.0, logging: {name: 'resolution'} }) });
 const synopsisAgent = new SynopsisAgent({ db, conversation: createConversation('anthropic', { model: 'haiku', temperature: 0.0, logging: {name: 'synopsis'} }) });
 
 const mementoChatArgs: MementoAgentArgs = {
     conversation,
+    resolutionAgent,
     synopsisAgent,
     db,
     outStream,

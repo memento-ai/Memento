@@ -8,7 +8,7 @@
 CREATE TABLE meta(
     id VARCHAR(21) PRIMARY KEY,   -- nanoid
     memid VARCHAR(24) REFERENCES mem(id),
-    kind VARCHAR(4) NOT NULL CHECK (kind IN ('conv', 'doc', 'dsum', 'frag', 'syn', 'xchg')),
+    kind VARCHAR(4) NOT NULL CHECK (kind IN ('conv', 'doc', 'dsum', 'frag', 'res', 'syn', 'xchg')),
     pinned BOOLEAN DEFAULT FALSE,
     priority INT DEFAULT 0,    -- 0 is lowest priority. high priority is unbounded
     role VARCHAR(10),

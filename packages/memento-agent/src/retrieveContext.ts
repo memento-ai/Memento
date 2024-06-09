@@ -23,9 +23,12 @@ export async function retrieveContext(agent: MementoAgent): Promise<MementoPromp
     const dynamicContent: DynamicContent = await gatherContent(agent.DB, { content, maxTokens: 16000, numKeywords: 5 });
     const { additionalContext } = dynamicContent;
 
+    const resolutions = await agent.DB.getResolutions();
+
     const retrievedContext = {
         functions,
         databaseSchema: agent.databaseSchema,
+        resolutions,
         dsumMems: kindContent(DSUM, additionalContext),
         docMems: kindContent(DOC, additionalContext),
         synMems: kindContent(SYN, additionalContext),
