@@ -10,10 +10,24 @@ const resolutionPromptTemplateText = stripCommonIndent(`
     Given the most recent exchange between the user and assistant, evaluate the assistant's response and take one of the following actions:
 
     1. If the assistant has not stated a new resolution, respond with an empty <resolution></resolution> tag.
-    2. If the assistant has stated a new resolution, respond with the exact text of the resolution, enclosed in <resolution> tags.
+    2. If the assistant has **explicitly** stated a new resolution, respond with the exact text of the resolution, enclosed in <resolution> tags.
 
-    When identifying resolutions, look for statements where the assistant commits to specific changes in its future behavior or actions.
-    These commitments should be based on feedback, suggestions, or requests from the user.
+    When identifying resolutions, look for statements where the assistant **explicitly** commits to specific changes
+    in its future behavior or actions.
+
+    Do not assume responsiblity for inferring resolutions that you believe might be implicit in the assistant's response.
+
+    Indicators for explicit resolutions include the assistant acknowledging a mistake, promising to improve,
+    or committing to change its behavior, and will usually include phrases such as:
+
+    - "Going forward, I will ..."
+    - "Thank you for pointing that out. I will make sure to ..."
+    - "I understand your feedback and will ..."
+    - "Thank you for that explanation. I will ..."
+
+    As a counter example, suppose the user simply asks for more detailed explanation. The assistant's correct response will be to
+    provide the requested additional information, but this is situational. The user did not ask the assistant to make a persistent change
+    in its behavior, so the assistant's response does not constitute a resolution.
 
     If the assistant's response contains multiple separate resolutions, extract each one and enclose them in separate <resolution> tags.
 
