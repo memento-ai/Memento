@@ -71,35 +71,31 @@ export type IngestDirectoryArgs = {
     log?: boolean,
 };
 
+export async function dropAbandonedFiles(db: MementoDb, dirPath: string) {
+    const existingPaths = new Set(await getExistingGitFiles(dirPath));
+    const ingestedPaths = new Set(await getIngestedFiles(db));
+    const toDelete = [...ingestedPaths].filter((path) => !existingPaths.has(path));
+    dlog(`Found ${toDelete.length} files to delete.`);
+    for await (const path of toDelete) {
+        dlog(`Deleting document for ${path} from the database since it no longer exists on the file system.`);
+        await db.pool.connect(async (conn) => {
+            await conn.query(sql.unsafe`DELETE FROM meta WHERE source = ${path};`)
+        });
+    }
+}
+
 export async function ingestDirectory({db, dirPath, summarizer, log}: IngestDirectoryArgs) : Promise<void> {
     log = log ?? false;
     if (log) debug.enable('ingester');
 
     dlog(`Ingesting directory: ${dirPath}`);
 
-    // These are the paths of the files that git knows about in the directory
-    const existingPaths: Set<string> = new Set(await getExistingGitFiles(dirPath));
-    dlog(`Found ${existingPaths.size} total files in the directory.`)
-
-    // These are the paths of the files that have been ingested into the database
-    const ingestedPaths: Set<string> = new Set((await getIngestedFiles(db)).filter((path) => path.startsWith(dirPath)));
-    dlog(`Found ${ingestedPaths.size} files already ingested.`)
-
-    // Find ingestedPaths that no longer exist in the directory
-    const toDelete = [...ingestedPaths].filter((path) => !existingPaths.has(path));
-    dlog(`Found ${toDelete.length} files to delete.`)
-
-    // Delete the ingested files that no longer exist
-    for (const path of toDelete) {
-        dlog(`Deleting document for ${path} from the database since it no longer exists on the file system.`);
-        await db.pool.connect(async (conn) => {
-            await conn.query(sql.unsafe`DELETE FROM meta WHERE source = ${path};`)
-        });
-    }
+    await dropAbandonedFiles(db, dirPath);
 
     summarizer = summarizer ?? (await import('./summarizeDocument')).createMockSummarizer();
 
     // git ls-files only returns files, not directories, but that's exactly what we want
+    const existingPaths = new Set(await getExistingGitFiles(dirPath));
     for (const fullPath of existingPaths) {
         if (SUPPORTED_EXTENSIONS.includes(path.extname(fullPath))) {
             await ingestFile(db, fullPath, summarizer);

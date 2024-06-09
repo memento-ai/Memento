@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import { connectDatabase, createMementoDb, delete_unreferenced_mems, wipeDatabase } from '@memento-ai/postgres-db';
 import { copyIngestedMementos } from '@memento-ai/utils';
 import { DocumentMemento } from '@memento-ai/types';
-import { ingestDirectory, createModelSummarizer, SUPPORTED_EXTENSIONS, dropIngestedFiles } from '@memento-ai/ingester';
+import { ingestDirectory, createModelSummarizer, SUPPORTED_EXTENSIONS, dropIngestedFiles, dropAbandonedFiles } from '@memento-ai/ingester';
 import { isProvider, ProviderNames } from '@memento-ai/conversation';
 import { MementoDb } from '@memento-ai/memento-db';
 import { sql } from 'slonik';
@@ -113,6 +113,8 @@ async function main() {
     await dropIngestedFiles(target);
     await copyIngestedMementos(db.pool, target.pool);
     await db.close();
+
+    await dropAbandonedFiles(target, dirPath);
 
     await delete_unreferenced_mems(target.pool);
 
