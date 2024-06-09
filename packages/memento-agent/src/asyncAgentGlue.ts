@@ -46,7 +46,7 @@ export function startAsyncAgentActions(
         .then(async (response: string) => {
             const message: Message = { content: response, role: ASSISTANT };
             const { content } = message;
-            const regex = /<resolution>(.*)<\/resolution>/g;
+            const regex = /<resolution>(.*?)<\/resolution>/mg;
             const matches = content.matchAll(regex);
             for await (const match of matches) {
                 const resolution = match[1];
