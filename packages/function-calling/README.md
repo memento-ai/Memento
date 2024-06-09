@@ -6,7 +6,7 @@ The `@memento-ai/function-calling` package provides a framework for defining and
 - Invoke registered functions with provided input and context
 - Extract function call requests from content using a special code block syntax
 - Validate extracted function calls against registered function schemas
-- Execute multiple function calls in sequence
+- Execute multiple function calls in sequence, handling both synchronous and asynchronous functions
 - Handle function errors and results
 ## Usage and Examples
 ### Registering Functions
@@ -79,3 +79,22 @@ const functionCalls: FunctionCallRequest[] = [
 const context = { readonlyPool: db.readonlyPool };
 const results: FunctionCallResult[] = await invokeMultFunctions({ registry, calls: functionCalls, context });
 ```
+
+### Invoking Synchronous and Asynchronous Functions
+The `invokeSyncAndAsyncFunctions` function allows executing both synchronous and asynchronous function calls extracted from an assistant's message:
+
+```typescript
+import { invokeSyncAndAsyncFunctions, type InvokeFunctionsArgs, type InvokeFunctionsResults } from '@memento-ai/function-calling/src/invokeSyncAndAsyncFunctions';
+
+const invokeFunctionsArgs: InvokeFunctionsArgs = {
+  assistantMessage, 
+  context, 
+  registry, 
+  asyncResultsP: Promise.resolve([]), 
+  cycleCount: 1
+};
+
+const { functionResultContent, newAsyncResultsP }: InvokeFunctionsResults = await invokeSyncAndAsyncFunctions(invokeFunctionsArgs);
+```
+
+This will execute the synchronous functions immediately, while asynchronous functions will be invoked and their results will be available in the next cycle via the `newAsyncResultsP` promise.

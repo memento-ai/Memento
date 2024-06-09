@@ -1,6 +1,6 @@
 // Path: packages/memento-agent/src/dynamicContent.ts
 
-import { selectSimilarMementos,  } from '@memento-ai/search';
+import { asSimilarityMap, combineMementoResults, selectSimilarMementos,  } from '@memento-ai/search';
 import { sql } from 'slonik';
 import type { MementoSearchArgs, MementoSearchResult, MementoSimilarityMap } from '@memento-ai/search';
 import type { MemKind, Message } from '@memento-ai/types';
@@ -109,11 +109,11 @@ export async function getRecentSynopses(db: MementoDb, maxSynopses: number = 30)
     return result.rows.map((row) => SynopsesIdPair.parse(row));
 }
 
-export async function gatherContent(db: MementoDb, args: MementoSearchArgs): Promise<DynamicContent> {
-    const maxMessagePairs = 5;
-    const similarMementos: MementoSimilarityMap = await selectSimilarMementos(db.pool, args);
+export async function gatherContent(db: MementoDb, results: MementoSearchResult[]): Promise<DynamicContent> {
+    const similarMementos: MementoSimilarityMap = await asSimilarityMap(results);
     const mementosByKind = indexMementosByKind(similarMementos);
 
+    const maxMessagePairs = 5;
     const messages: MessageIdPair[] = await getRecentConvesation(db, maxMessagePairs);
 
     // If the recent conversation message are contained in the additional context, remove them.

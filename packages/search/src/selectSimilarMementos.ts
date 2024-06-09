@@ -54,55 +54,65 @@ function trimResult(result: MementoSearchResult[], idSet: Set<string>, maxTokens
     return result;
 }
 
-export async function selectSimilarMementos(dbPool: DatabasePool, args: MementoSearchArgs): Promise<MementoSimilarityMap> {
-    const { content, maxTokens=5000, numKeywords=5 } = args;
+export type CombineMementoResultArgs = {
+    lhs: MementoSearchResult[];
+    rhs: MementoSearchResult[];
+    maxTokens: number;
+    p?: number;
+}
 
-    dlog(`Selecting maximum of ${maxTokens} tokens.`)
+// Combine the results of two memento searches lhs and rhs into a single search result list.
+// Some mementos may be in one selection but not the other. When this happens, the missing score is treated as zero.
+// The combined score can be a weighted sum using weight p, which defaults to 0.5.
+// The input lists lhs and rhs can be any valid MementoSearchResult array, including the output of this function.
 
-    let keywordSelection: MementoSearchResult[] = await selectMemsByKeywordSearch(dbPool, {content, maxTokens, numKeywords});
-    let similaritySelection: MementoSearchResult[] = await selectMemsBySemanticSimilarity(dbPool, {content, maxTokens});
+export function combineMementoResults(args: CombineMementoResultArgs): MementoSearchResult[] {
+    // If one of the lists is empty, return the other list.
+    if (!args.lhs.length) {
+        return args.rhs;
+    } else if (!args.rhs.length) {
+        return args.lhs;
+    }
 
-    // We need to make a new MementoSearchResult[] that contains the union of the two selections,
-    // but with the score being some kind of combination of the two scores.
-    // We achieve that easily given that both scores are already normalized to be in the full range of [0, 1].
-
-    // Some mementos may be in one selection but not the other. When this happens, the missing score is treated as zero.
-    // The combined score is simply the arithmetic mean of the two scores.
+    const { lhs, rhs, maxTokens, p=0.5 } = args;
 
     let combined: MementoSearchResult[] = [];
-    let kMap: Record<string, MementoSearchResult> = {};
-    let sMap: Record<string, MementoSearchResult> = {};
-
-    let kTokenSum = keywordSelection.reduce((acc, m) => acc + m.tokens, 0);
-    let sTokenSum = similaritySelection.reduce((acc, m) => acc + m.tokens, 0);
-
-    dlog(`Keyword token sum: ${kTokenSum}`);
-    dlog(`Similarity token sum: ${sTokenSum}`);
+    let lhsMap: Record<string, MementoSearchResult> = {};
+    let rhsMap: Record<string, MementoSearchResult> = {};
 
     let idSet: Set<string> = new Set<string>();
-    for (let m of keywordSelection) {
+    for (let m of lhs) {
         idSet.add(m.id);
-        kMap[m.id] = m;
+        lhsMap[m.id] = m;
     }
-    for (let m of similaritySelection) {
+    for (let m of rhs) {
         idSet.add(m.id);
-        sMap[m.id] = m;
+        rhsMap[m.id] = m;
     }
     for (let id of idSet) {
-        let kScore = id in kMap ? kMap[id].score : 0;
-        let sScore = id in sMap ? sMap[id].score : 0;
-        let entry = kMap[id] ?? sMap[id];
-        let score = (kScore + sScore) / 2;
+        let lhsScore = id in lhsMap ? lhsMap[id].score : 0;
+        let rhsScore = id in rhsMap ? rhsMap[id].score : 0;
+        let entry = lhsMap[id] ?? rhsMap[id];
+        let score = lhsScore*p + rhsScore*(1-p) ;
         combined.push({...entry, score});
     }
 
     combined = trimResult(combined, idSet, maxTokens);
     combined = linearNormalize(combined, (m) => m.score);
+    return combined;
+}
 
-    let result: Record<string, MementoSearchResult> = {};
-    for (let m of combined) {
-        result[m.id] = m;
+export async function selectSimilarMementos(dbPool: DatabasePool, args: MementoSearchArgs): Promise<MementoSearchResult[]> {
+    const { content, maxTokens=5000, numKeywords=5 } = args;
+    let keywordSelection: MementoSearchResult[] = await selectMemsByKeywordSearch(dbPool, {content, maxTokens, numKeywords});
+    let similaritySelection: MementoSearchResult[] = await selectMemsBySemanticSimilarity(dbPool, {content, maxTokens});
+    return combineMementoResults({lhs: keywordSelection, rhs: similaritySelection, maxTokens});
+}
+
+export async function asSimilarityMap(searchResults: MementoSearchResult[]): Promise<MementoSimilarityMap> {
+    let map: MementoSimilarityMap = {};
+    for (let m of searchResults) {
+        map[m.id] = m;
     }
-
-    return result;
+    return map;
 }

@@ -7,6 +7,7 @@ import { registry } from "@memento-ai/function-calling";
 import type { DynamicContent } from "./dynamicContent";
 import type { MementoAgent } from "./mementoAgent";
 import type { MementoPromptTemplateArgs } from "./mementoPromptTemplate";
+import type { MementoSearchArgs, MementoSearchResult } from "@memento-ai/search";
 
 export function functionCallingInstructions() : string {
     return `
@@ -16,11 +17,10 @@ ${Object.values(registry)
 `.trim()
 }
 
-export async function retrieveContext(agent: MementoAgent): Promise<MementoPromptTemplateArgs> {
-    const { content } = agent.lastUserMessage;
+export async function retrieveContext(agent: MementoAgent, aggregateSearchResults: MementoSearchResult[]): Promise<MementoPromptTemplateArgs> {
     const functions = functionCallingInstructions();
 
-    const dynamicContent: DynamicContent = await gatherContent(agent.DB, { content, maxTokens: 16000, numKeywords: 5 });
+    const dynamicContent: DynamicContent = await gatherContent(agent.DB, aggregateSearchResults);
     const { additionalContext } = dynamicContent;
 
     const resolutions = await agent.DB.getResolutions();

@@ -27,7 +27,7 @@ The options are:
 - `-C, --cwd <dir>` (optional): Use the specified directory as the current working directory (default: `.`)
 - `-D, --directory <dir>` (optional): The directory from which to recursively ingest files (default: `packages`)
 
-This will recursively ingest all files in the `packages` directory (or the directory specified with the `-D, --directory` option) into the specified database. The ingestion utility supports the file types used to implement Memento, which are listed in the `SUPPORTED_EXTENSIONS` constant.
+This will recursively ingest all files in the specified directory (default: `packages`) into the specified database. The ingestion utility supports the file types used to implement Memento, which are listed in the `SUPPORTED_EXTENSIONS` constant.
 
 The ingestion utility uses the specified provider and model to summarize the content of the files before storing them in the database.
 
@@ -43,6 +43,7 @@ bun run packages/app/src/cli.ts -p <provider> -m <model> -d <database>
 - `-m, --model <model>`: The name of the model to use
 - `-d, --database <dbname>`: The name of the database to use
 - `-x, --clean-slate` (optional): Drop the named database and start over
+- `-t, --tokens` (optional): Show token counts
 
 This will start the chatbot, which will persist the conversation history in the specified database. You can then interact with the chatbot by typing your messages and pressing Enter.
 
@@ -58,5 +59,8 @@ bun run packages/app/src/update-readmes.ts -p <provider> -m <model>
 
 - `-p, --provider <provider>`: The provider to use (e.g., `anthropic`, `ollama`, `openai`, ...)
 - `-m, --model <model>`: The model to use for generating the README content
+- `-P, --package <package>` (optional): Update only the specified package's README.md
 
 This utility will process each package in the `packages` directory, generating a README.md file based on the package's source code and the existing project README.md. It will also update the main project README.md file.
+
+If the `-P, --package` option is provided, only the specified package's README.md will be updated.

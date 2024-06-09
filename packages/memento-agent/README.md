@@ -13,6 +13,8 @@ It performs the important function of constructing the system prompt with dynami
 - Provides a dynamic prompt system that includes instructions for function calling and additional context from the database.
 - Handles asynchronous function calls, allowing for background updates to the database while continuing the conversation.
 - Supports configurable token limits for various types of content, such as conversation summaries, similarity search results, and synopses.
+- Generates a concise summary or "synopsis" of the latest conversational exchange between the user and assistant.
+- Allows the assistant to make "resolutions" to affect its future behavior based on user feedback.
 
 ## Usage and Examples
 The Memento Agent is designed to be used as part of the Memento system and is initialized with a conversation object, a database connection, and optional configuration parameters such as maximum token limits for various types of content.

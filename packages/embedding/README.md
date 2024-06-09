@@ -12,18 +12,20 @@ The `@memento-ai/embedding` package provides functionality for generating text e
 
 ### Importing the Package
 ```typescript
-import { MyEmbeddingFunction } from '@memento-ai/embedding';
+import { MyEmbeddingFunction, embedding } from '@memento-ai/embedding';
 ```
 
 ### Creating an Instance
 ```typescript
-const embedding = new MyEmbeddingFunction();
+const embeddingInstance = new MyEmbeddingFunction();
 // or with a custom model
-const embedding = new MyEmbeddingFunction('custom-model');
+const embeddingInstance = new MyEmbeddingFunction('custom-model');
 ```
 
-### Generating Embeddings
+### Using the Default Instance
 ```typescript
+import { embedding } from '@memento-ai/embedding';
+
 // Generate embeddings for multiple texts
 const texts = ['hello world', 'goodbye world'];
 const embeddings = await embedding.generate(texts);
@@ -34,17 +36,29 @@ const singleEmbedding = await embedding.generateOne('hello world');
 console.log(singleEmbedding); // [...]
 ```
 
+### Generating Embeddings
+```typescript
+// Generate embeddings for multiple texts
+const texts = ['hello world', 'goodbye world'];
+const embeddings = await embeddingInstance.generate(texts);
+console.log(embeddings); // [[...], [...]]
+
+// Generate a single embedding
+const singleEmbedding = await embeddingInstance.generateOne('hello world');
+console.log(singleEmbedding); // [...]
+```
+
 ### Example Usage
 ```typescript
 import { MyEmbeddingFunction } from '@memento-ai/embedding';
 
-const embedding = new MyEmbeddingFunction();
+const embeddingInstance = new MyEmbeddingFunction();
 
 const text1 = 'The quick brown fox jumps over the lazy dog.';
 const text2 = 'A quick red fox jumps over the sleeping cat.';
 
-const embedding1 = await embedding.generateOne(text1);
-const embedding2 = await embedding.generateOne(text2);
+const embedding1 = await embeddingInstance.generateOne(text1);
+const embedding2 = await embeddingInstance.generateOne(text2);
 
 // Calculate the cosine similarity between the two embeddings
 const cosineSimilarity = calculateCosineSimilarity(embedding1, embedding2);

@@ -1,12 +1,12 @@
 // Path: packages/search/src/tests/selectSimilarMemsUtil.ts
 
 import { Command } from 'commander';
-import { extractKeywordsFromContent } from '../extractKeywordsFromContent';
+import { extractKeywordsFromContent } from './extractKeywordsFromContent';
 import { MementoDb } from '@memento-ai/memento-db';
-import { selectMemsByKeywordSearch } from '../selectMemsByKeywordSearch';
-import { selectMemsBySemanticSimilarity } from '../selectMemsBySemanticSimilarity';
+import { selectMemsByKeywordSearch } from './selectMemsByKeywordSearch';
+import { selectMemsBySemanticSimilarity } from './selectMemsBySemanticSimilarity';
 import c from 'ansi-colors';
-import { selectSimilarMementos } from '../selectSimilarMementos';
+import { selectSimilarMementos } from './selectSimilarMementos';
 
 const program = new Command();
 

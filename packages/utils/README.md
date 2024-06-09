@@ -1,7 +1,7 @@
 # @memento-ai/utils
 
 ## Description
-The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for finding the project root directory, generating README.md files for packages, adding path comments to TypeScript files, copying ingested mementos between databases, parsing input using Zod schemas with error handling, and removing common indentation from text blocks.
+The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for finding the project root directory, copying ingested mementos between databases, parsing input using Zod schemas with error handling, and removing common indentation from text blocks.
 
 ## Key Features
 - `getProjectRoot()` function to obtain the root directory of the Memento project

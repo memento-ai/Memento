@@ -36,4 +36,4 @@ The `SynopsisAgent` constructor takes an object with the following properties:
 - `db`: An instance of `MementoDb` for accessing the conversation history
 - `conversation`: An instance of `ConversationInterface` for generating the synopsis
 
-The `run` method of the `SynopsisAgent` retrieves the latest user and assistant messages, along with up to the last 1000 synopses, and generates a prompt using the `synopsis-prompt-template`. It then sends this prompt to the `conversation` instance to generate the synopsis, which is returned as a string.
+The `run` method of the `SynopsisAgent` retrieves the latest user and assistant messages, along with up to the last 1000 synopses, and generates a prompt using the `synopsis-prompt-template`. It then sends this prompt, along with additional instructions, to the `conversation` instance to generate the synopsis, which is returned as a string.
