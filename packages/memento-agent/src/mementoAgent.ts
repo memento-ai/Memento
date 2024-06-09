@@ -7,10 +7,11 @@ import { mementoPromptTemplate, type MementoPromptTemplateArgs } from "./memento
 import { FunctionHandler, registry, type FunctionCallResult } from "@memento-ai/function-calling";
 import { retrieveContext } from "./retrieveContext";
 import { constructUserMessage } from "@memento-ai/types";
-import type { Message, UserMessage, AssistantMessage } from "@memento-ai/types";
+import type { Message, UserMessage, AssistantMessage, Memento } from "@memento-ai/types";
 import { Writable } from "node:stream";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
 import type { ResolutionAgent } from "@memento-ai/resolution-agent";
+import { selectSimilarMementos, type MementoSearchResult, combineMementoResults } from "@memento-ai/search";
 
 export type MementoAgentArgs = AgentArgs & {
     outStream?: Writable;
@@ -39,6 +40,7 @@ export class MementoAgent extends FunctionCallingAgent
     asyncResults: Promise<FunctionCallResult[]>;
     functionHandler: FunctionHandler;
     asyncResponsePromise: Promise<string>;
+    aggregateSearchResults: MementoSearchResult[];
 
     constructor(args: MementoAgentArgs)
     {
@@ -54,6 +56,7 @@ export class MementoAgent extends FunctionCallingAgent
         this.asyncResults = Promise.resolve([]);
         this.functionHandler = new FunctionHandler({ agent: this });
         this.asyncResponsePromise = Promise.resolve("");
+        this.aggregateSearchResults = [];
     }
 
     close(): Promise<void> {
@@ -62,7 +65,17 @@ export class MementoAgent extends FunctionCallingAgent
 
     // Create the prompt, overriden from the Agent base class
     async generatePrompt(): Promise<string> {
-        const context: MementoPromptTemplateArgs = await retrieveContext(this);
+        const args = {
+            maxTokens: this.max_similarity_tokens,
+            numKeywords: 5,
+            content: this.lastUserMessage.content,
+        };
+        const currentSearchResults = await selectSimilarMementos(this.DB.pool, args);
+        const maxTokens = args.maxTokens ?? 16000;
+        const results = combineMementoResults({ lhs: this.aggregateSearchResults, rhs: currentSearchResults, maxTokens, p: 0.5});
+        this.aggregateSearchResults = results;
+
+        const context: MementoPromptTemplateArgs = await retrieveContext(this, results);
         return mementoPromptTemplate(context);
     }
 
