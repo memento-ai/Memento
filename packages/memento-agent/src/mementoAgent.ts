@@ -51,7 +51,6 @@ export class MementoAgent extends FunctionCallingAgent
         this.resolutionAgent = resolutionAgent;
         this.synopsisAgent = synopsisAgent;
         this.max_message_pairs = max_message_pairs?? 5;
-        this.max_similarity_tokens = max_similarity_tokens ?? 2000;
         this.max_synopses_tokens = max_synopses_tokens ?? 2000;
         this.asyncResults = Promise.resolve([]);
         this.functionHandler = new FunctionHandler({ agent: this });
@@ -66,12 +65,12 @@ export class MementoAgent extends FunctionCallingAgent
     // Create the prompt, overriden from the Agent base class
     async generatePrompt(): Promise<string> {
         const args = {
-            maxTokens: this.max_similarity_tokens,
+            maxTokens: 16000,
             numKeywords: 5,
             content: this.lastUserMessage.content,
         };
         const currentSearchResults = await selectSimilarMementos(this.DB.pool, args);
-        const maxTokens = args.maxTokens ?? 16000;
+        const {maxTokens} = args;
         const results = combineMementoResults({ lhs: this.aggregateSearchResults, rhs: currentSearchResults, maxTokens, p: 0.5});
         this.aggregateSearchResults = results;
 
@@ -93,6 +92,18 @@ export class MementoAgent extends FunctionCallingAgent
         let userMessage: UserMessage = constructUserMessage(content);
 
         let assistantMessage: AssistantMessage = await this.functionHandler.handle(userMessage, priorMessages);
+
+        // Also use the assistant's response to update the search context.
+        // This will only be used for the next user message.
+        const args = {
+            maxTokens: 16000,
+            numKeywords: 5,
+            content: assistantMessage.content,
+        };
+        const currentSearchResults = await selectSimilarMementos(this.DB.pool, args);
+        const {maxTokens} = args;
+        const results = combineMementoResults({ lhs: this.aggregateSearchResults, rhs: currentSearchResults, maxTokens, p: 0.5});
+        this.aggregateSearchResults = results;
 
         let xchgId: ID;
         try {
