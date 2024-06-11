@@ -1,26 +1,27 @@
 // Path: packages/memento-agent/src/mementoAgent.ts
 
-import { FunctionCallingAgent, type AgentArgs, type SendArgs } from "@memento-ai/agent";
 import { awaitAsyncAgentActions, startAsyncAgentActions } from "./asyncAgentGlue";
-import { getDatabaseSchema, type ID } from "@memento-ai/postgres-db";
-import { mementoPromptTemplate, type MementoPromptTemplateArgs } from "./mementoPromptTemplate";
-import { FunctionHandler, registry, type FunctionCallResult } from "@memento-ai/function-calling";
-import { retrieveContext } from "./retrieveContext";
 import { constructUserMessage } from "@memento-ai/types";
-import type { Message, UserMessage, AssistantMessage, Memento } from "@memento-ai/types";
+import { FunctionCallingAgent } from "@memento-ai/agent";
+import { FunctionHandler, registry, type FunctionCallResult } from "@memento-ai/function-calling";
+import { getDatabaseSchema } from "@memento-ai/postgres-db";
+import { mementoPromptTemplate } from "./mementoPromptTemplate";
+import { retrieveContext } from "./retrieveContext";
+import { selectSimilarMementos, combineMementoResults } from "@memento-ai/search";
 import { Writable } from "node:stream";
-import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
+import type { AgentArgs, SendArgs } from "@memento-ai/agent";
+import type { ID } from "@memento-ai/postgres-db";
+import type { MementoPromptTemplateArgs } from "./mementoPromptTemplate";
+import type { MementoSearchResult } from "@memento-ai/search";
+import type { Message, UserMessage, AssistantMessage } from "@memento-ai/types";
 import type { ResolutionAgent } from "@memento-ai/resolution-agent";
-import { selectSimilarMementos, type MementoSearchResult, combineMementoResults } from "@memento-ai/search";
+import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
+import type { Config } from "@memento-ai/config";
 
-export type MementoAgentArgs = AgentArgs & {
+export type MementoAgentArgs = AgentArgs & Config & {
     outStream?: Writable;
     resolutionAgent?: ResolutionAgent;
     synopsisAgent?: SynopsisAgent;
-    max_message_pairs?: number;
-    max_response_tokens?: number;
-    max_similarity_tokens?: number;
-    max_synopses_tokens?: number;
 }
 
 export type MessagePair = {
@@ -34,9 +35,13 @@ export class MementoAgent extends FunctionCallingAgent
     outStream?: Writable;
     resolutionAgent?: ResolutionAgent;
     synopsisAgent?: SynopsisAgent;
+
     max_message_pairs: number;
+    max_response_tokens: number;
     max_similarity_tokens: number;
     max_synopses_tokens: number;
+    num_keywords: number;
+
     asyncResults: Promise<FunctionCallResult[]>;
     functionHandler: FunctionHandler;
     asyncResponsePromise: Promise<string>;
@@ -44,14 +49,18 @@ export class MementoAgent extends FunctionCallingAgent
 
     constructor(args: MementoAgentArgs)
     {
-        const { conversation, db, outStream, resolutionAgent, synopsisAgent, max_message_pairs, max_similarity_tokens, max_synopses_tokens } = args;
+        const { conversation, db, outStream, resolutionAgent, synopsisAgent,
+             max_message_pairs, max_similarity_tokens, max_synopses_tokens, max_response_tokens } = args;
         super({ conversation, db, registry });
         this.databaseSchema = getDatabaseSchema();
         this.outStream = outStream;
         this.resolutionAgent = resolutionAgent;
         this.synopsisAgent = synopsisAgent;
-        this.max_message_pairs = max_message_pairs?? 5;
-        this.max_synopses_tokens = max_synopses_tokens ?? 2000;
+        this.max_message_pairs = max_message_pairs;
+        this.max_response_tokens = max_response_tokens;
+        this.max_similarity_tokens = max_similarity_tokens ;
+        this.max_synopses_tokens = max_synopses_tokens;
+        this.num_keywords = 5;
         this.asyncResults = Promise.resolve([]);
         this.functionHandler = new FunctionHandler({ agent: this });
         this.asyncResponsePromise = Promise.resolve("");
@@ -65,7 +74,7 @@ export class MementoAgent extends FunctionCallingAgent
     // Create the prompt, overriden from the Agent base class
     async generatePrompt(): Promise<string> {
         const args = {
-            maxTokens: 16000,
+            maxTokens: this.max_similarity_tokens,
             numKeywords: 5,
             content: this.lastUserMessage.content,
         };

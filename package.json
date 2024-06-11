@@ -7,6 +7,7 @@
   "workspaces": [
     "packages/agent",
     "packages/app",
+    "packages/config",
     "packages/conversation",
     "packages/embedding",
     "packages/encoding",

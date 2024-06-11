@@ -106,7 +106,7 @@ export async function selectSimilarMementos(dbPool: DatabasePool, args: MementoS
     const { content, maxTokens=5000, numKeywords=5 } = args;
     let keywordSelection: MementoSearchResult[] = await selectMemsByKeywordSearch(dbPool, {content, maxTokens, numKeywords});
     let similaritySelection: MementoSearchResult[] = await selectMemsBySemanticSimilarity(dbPool, {content, maxTokens});
-    return combineMementoResults({lhs: keywordSelection, rhs: similaritySelection, maxTokens});
+    return combineMementoResults({lhs: keywordSelection, rhs: similaritySelection, maxTokens, p: 0.5});
 }
 
 export async function asSimilarityMap(searchResults: MementoSearchResult[]): Promise<MementoSimilarityMap> {

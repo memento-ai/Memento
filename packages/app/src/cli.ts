@@ -10,12 +10,16 @@ import { type Writable } from 'node:stream';
 import c from 'ansi-colors';
 import debug from 'debug';
 import { ResolutionAgent } from '@memento-ai/resolution-agent';
+import { loadConfig, loadDefaultConfig } from '@memento-ai/config';
+import type { Config } from '@memento-ai/config';
+import type { AgentArgs } from '@memento-ai/agent';
 
 const program = new Command();
 
 program
     .version('0.0.1')
     .description('A chatbot that persists the conversation')
+    .option('-c, --config <config>', 'The path to the configuration file')
     .option('-p, --provider <provider>', 'The provider to use [anthropic, ollama, openai')
     .option('-m, --model <model>', 'The name of the model to use')
     .option('-d, --database <dbname>', 'The name of the database to use')
@@ -26,25 +30,29 @@ program.parse(process.argv);
 
 const options = program.opts();
 
-const { provider, model, database, tokens } = options;
+const { config, provider, model, database, tokens } = options;
+
+let configData: Config;
+if (config) {
+    configData = await loadConfig(config);
+} else {
+    configData = await loadDefaultConfig();
+}
 
 if (tokens) {
     debug.enable("usage:tokens");
 }
 
-if (!provider) {
-    console.error('You must specify an LLM provider');
-    program.help();
+if (provider) {
+    configData.memento_agent.provider = provider;
 }
 
-if (!model) {
-    console.error('You must specify a model supported by the provider');
-    program.help();
+if (model) {
+    configData.memento_agent.model = model;
 }
 
-if (!database) {
-    console.error('You must provide a database');
-    program.help();
+if (database) {
+    configData.database = database;
 }
 
 const outStream: Writable = process.stdout;
@@ -54,7 +62,7 @@ if (options.cleanSlate) {
 }
 
 const mementoConversationOptions: ConversationOptions = {
-    model,
+    model: configData.memento_agent.model,
     stream: process.stdout,
     logging: { name:'memento' }
 }
@@ -63,8 +71,30 @@ const db: MementoDb = await MementoDb.create(database);
 
 const conversation: ConversationInterface = createConversation(provider, mementoConversationOptions);
 
-const resolutionAgent = new ResolutionAgent({ db, conversation: createConversation('anthropic', { model: 'haiku', temperature: 0.0, logging: {name: 'resolution'} }) });
-const synopsisAgent = new SynopsisAgent({ db, conversation: createConversation('anthropic', { model: 'haiku', temperature: 0.0, logging: {name: 'synopsis'} }) });
+const resoConvOpts: ConversationOptions = {
+    model: configData.resolution_agent.model,
+    stream: undefined,
+    logging: { name: 'resolution' },
+    temperature: configData.resolution_agent.temperature
+}
+
+const resoAgentArgs: AgentArgs = {
+    db,
+    conversation: createConversation(config.resolution_agent.provider, resoConvOpts)
+};
+const resolutionAgent = new ResolutionAgent(resoAgentArgs);
+
+const synConvOpts: ConversationOptions = {
+    model: configData.synopsis_agent.model,
+    stream: undefined,
+    logging: { name: 'synopsis' },
+    temperature: configData.synopsis_agent.temperature
+}
+const synAgentArgs: AgentArgs = {
+    db,
+    conversation: createConversation(config.synopsis_agent.provider, synConvOpts)
+};
+const synopsisAgent = new SynopsisAgent(synAgentArgs);
 
 const mementoChatArgs: MementoAgentArgs = {
     conversation,
@@ -72,9 +102,11 @@ const mementoChatArgs: MementoAgentArgs = {
     synopsisAgent,
     db,
     outStream,
-
-    // There are several parameters with defaults that we might want to expose via the CLI here
-  };
+    max_message_pairs: configData.conversation.max_exchanges,
+    max_response_tokens: configData.conversation.max_tokens,
+    max_similarity_tokens: configData.search.max_tokens,
+    max_synopses_tokens: configData.synopsis_agent.max_tokens,
+};
 
 const mementoAgent: MementoAgent = new MementoAgent(mementoChatArgs);
 

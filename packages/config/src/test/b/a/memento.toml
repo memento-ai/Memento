@@ -1,0 +1,9 @@
+# Configuration file for the Memento-A
+# This file overrides only part of the config.
+# The rest is inherited from the test/memento.toml and test/b/memento.toml
+
+database = "memento-a.db"
+
+[conversation]
+max_exchanges = 3
+max_tokens = 1111
