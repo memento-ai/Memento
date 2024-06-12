@@ -18,7 +18,8 @@ import type { ResolutionAgent } from "@memento-ai/resolution-agent";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
 import type { Config } from "@memento-ai/config";
 
-export type MementoAgentArgs = AgentArgs & Config & {
+export type MementoAgentArgs = AgentArgs & {
+    config: Config;
     outStream?: Writable;
     resolutionAgent?: ResolutionAgent;
     synopsisAgent?: SynopsisAgent;
@@ -49,18 +50,17 @@ export class MementoAgent extends FunctionCallingAgent
 
     constructor(args: MementoAgentArgs)
     {
-        const { conversation, db, outStream, resolutionAgent, synopsisAgent,
-             max_message_pairs, max_similarity_tokens, max_synopses_tokens, max_response_tokens } = args;
+        const { conversation, db, outStream, resolutionAgent, synopsisAgent, config } = args;
         super({ conversation, db, registry });
         this.databaseSchema = getDatabaseSchema();
         this.outStream = outStream;
         this.resolutionAgent = resolutionAgent;
         this.synopsisAgent = synopsisAgent;
-        this.max_message_pairs = max_message_pairs;
-        this.max_response_tokens = max_response_tokens;
-        this.max_similarity_tokens = max_similarity_tokens ;
-        this.max_synopses_tokens = max_synopses_tokens;
-        this.num_keywords = 5;
+        this.max_message_pairs = config.conversation.max_exchanges;
+        this.max_response_tokens = config.conversation.max_tokens;
+        this.max_similarity_tokens = config.search.max_tokens ;
+        this.max_synopses_tokens = config.synopsis_agent.max_tokens;
+        this.num_keywords = config.search.keywords;
         this.asyncResults = Promise.resolve([]);
         this.functionHandler = new FunctionHandler({ agent: this });
         this.asyncResponsePromise = Promise.resolve("");
