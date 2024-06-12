@@ -1,26 +1,28 @@
 // Path: packages/memento-agent/src/mementoAgent.ts
 
-import { FunctionCallingAgent, type AgentArgs, type SendArgs } from "@memento-ai/agent";
 import { awaitAsyncAgentActions, startAsyncAgentActions } from "./asyncAgentGlue";
-import { getDatabaseSchema, type ID } from "@memento-ai/postgres-db";
-import { mementoPromptTemplate, type MementoPromptTemplateArgs } from "./mementoPromptTemplate";
-import { FunctionHandler, registry, type FunctionCallResult } from "@memento-ai/function-calling";
-import { retrieveContext } from "./retrieveContext";
 import { constructUserMessage } from "@memento-ai/types";
-import type { Message, UserMessage, AssistantMessage, Memento } from "@memento-ai/types";
+import { FunctionCallingAgent } from "@memento-ai/agent";
+import { FunctionHandler, registry, type FunctionCallResult } from "@memento-ai/function-calling";
+import { getDatabaseSchema } from "@memento-ai/postgres-db";
+import { mementoPromptTemplate } from "./mementoPromptTemplate";
+import { retrieveContext } from "./retrieveContext";
+import { selectSimilarMementos, combineMementoResults } from "@memento-ai/search";
 import { Writable } from "node:stream";
-import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
+import type { AgentArgs, SendArgs } from "@memento-ai/agent";
+import type { ID } from "@memento-ai/postgres-db";
+import type { MementoPromptTemplateArgs } from "./mementoPromptTemplate";
+import type { MementoSearchResult } from "@memento-ai/search";
+import type { Message, UserMessage, AssistantMessage } from "@memento-ai/types";
 import type { ResolutionAgent } from "@memento-ai/resolution-agent";
-import { selectSimilarMementos, type MementoSearchResult, combineMementoResults } from "@memento-ai/search";
+import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
+import type { Config } from "@memento-ai/config";
 
 export type MementoAgentArgs = AgentArgs & {
+    config: Config;
     outStream?: Writable;
     resolutionAgent?: ResolutionAgent;
     synopsisAgent?: SynopsisAgent;
-    max_message_pairs?: number;
-    max_response_tokens?: number;
-    max_similarity_tokens?: number;
-    max_synopses_tokens?: number;
 }
 
 export type MessagePair = {
@@ -34,9 +36,13 @@ export class MementoAgent extends FunctionCallingAgent
     outStream?: Writable;
     resolutionAgent?: ResolutionAgent;
     synopsisAgent?: SynopsisAgent;
+
     max_message_pairs: number;
+    max_response_tokens: number;
     max_similarity_tokens: number;
     max_synopses_tokens: number;
+    num_keywords: number;
+
     asyncResults: Promise<FunctionCallResult[]>;
     functionHandler: FunctionHandler;
     asyncResponsePromise: Promise<string>;
@@ -44,15 +50,17 @@ export class MementoAgent extends FunctionCallingAgent
 
     constructor(args: MementoAgentArgs)
     {
-        const { conversation, db, outStream, resolutionAgent, synopsisAgent, max_message_pairs, max_similarity_tokens, max_synopses_tokens } = args;
+        const { conversation, db, outStream, resolutionAgent, synopsisAgent, config } = args;
         super({ conversation, db, registry });
         this.databaseSchema = getDatabaseSchema();
         this.outStream = outStream;
         this.resolutionAgent = resolutionAgent;
         this.synopsisAgent = synopsisAgent;
-        this.max_message_pairs = max_message_pairs?? 5;
-        this.max_similarity_tokens = max_similarity_tokens ?? 2000;
-        this.max_synopses_tokens = max_synopses_tokens ?? 2000;
+        this.max_message_pairs = config.conversation.max_exchanges;
+        this.max_response_tokens = config.conversation.max_tokens;
+        this.max_similarity_tokens = config.search.max_tokens ;
+        this.max_synopses_tokens = config.synopsis_agent.max_tokens;
+        this.num_keywords = config.search.keywords;
         this.asyncResults = Promise.resolve([]);
         this.functionHandler = new FunctionHandler({ agent: this });
         this.asyncResponsePromise = Promise.resolve("");
@@ -71,7 +79,7 @@ export class MementoAgent extends FunctionCallingAgent
             content: this.lastUserMessage.content,
         };
         const currentSearchResults = await selectSimilarMementos(this.DB.pool, args);
-        const maxTokens = args.maxTokens ?? 16000;
+        const {maxTokens} = args;
         const results = combineMementoResults({ lhs: this.aggregateSearchResults, rhs: currentSearchResults, maxTokens, p: 0.5});
         this.aggregateSearchResults = results;
 
@@ -93,6 +101,18 @@ export class MementoAgent extends FunctionCallingAgent
         let userMessage: UserMessage = constructUserMessage(content);
 
         let assistantMessage: AssistantMessage = await this.functionHandler.handle(userMessage, priorMessages);
+
+        // Also use the assistant's response to update the search context.
+        // This will only be used for the next user message.
+        const args = {
+            maxTokens: 16000,
+            numKeywords: 5,
+            content: assistantMessage.content,
+        };
+        const currentSearchResults = await selectSimilarMementos(this.DB.pool, args);
+        const {maxTokens} = args;
+        const results = combineMementoResults({ lhs: this.aggregateSearchResults, rhs: currentSearchResults, maxTokens, p: 0.5});
+        this.aggregateSearchResults = results;
 
         let xchgId: ID;
         try {

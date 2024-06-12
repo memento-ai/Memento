@@ -47,23 +47,3 @@ console.log(embeddings); // [[...], [...]]
 const singleEmbedding = await embeddingInstance.generateOne('hello world');
 console.log(singleEmbedding); // [...]
 ```
-
-### Example Usage
-```typescript
-import { MyEmbeddingFunction } from '@memento-ai/embedding';
-
-const embeddingInstance = new MyEmbeddingFunction();
-
-const text1 = 'The quick brown fox jumps over the lazy dog.';
-const text2 = 'A quick red fox jumps over the sleeping cat.';
-
-const embedding1 = await embeddingInstance.generateOne(text1);
-const embedding2 = await embeddingInstance.generateOne(text2);
-
-// Calculate the cosine similarity between the two embeddings
-const cosineSimilarity = calculateCosineSimilarity(embedding1, embedding2);
-
-console.log(`Cosine similarity between "${text1}" and "${text2}": ${cosineSimilarity}`);
-```
-
-In this example, we generate embeddings for two text inputs, calculate the cosine similarity between them, and print the result. The `calculateCosineSimilarity` function is not provided by the `@memento-ai/embedding` package and would need to be implemented separately.

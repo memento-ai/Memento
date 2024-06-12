@@ -12,6 +12,7 @@ The `@memento-ai/ingester` package provides functionality for ingesting and summ
   - Mock summarizer for testing
   - Chat-based summarizer using a conversation interface
   - Model-based summarizer using a specified provider and model
+  - Ability to create custom summarizers by extending the `SummarizerAgent` class
 
 ## Usage and Examples
 ### Ingesting a File
@@ -33,7 +34,7 @@ import { ingestDirectory, createMockSummarizer } from '@memento-ai/ingester';
 const db = await MementoDb.create('my-database');
 const summarizer = createMockSummarizer();
 
-await ingestDirectory({db, dirPath: 'path/to/directory', summarizer});
+await ingestDirectory({ db, dirPath: 'path/to/directory', summarizer });
 ```
 
 ### Getting Ingested Files
@@ -71,3 +72,37 @@ const { docid, summaryid } = await summarizeAndStoreDocuments({
 ```
 
 This example uses the `createModelSummarizer` function to create a summarizer that uses the `haiku` model from Anthropic. You can also use the `createMockSummarizer` or `createChatSummarizer` functions to create different types of summarizers.
+
+### Creating a Custom Summarizer
+You can create a custom summarizer by extending the `SummarizerAgent` class and implementing the `summarize` method:
+
+```typescript
+import { SummarizerAgent, type SummarizerArgs } from '@memento-ai/ingester';
+import { createConversation } from '@memento-ai/conversation';
+import { AssistantMessage } from '@memento-ai/types';
+
+class CustomSummarizer extends SummarizerAgent {
+  constructor() {
+    super({ conversation: createConversation('provider', { model: 'model-name' }) });
+  }
+
+  async summarize({ content, source }: SummarizerArgs): Promise<AssistantMessage> {
+    // Implement your custom summarization logic here
+    const summary = `Custom summary for ${source}: ${content.slice(0, 50)}...`;
+    return { role: 'assistant', content: summary };
+  }
+}
+```
+
+Then, you can use your custom summarizer when ingesting files or directories:
+
+```typescript
+import { MementoDb } from '@memento-ai/memento-db';
+import { ingestFile } from '@memento-ai/ingester';
+import { CustomSummarizer } from './CustomSummarizer';
+
+const db = await MementoDb.create('my-database');
+const summarizer = new CustomSummarizer();
+
+const { docid, summaryid } = await ingestFile(db, 'path/to/file.ts', summarizer);
+```

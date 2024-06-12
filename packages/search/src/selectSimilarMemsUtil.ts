@@ -1,4 +1,4 @@
-// Path: packages/search/src/tests/selectSimilarMemsUtil.ts
+// Path: packages/search/src/selectSimilarMemsUtil.ts
 
 import { Command } from 'commander';
 import { extractKeywordsFromContent } from './extractKeywordsFromContent';

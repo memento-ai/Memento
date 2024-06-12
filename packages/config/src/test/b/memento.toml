@@ -1,0 +1,39 @@
+# This is a test configuration file with all fields filled in.
+# Because all fields are filled in, any memento.toml files in directories above this one
+# will have no effect when loadAggregateConfig() is called from this directory
+# or any subdirectories.
+# Many of the fields here are set to distinct and unrealisitc values so that we can test that the
+# correct values are being loaded, either directly, or via loadAggregateConfig()
+
+database = "memento-b.db"
+
+[memento_agent]
+provider = "anthropic"
+model = "opus"
+temperature = 1.5
+role = "memento"
+
+[synopsis_agent]
+provider = "anthropic"
+model = "haiku"
+temperature = 0.25
+max_tokens = 1000
+role = "synopsis"
+
+[resolution_agent]
+provider = "anthropic"
+model = "sonnet"
+temperature = 1.25
+role = "resolution"
+
+[conversation]
+max_exchanges = 13
+max_tokens = 3333
+
+[search]
+max_tokens = 7777
+keywords = 7
+
+    [search.decay]
+    user = 0.25
+    asst = 0.6

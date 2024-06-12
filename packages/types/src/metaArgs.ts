@@ -29,11 +29,6 @@ export const FragmentMetaArgs = z.object({
 });
 export type FragmentMetaArgs = z.input<typeof FragmentMetaArgs>;
 
-export const MetaId = z.string().regex(/^[a-z0-9-]+$/, 'The metaId must be kebab-case lowercase alphanumeric')
-    .transform(value => value.slice(0, 21))
-    .describe('The metaId of the conversation summary. Lower-case, kebab-case, alphanumeric. Will be truncated to 21 characters.');
-export type MetaId = z.TypeOf<typeof MetaId>;
-
 export const DocSummaryMetaArgs = z.object({
     kind: z.literal(DSUM),
     docid: z.string(),      // the id of the meta for the associated document

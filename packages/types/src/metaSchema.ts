@@ -3,7 +3,6 @@
 import { z } from 'zod';
 import { Role } from './role';
 import { CONV, DOC, FRAG, DSUM, SYN, MemKind, XCHG, RES } from './memKind';
-import { MetaId } from './metaArgs';
 
 // The various *MetaData types are the logical database schema for each of the mem kinds.
 // All metas are stored in one table, so all kinds could potentially use all columns,
@@ -12,6 +11,9 @@ import { MetaId } from './metaArgs';
 // to define which columns are actually materialized for each kind.
 
 // Every kind must have these three columns:
+
+export const MetaId = z.string().max(21);
+export type MetaId = z.infer<typeof MetaId>;
 
 export const RequiredMetaBase = z.object({
     kind: MemKind,      // The kind of the meta record
