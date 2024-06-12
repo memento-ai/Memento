@@ -11,17 +11,20 @@ const defaultConfig: Config = {
         provider: "anthropic",
         model: "haiku",
         temperature: 0,
+        role: "memento",
     },
     resolution_agent: {
         provider: "anthropic",
         model: "haiku",
         temperature: 0,
+        role: "resolution",
     },
     synopsis_agent: {
         provider: "anthropic",
         model: "haiku",
         temperature: 0,
         max_tokens: 2000,
+        role: "synopsis",
     },
     conversation: {
         max_exchanges: 5,

@@ -1,6 +1,6 @@
 // Path: packages/config/src/config.ts
 
-import { dirname, parse, normalize } from 'node:path'
+import { dirname, parse, normalize, resolve } from 'node:path'
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import type { Stats } from 'node:fs';
 import { z } from 'zod'
@@ -14,7 +14,12 @@ const dlog = debug('config');
 // The configuration here is for common parameters used in the app and excludes one time options
 // See also example.memento.toml
 
-export const ModelConfig = z.object({
+export const ConversationConfig = z.object({
+
+    // The role of the agent using this converstion: memento, resolution, synopsis, pkg_readme, prj_readme, etc.
+    // This is primarily used for logging purposes.
+    role: z.string().default('unknown'),
+
     // The provider to use [anthropic, ollama, openai, ...]. See @memento-ai/conversation/src/provider.ts
     provider: z.string().default('anthropic'),
 
@@ -24,23 +29,26 @@ export const ModelConfig = z.object({
     // Temperature
     temperature: z.number().default(0.0),
 });
+export type ConversationConfig = z.infer<typeof ConversationConfig>;
 
 
 export const Config = z.object({
     // The name of the database to use
     database: z.string().default('memento'),
 
-    memento_agent: ModelConfig.default({}),
-    resolution_agent: ModelConfig.default({}),
-    synopsis_agent: ModelConfig.extend({
+    memento_agent: ConversationConfig.default({ role: 'memento'}),
+    resolution_agent: ConversationConfig.default({ role: 'resolution'}),
+    synopsis_agent: ConversationConfig.extend({
         // The maximum number of synopses tokens in the additional context
         max_tokens: z.number().default(2000),
-    }).default({}),
+    }).default({ role: 'synopsis' }),
 
     conversation: z.object({
         // The conversation history will be limited to this number of exchanges
         // or this number of tokens, whichever comes first.
         max_exchanges: z.number().default(5),
+
+        // The maximum number of response tokens
         max_tokens: z.number().default(3000),
     }).default({}),
 
@@ -137,11 +145,13 @@ function directoryOf(path?: string): string | undefined {
     if (path === undefined) {
         return undefined;
     }
-    const stats: Stats = statSync(path);
+    const resolved = resolve(path);
+    dlog({resolved});
+    const stats: Stats = statSync(resolved);
     if (stats.isDirectory()) {
         return path;
     }
-    let p = parse(normalize(path));
+    let p = parse(normalize(resolved));
     return p.dir;
 }
 
@@ -149,8 +159,9 @@ function directoryOf(path?: string): string | undefined {
 // starting from the root directory to the current working directory, with the nearest directories
 // taking precedence. If the leafPath is a file (of any name), it will also load the configuration
 // from that file with that file taking precedence.
-export async function loadAggregateConfig(leafPath?: string): Promise<Config> {
-    let leafDir = directoryOf(leafPath) ?? cwd();
+export async function loadAggregateConfig(leafPath: string): Promise<Config> {
+    dlog(`Loading aggregate config from path ${leafPath}`);
+    let leafDir = directoryOf(leafPath);
     dlog(`Loading aggregate config from ${leafDir}`);
     // Start with a config that is a pure default
     let config = loadDefaultConfig();
@@ -170,7 +181,6 @@ export async function loadAggregateConfig(leafPath?: string): Promise<Config> {
 }
 
 type DeepPartial<T> = Partial<{ [P in keyof T]: DeepPartial<T[P]> }>;
-
 export type PartialConfig = DeepPartial<Config>;
 
 export function merge(a: Config, b: PartialConfig): Config {
