@@ -2,3 +2,4 @@ node_modules
 out/
 src/notes
 logs
+sonnet.toml
