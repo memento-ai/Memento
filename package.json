@@ -1,7 +1,7 @@
 {
   "name": "workspaces",
   "private": true,
-  "scripts" : {
+  "scripts": {
     "check": "for package in packages/*; do echo $package; bun --cwd $package check; done"
   },
   "workspaces": [
@@ -20,7 +20,11 @@
     "packages/resolution-agent",
     "packages/search",
     "packages/synopsis-agent",
+    "packages/system",
     "packages/types",
     "packages/utils"
-  ]
+  ],
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
 }
