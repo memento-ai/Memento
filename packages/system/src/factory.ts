@@ -21,7 +21,7 @@ export async function createMementoDb(config: Config): Promise<MementoDb> {
     return await MementoDb.create(config.database);
 }
 
-export function createConversation(config: ConversationConfig): ConversationInterface | undefined {
+export function createConversation(config: ConversationConfig, stream?: Writable): ConversationInterface | undefined {
     const { provider, model, temperature, role } = config;
     if (provider === 'none') {
         return undefined;
@@ -31,7 +31,7 @@ export function createConversation(config: ConversationConfig): ConversationInte
     }
     const conversationOptions: ConversationOptions = {
         model,
-        stream: undefined,
+        stream,
         logging: { name: role },
         temperature
     };
@@ -70,7 +70,7 @@ export type MementoAgentExtraArgs =  {
 
 export async function createMementoAgent(config: Config, db: MementoDb, extra : MementoAgentExtraArgs): Promise<MementoAgent> {
     const { synopsisAgent, resolutionAgent, outStream } = extra;
-    const conversation = createConversation(config.memento_agent);
+    const conversation = createConversation(config.memento_agent, outStream);
     if (conversation == undefined) {
         throw new Error('MementoAgent requires a conversation provider.');
     }
