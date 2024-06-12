@@ -1,7 +1,7 @@
 // Path: packages/memento-db/src/mementoDb-mems.ts
 
-import { addMemento } from '@memento-ai/postgres-db';
-import { CONV, DOC, DSUM, FRAG, RES, SYN } from '@memento-ai/types';
+import { addMemento, type ID } from '@memento-ai/postgres-db';
+import { CONV, DOC, DSUM, FRAG, Mem, MemId, MetaId, RES, SYN, createMem } from '@memento-ai/types';
 import { ConversationMetaArgs, DocumentMetaArgs, DocSummaryMetaArgs, FragmentMetaArgs, ResolutionMetaArgs, SynopsisMetaArgs } from '@memento-ai/types';
 import { nanoid } from 'nanoid';
 import { sql } from 'slonik';
@@ -9,10 +9,12 @@ import type  { DatabasePool } from 'slonik';
 import { zodParse } from '@memento-ai/utils';
 import debug from 'debug';
 import type { AddConvArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddFragArgs, AddResolutionArgs, AddSynopsisArgs } from './mementoDb-types';
-import type { ID } from '@memento-ai/postgres-db';
 import type { LinkExchangeArgs } from './mementoDb';
 
 const dlog = debug("mementoDb:mems");
+
+const wlog = debug("mementoDb:mems:warn");
+debug.enable("mementoDb:mems:warn");
 
 export async function addConversationMem(pool: DatabasePool, args_: AddConvArgs): Promise<ID> {
     const { content, role, priority } = args_;
@@ -46,6 +48,16 @@ export async function addDocAndSummary(pool: DatabasePool, args_: AddDocAndSumma
 
 export async function addResolutionMem(pool: DatabasePool, args_: AddResolutionArgs): Promise<ID> {
     const { content } = args_;
+
+    const mem: Mem = await createMem(content);
+    const existsQuery = sql.type(MemId)`
+        SELECT id from memento where memid = ${mem.id} LIMIT 1`;
+    const exists = await pool.maybeOne(existsQuery);
+    if (exists) {
+        wlog('Resolution already exists:', exists);
+        return { id: exists };
+    }
+
     const metaArgs = zodParse(ResolutionMetaArgs, {
         kind: RES,
     });
