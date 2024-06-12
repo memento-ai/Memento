@@ -1,10 +1,11 @@
 # @memento-ai/system
+
 ## Description
 The `@memento-ai/system` package provides functionality for creating and managing the core components of the Memento AI system, including the database, agents, and conversation interfaces.
 
 ## Key Features
 - Creates instances of the `MementoDb`, `MementoAgent`, `SynopsisAgent`, and `ResolutionAgent` classes based on the provided configuration.
-- Provides a factory function to create a conversation interface using the specified provider and configuration.
+- Provides factory functions to create a conversation interface using the specified provider and configuration.
 - Allows for the creation of a complete Memento system with all the necessary components.
 - Provides a utility function for creating a test system with optional inclusion of synopsis and resolution agents.
 
@@ -26,8 +27,8 @@ const system: MementoSystem = await createMementoSystem(config, outStream);
 The `createMementoSystem` function returns an object containing the following properties:
 - `db`: An instance of `MementoDb`.
 - `mementoAgent`: An instance of `MementoAgent`.
-- `synopsisAgent`: An instance of `SynopsisAgent` (optional).
-- `resolutionAgent`: An instance of `ResolutionAgent` (optional).
+- `synopsisAgent`: An instance of `SynopsisAgent` (optional, based on configuration).
+- `resolutionAgent`: An instance of `ResolutionAgent` (optional, based on configuration).
 
 To create a test system with optional inclusion of synopsis and resolution agents, use the `makeTestSystem` function:
 

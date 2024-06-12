@@ -1,13 +1,14 @@
 # @memento-ai/utils
 
 ## Description
-The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for finding the project root directory, copying ingested mementos between databases, parsing input using Zod schemas with error handling, and removing common indentation from text blocks.
+The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for finding the project root directory, copying ingested mementos between databases, parsing input using Zod schemas with error handling, removing common indentation from text blocks, and adding path comments to TypeScript files.
 
 ## Key Features
 - `getProjectRoot()` function to obtain the root directory of the Memento project
 - `copyIngestedMementos` function to copy ingested mementos from one database to another
 - `zodParse` function to parse input using Zod schemas with error handling
 - `stripCommonIndent` function to remove common indentation from a block of text
+- `addPathComment` utility to add or update the path comment at the top of TypeScript files
 
 ## Usage and Examples
 
@@ -72,3 +73,14 @@ In this example, `strippedText` will be as if it had been declared as:
 const text = `This is some text
 with common indentation.`;
 ```
+
+### Adding Path Comments
+The `addPathComment` utility can be used to add or update the path comment at the top of TypeScript files. This is useful for ensuring that the file path is correctly documented in each file.
+
+To use this utility, run the following command from the project root:
+
+```
+bun run packages/utils/src/add-path-comment.ts
+```
+
+This will update all TypeScript files in the project with the correct path comment.

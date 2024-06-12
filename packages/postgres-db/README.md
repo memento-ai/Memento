@@ -1,7 +1,7 @@
 # @memento-ai/postgres-db
 
 ## Description
-The `@memento-ai/postgres-db` package provides utilities for interacting with a PostgreSQL database used by the Memento AI system. It includes functions for creating and managing the database schema, inserting and retrieving data, executing SQL queries, and handling conversation history and summaries.
+The `@memento-ai/postgres-db` package provides utilities for interacting with a PostgreSQL database used by the Memento AI system. It includes functions for creating and managing the database schema, inserting and retrieving data, executing SQL queries, handling conversation history and summaries, and cleaning up orphaned user messages after application crashes.
 
 ## Key Features
 - Create and drop PostgreSQL databases for Memento

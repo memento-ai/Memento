@@ -5,8 +5,8 @@ The `@memento-ai/app` package provides a command-line interface (CLI) for intera
 
 ## Key Features
 - CLI for interacting with the Memento AI agent, persisting conversation history in a database
-- Ingestion utility for adding files to the Memento database, with support for summarizing file content using a specified language model
-- Utility for updating README.md files across the Memento monorepo packages
+- Ingestion utility for recursively adding files to the Memento database, with support for summarizing file content using a specified language model
+- Utility for updating README.md files across the Memento monorepo packages based on the package's source code and the project README.md
 
 ## Usage and Examples
 

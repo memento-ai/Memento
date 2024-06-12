@@ -1,13 +1,13 @@
 # @memento-ai/memento-db
 ## Description
-The `@memento-ai/memento-db` package provides a TypeScript interface for interacting with a PostgreSQL database to store and retrieve "mementos" - pieces of information that are part of a conversational history. It includes functionality for adding different types of mementos (conversations, fragments, documents, summaries, resolutions, and synopses), searching for similar mementos, and retrieving conversation history.
+The `@memento-ai/memento-db` package provides a TypeScript interface for interacting with a PostgreSQL database to store and retrieve "mementos" - pieces of information that are part of a conversational history. It includes functionality for adding different types of mementos (conversations, fragments, documents, summaries, resolutions, synopses, and conversation exchanges), searching for similar mementos, and retrieving conversation history.
 
 ## Key Features
 - Add conversation mementos (user and assistant messages)
 - Add fragment mementos (excerpts from documents)
 - Add documents and their summaries
 - Add conversation exchange mementos (user-assistant message pairs)
-- Add resolution mementos 
+- Add resolution mementos
 - Add synopsis mementos
 - Link conversation exchange mementos to synopsis mementos
 - Retrieve the conversation history
@@ -70,19 +70,3 @@ const resolutions = await db.getResolutions();
 const lastUserMessage = await db.get_last_user_message();
 const lastAssistantMessage = await db.get_last_assistant_message();
 ```
-
-### Key Methods
-- `addConversationMem`: Add a conversation memento to the database.
-- `addFragmentMem`: Add a fragment memento to the database.
-- `addDocAndSummary`: Add a document and its summary to the database.
-- `addConvExchangeMementos`: Add a conversation exchange memento (user-assistant message pair).
-- `addResolutionMem`: Add a resolution memento to the database.
-- `addSynopsisMem`: Add a synopsis memento to the database.
-- `linkExchangeSynopsis`: Link a conversation exchange memento to a synopsis memento.
-- `getConversation`: Retrieve the conversation history as an array of messages.
-- `getResolutions`: Retrieve resolution mementos from the database.
-- `getSynopses`: Retrieve a list of synopses (short summaries) from the database.
-- `get_last_user_message`: Get the last user message in the conversation.
-- `get_last_assistant_message`: Get the last assistant message in the conversation.
-
-See the `src` directory for the full implementation of the `MementoDb` class and its methods, as well as unit tests demonstrating the functionality.

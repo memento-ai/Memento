@@ -7,7 +7,7 @@ The `@memento-ai/resolution-agent` package provides a Resolution Agent that moni
 - Analyzes the most recent exchange between the user and assistant
 - Identifies explicit resolutions made by the assistant to change its future behavior, looking for:
   1. User feedback about assistant behavior
-  2. Acknowledgement of the feedback by the assistant 
+  2. Acknowledgement of the feedback by the assistant
   3. A statement from the assistant on how its behavior will be modified going forward
 - Extracts the resolution text, rephrasing for clarity and concision as needed
 - Encloses the extracted resolution in `<resolution>` tags
