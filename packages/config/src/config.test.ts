@@ -158,17 +158,20 @@ describe("Config", () => {
                 provider: "anthropic",
                 model: "opus",
                 temperature: 1.5,
+                role: "memento",
             },
             resolution_agent: {
                 provider: "anthropic",
                 model: "sonnet",
                 temperature: 1.25,
+                role: "resolution",
             },
             synopsis_agent: {
                 provider: "anthropic",
                 model: "haiku",
                 temperature: 0.25,
                 max_tokens: 1000,
+                role: "synopsis",
             },
             conversation: {
                 max_exchanges: 3,        // from a/memento.toml
