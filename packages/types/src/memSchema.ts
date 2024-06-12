@@ -17,8 +17,11 @@ import { zodParse } from '@memento-ai/utils';
 // do so automatically. The ingest application always deletes unreferenced mems just
 // before it exits.
 
+export const MemId = z.string().max(24);
+export type MemId = z.infer<typeof MemId>;
+
 export const Mem = z.object({
-    id: z.string(),
+    id: MemId,
     content: z.string(),
     embed_vector: z.array(z.number()),
     tokens: z.number(),
@@ -30,7 +33,7 @@ export type Mem = z.output<typeof Mem>;
 export async function createMem(content: string) : Promise<Mem> {
     const hasher = new Bun.CryptoHasher("md4");
     hasher.update(content);
-    const id = hasher.digest('base64');
+    const id: MemId = hasher.digest('base64');
     const mem: Mem = zodParse(Mem, {
         id,
         content: content,
