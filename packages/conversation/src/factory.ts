@@ -10,9 +10,10 @@ import { Writable } from 'stream';
 import dayjs from 'dayjs';
 import fs from 'fs';
 import type { ConversationInterface, SendMessageArgs } from "./conversation";
-import type { AssistantMessage, Message } from "@memento-ai/types";
+import type { AssistantMessage } from "@memento-ai/types";
 import type { Provider } from "./provider";
 import { GoogleConversation } from "./google";
+import { loggingTemplate } from "./loggingTemplate";
 
 export interface Logging {
     name: string;
@@ -38,6 +39,7 @@ export function withLogger(conversation: ConversationInterface, path: string): C
     async function sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {
         const { prompt, messages } = args;
         const response: AssistantMessage = await conversation.sendMessage(args);
+        const loggingData: string = loggingTemplate({ prompt, messages: [...messages, response] });
 
         const datestring = dayjs().format('YYYY-MM-DD');
         const fullPath = `logs/${path}/${datestring}`;
@@ -45,15 +47,7 @@ export function withLogger(conversation: ConversationInterface, path: string): C
 
         const hm = dayjs().format('HH:mm');
         const file = fs.createWriteStream(`${fullPath}/${hm}.md`, { flags: 'a' });
-
-        file.write(prompt);
-        file.write("# Messages:\n");
-        for (const message of messages) {
-            file.write(`## ${message.role}:\n`);
-            file.write(message.content + '\n');
-        }
-        file.write("# Response:\n" + response.content + '\n');
-
+        file.write(loggingData);
         file.close();
 
         return response;
