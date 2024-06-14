@@ -13,9 +13,6 @@ import type { LinkExchangeArgs } from './mementoDb';
 
 const dlog = debug("mementoDb:mems");
 
-const wlog = debug("mementoDb:mems:warn");
-debug.enable("mementoDb:mems:warn");
-
 export async function addConversationMem(pool: DatabasePool, args_: AddConvArgs): Promise<ID> {
     const { content, role, priority } = args_;
     const args = zodParse(ConversationMetaArgs, {
@@ -54,7 +51,7 @@ export async function addResolutionMem(pool: DatabasePool, args_: AddResolutionA
         SELECT id from memento where memid = ${mem.id} LIMIT 1`;
     const exists = await pool.maybeOne(existsQuery);
     if (exists) {
-        wlog('Resolution already exists:', exists);
+        dlog('Resolution already exists:', exists);
         return { id: exists };
     }
 

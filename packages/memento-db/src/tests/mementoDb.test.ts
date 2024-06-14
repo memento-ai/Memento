@@ -6,6 +6,7 @@ import { MementoDb } from '../mementoDb';
 import { nanoid } from "nanoid";
 import { USER, ASSISTANT } from "@memento-ai/types";
 import type { Message } from "@memento-ai/types";
+import { loadDefaultConfig } from "@memento-ai/config";
 
 describe("MementoCollection independent db required", () => {
 
@@ -41,7 +42,14 @@ describe("MementoCollection independent db required", () => {
         await db.addConversationMem({content: "testMem1", role: USER});
         await db.addConversationMem({content: "testMem2", role: ASSISTANT});
         await db.addConversationMem({content: "testMem3", role: USER});
-        const conversation: Message[] = await db.getConversation();
-        expect(conversation.length).toBe(3);
+        await db.addConversationMem({content: "testMem4", role: ASSISTANT});
+        const config = loadDefaultConfig();
+        expect(config).toBeTruthy();
+        expect(config.conversation).toBeTruthy();
+        expect(config.conversation.max_exchanges).toBeGreaterThanOrEqual(3);
+        expect(config.conversation.max_tokens).toBeGreaterThanOrEqual(1000);
+        console.log(config.conversation);
+        const conversation: Message[] = await db.getConversation(config);
+        expect(conversation.length).toBe(4);
     }, timeout);
 });
