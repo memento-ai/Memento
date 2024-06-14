@@ -1,12 +1,12 @@
 // Path: packages/memento-agent/src/dynamicContent.ts
 
-import { asSimilarityMap, combineMementoResults, selectSimilarMementos,  } from '@memento-ai/search';
-import { sql } from 'slonik';
-import type { MementoSearchArgs, MementoSearchResult, MementoSimilarityMap } from '@memento-ai/search';
-import type { MemKind, Message } from '@memento-ai/types';
+import { asSimilarityMap  } from '@memento-ai/search';
 import { CONV, MemKindValues, Role, SYN, XCHG } from '@memento-ai/types';
-import type { MementoDb } from '@memento-ai/memento-db';
+import { sql } from 'slonik';
 import { z } from 'zod';
+import type { MementoDb } from '@memento-ai/memento-db';
+import type { MementoSearchResult, MementoSimilarityMap } from '@memento-ai/search';
+import type { MemKind, Message } from '@memento-ai/types';
 
 type ID = string;
 export type MementoSearchResultMap = Record<ID, MementoSearchResult>;
@@ -55,7 +55,7 @@ const MessageIdPair = z.object({
 });
 type MessageIdPair = z.infer<typeof MessageIdPair>;
 
-export async function getRecentConvesation(db: MementoDb, maxMessagePairs: number = 10): Promise<MessageIdPair[]> {
+export async function getRecentConversation(db: MementoDb, maxMessagePairs: number = 10): Promise<MessageIdPair[]> {
     const query = sql.type(MessageIdPair)`
         WITH recent_messages AS (
             SELECT
@@ -114,7 +114,7 @@ export async function gatherContent(db: MementoDb, results: MementoSearchResult[
     const mementosByKind = indexMementosByKind(similarMementos);
 
     const maxMessagePairs = 5;
-    const messages: MessageIdPair[] = await getRecentConvesation(db, maxMessagePairs);
+    const messages: MessageIdPair[] = await getRecentConversation(db, maxMessagePairs);
 
     // If the recent conversation message are contained in the additional context, remove them.
     for (let message of messages) {
