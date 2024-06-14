@@ -51,10 +51,10 @@ The `selectMemsByKeywordSearch` function performs a keyword-based search using t
 The package also provides utility functions for normalizing search scores, combining search results, and converting search results to a similarity map:
 
 ```typescript
-import { linearNormalize, combineMementoResults, asSimilarityMap } from '@memento-ai/search';
+import { linearNormalize, combineSearchResults, asSimilarityMap } from '@memento-ai/search';
 
 const normalizedResults = linearNormalize(searchResults, (item) => item.score);
-const combinedResults = combineMementoResults({
+const combinedResults = combineSearchResults({
   lhs: keywordSearchResults,
   rhs: semanticSearchResults,
   maxTokens: 5000
@@ -62,7 +62,7 @@ const combinedResults = combineMementoResults({
 const similarityMap = await asSimilarityMap(searchResults);
 ```
 
-These functions ensure that the search scores are in the range [0, 1] and can be used to adjust the relative importance of different search results. The `combineMementoResults` function combines the results of two memento searches into a single search result list, handling cases where mementos are present in one selection but not the other. The `asSimilarityMap` function converts the search results into a map where the keys are the memento IDs and the values are the corresponding search result objects.
+These functions ensure that the search scores are in the range [0, 1] and can be used to adjust the relative importance of different search results. The `combineSearchResults` function combines the results of two memento searches into a single search result list, handling cases where mementos are present in one selection but not the other. The `asSimilarityMap` function converts the search results into a map where the keys are the memento IDs and the values are the corresponding search result objects.
 
 ### selectSimilarMemsUtil.ts
 
