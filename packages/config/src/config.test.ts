@@ -1,8 +1,8 @@
 // Path: packages/config/src/config.test.ts
 
 import { expect, test, describe } from "bun:test";
-import { Config, loadAggregateConfig, loadConfig, loadDefaultConfig, loadPartialConfig, merge} from "./config";
-import type { PartialConfig } from "./config";
+import { Config, loadAggregateConfig, loadConfig, loadDefaultConfig, loadPartialConfig, merge} from "..";
+import type { PartialConfig } from "..";
 import { getProjectRoot } from "@memento-ai/utils";
 
 const defaultConfig: Config = {
