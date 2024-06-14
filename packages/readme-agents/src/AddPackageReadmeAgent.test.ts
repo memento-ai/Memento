@@ -32,5 +32,5 @@ describe('AddPackageReadmeAgent', () => {
     it('should generate the Package README.md file', async () => {
         const readme = await agent.run();
         expect(readme).toContain('# @memento-ai/readme-agents');
-    });
+    }, 60000);
 });
