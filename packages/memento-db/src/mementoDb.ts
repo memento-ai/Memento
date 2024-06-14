@@ -8,8 +8,9 @@ import { registry, type FunctionRegistry } from "@memento-ai/function-calling";
 import { sql } from 'slonik';
 import { z } from 'zod';
 import debug from 'debug';
-import type {  DatabasePool, Interceptor } from 'slonik';
 import type { AddConvArgs, AddFragArgs, AddDocAndSummaryArgs, DocAndSummaryResult, AddSynopsisArgs, Context, AddConvExchangeArgs } from './mementoDb-types';
+import type { Config } from '@memento-ai/config';
+import type { DatabasePool, Interceptor } from 'slonik';
 import type { Message } from '@memento-ai/types';
 
 const dlog = debug("mementoDb");
@@ -122,8 +123,8 @@ export class MementoDb {
         return addSynopsisMem(this.pool, args_);
     }
 
-    async getConversation(maxMessagePairs: number = 10): Promise<Message[]> {
-        return await getConversation(this.pool, maxMessagePairs);
+    async getConversation(config: Config): Promise<Message[]> {
+        return await getConversation(this.pool, config);
     }
 
     async getSynopses(tokenLimit: number): Promise<string[]> {

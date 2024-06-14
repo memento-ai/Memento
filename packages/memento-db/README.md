@@ -14,6 +14,7 @@ The `@memento-ai/memento-db` package provides a TypeScript interface for interac
 - Retrieve resolution mementos
 - Retrieve synopses (short summaries) from the database
 - Get the last user and assistant messages in a conversation
+- Add multiple mementos in a single transaction for a conversation exchange (user message, assistant message, and the exchange itself)
 
 ## Usage and Examples
 The main entry point is the `MementoDb` class, which provides methods for interacting with the database:

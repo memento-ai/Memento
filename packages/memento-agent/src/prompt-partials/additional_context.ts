@@ -20,8 +20,9 @@ const additional_context_text = stripCommonIndent(`
     {{#if docMems}}
     <document_mementos>
     {{#each docMems}}
-    <document source="{{source}}">
+    <doc source="{{source}}">
     {{{content}}}
+    </doc>
     {{/each}}
     </document_mementos>
     {{/if}}

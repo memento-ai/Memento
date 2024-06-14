@@ -11,7 +11,8 @@ export type RootReadmePromptTemplateArgs = {
 };
 
 const rootReadmePromptTemplateText = stripCommonIndent(`
-    ## Instructions
+    <system>
+    <instructions>
     Your task is to generate the Project README.md file for the Memento monorepo.
     Memento is a Typescript application that uses PostgreSQL, so source files are primarily
     Typescript (*.ts), but also include SQL files (*.sql) for database schema and queries.
@@ -23,31 +24,31 @@ const rootReadmePromptTemplateText = stripCommonIndent(`
     the existing project README.md file. Please make improvements that seem warranted, but retain
     existing content that might not be inferrable from the package READMEs.
 
+    Be careful to notice when new packages have been added to the repository, and include them in the README.md.
+
     Note that the README.md content you generate will be visible to users of the Memento repository on GitHub,
     so it should be informative and well-organized.
+    </instructions>
 
-    ## Repository Source Files
-    The following are the paths of all source files in the repository:
-
+    <repository_source_paths>
     {{#each paths}}
-    - {{this}}
+    - {{{this}}}
     {{/each}}
-    ---
-    ## Current Project README.md
-    \`\`\`markdown
-    {{root}}
-    \`\`\`
-    ---
-    ## Package READMEs
-    The following are the contents of the README.md file for each package in the repository.
+    </repository_source_paths>
 
+    <current_project_readme>
+    {{{root}}}
+    </current_project_readme>
+
+    <package_readmes>
     {{#each readmes}}
-    ### Package: @memento-ai/{{package}}
-    \`\`\`markdown
-    {{content}}
-    \`\`\`
-    ---
+    <package name="@memento-ai/{{package}}">
+    {{{content}}}
+    </package>
     {{/each}}
+    </package_readmes>
+
+    </system>
 `);
 
 export const rootReadmePromptTemplate = Handlebars.compile<RootReadmePromptTemplateArgs>(rootReadmePromptTemplateText);

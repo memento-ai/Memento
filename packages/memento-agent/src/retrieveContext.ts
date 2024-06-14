@@ -7,7 +7,7 @@ import { registry } from "@memento-ai/function-calling";
 import type { DynamicContent } from "./dynamicContent";
 import type { MementoAgent } from "./mementoAgent";
 import type { MementoPromptTemplateArgs } from "./mementoPromptTemplate";
-import type { MementoSearchArgs, MementoSearchResult } from "@memento-ai/search";
+import type { MementoSearchResult } from "@memento-ai/search";
 
 export function functionCallingInstructions() : string {
     return `

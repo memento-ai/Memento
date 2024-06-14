@@ -27,7 +27,7 @@ The options are:
 - `-C, --cwd <dir>` (optional): Use the specified directory as the current working directory (default: `.`)
 - `-D, --directory <dir>` (optional): The directory from which to recursively ingest files (default: `packages`)
 
-This will recursively ingest all files in the specified directory (default: `packages`) into the specified database. The ingestion utility supports the file types used to implement Memento, which are listed in the `SUPPORTED_EXTENSIONS` constant.
+This will recursively ingest all files in the specified directory (default: `packages`) into the specified database. The ingestion utility supports the file types used to implement Memento, which are listed in the `SUPPORTED_EXTENSIONS` constant from the `@memento-ai/ingester` package.
 
 The ingestion utility uses the specified provider and model to summarize the content of the files before storing them in the database.
 

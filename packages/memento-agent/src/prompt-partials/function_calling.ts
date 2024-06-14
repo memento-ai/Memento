@@ -47,7 +47,7 @@ const function_calling_text = stripCommonIndent(`
     </important>
 
     <function_registry>
-    {{functions}}
+    {{{functions}}}
     </function_registry>
     </function_calling>
 `);

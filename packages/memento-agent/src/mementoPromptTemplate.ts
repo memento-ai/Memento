@@ -6,6 +6,7 @@ import { function_calling } from "./prompt-partials/function_calling";
 import { pronouns } from "./prompt-partials/pronouns";
 import { resolutions } from "./prompt-partials/resolutions";
 import { sql_schema } from "./prompt-partials/sql_schema";
+import { terminology } from "./prompt-partials/terminology";
 import { stripCommonIndent } from "@memento-ai/utils";
 import Handlebars from "handlebars";
 import type { MementoSearchResult } from "@memento-ai/search";
@@ -30,12 +31,15 @@ Handlebars.registerPartial('function_calling', function_calling);
 Handlebars.registerPartial('sql_schema', sql_schema);
 Handlebars.registerPartial('additional_context', additional_context);
 Handlebars.registerPartial('resolutions', resolutions);
+Handlebars.registerPartial('terminology', terminology);
 
 const mementoPromptTemplateText = stripCommonIndent(`
     <system>
     {{> core_system }}
 
     {{> pronouns }}
+
+    {{> terminology }}
 
     {{> function_calling functions=functions }}
 

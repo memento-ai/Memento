@@ -16,7 +16,8 @@ program
     .description(`A utility to update all of the README.md files in the project (assumes Memento monorepo structure).`)
     .requiredOption('-p, --provider <provider>', 'The provider to use [anthropic, ollama, openai, ...]')
     .requiredOption('-m, --model <model>', 'The model to use for summarization')
-    .option('-P, --package <package>', 'Optionally update only the given package');
+    .option('-P, --package <package>', 'Optionally update only the given package')
+    .option('-R, --project-only', 'Optionally update only the project README.md file');
 
 program.parse(process.argv);
 
@@ -33,6 +34,11 @@ async function main() {
     console.info('Running update-readmes utility...');
     const options = program.opts();
 
+    if (options.projectOnly && !!options.package) {
+        console.error(`Cannot specify both --project-only and --package`);
+        process.exit(1);
+    }
+
     const { provider, model } = options;
 
     const projectRoot = getProjectRoot();
@@ -48,8 +54,11 @@ async function main() {
         }
         await updateOnePackageReadme(projectRoot, options.package, provider, model);
     } else {
-        for (const pkg of package_paths) {
-            await updateOnePackageReadme(projectRoot, pkg, provider, model);
+
+        if (!options.projectOnly) {
+            for (const pkg of package_paths) {
+                await updateOnePackageReadme(projectRoot, pkg, provider, model);
+            }
         }
 
         const addProjectReadmeAgent = new AddProjectReadmeAgent({projectRoot, provider, model});
@@ -59,4 +68,4 @@ async function main() {
 
 }
 
-main().catch(console.error);
+await main().catch(console.error);
