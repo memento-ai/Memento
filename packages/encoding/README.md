@@ -1,12 +1,12 @@
 # @memento-ai/encoding
 
 ## Description
-The `@memento-ai/encoding` package provides utility functions for encoding and decoding text using the `cl100k_base` encoding from the `tiktoken` library. It also includes a function for counting the number of tokens in a given text.
+The `@memento-ai/encoding` package provides utility functions for encoding and decoding text using the `cl100k_base` encoding from the `tiktoken` library. It also includes a function for counting the number of tokens in a given text, including support for emoji characters.
 
 ## Key Features
 - Encode a string to a Uint32Array
 - Decode a Uint32Array to a Uint8Array or a string
-- Count the number of tokens in a given text, including support for emoji characters
+- Count the number of tokens in a given text
 
 ## Usage and Examples
 
@@ -39,4 +39,4 @@ const tokenCount: number = count_tokens(text);
 console.log(tokenCount); // Output: 3
 ```
 
-The package uses the `tiktoken` library for encoding and decoding operations, and the `cl100k_base` encoding is used by default. It supports encoding and decoding of text containing emoji characters as well.
+The package uses the `tiktoken` library for encoding and decoding operations, and the `cl100k_base` encoding is used by default. It supports encoding and decoding of text containing emoji characters.

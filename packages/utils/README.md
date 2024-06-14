@@ -4,11 +4,11 @@
 The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for finding the project root directory, copying ingested mementos between databases, parsing input using Zod schemas with error handling, removing common indentation from text blocks, and adding path comments to TypeScript files.
 
 ## Key Features
-- `getProjectRoot()` function to obtain the root directory of the Memento project
-- `copyIngestedMementos` function to copy ingested mementos from one database to another
-- `zodParse` function to parse input using Zod schemas with error handling
-- `stripCommonIndent` function to remove common indentation from a block of text
-- `addPathComment` utility to add or update the path comment at the top of TypeScript files
+- `getProjectRoot()` function to obtain the root directory of the Memento project.
+- `copyIngestedMementos` function to copy ingested mementos (documents, summaries, etc.) from one database to another.
+- `zodParse` function to parse input using Zod schemas with error handling and stack trace support.
+- `stripCommonIndent` function to remove common indentation from a block of text.
+- `addPathComment` utility to add or update the path comment at the top of TypeScript files.
 
 ## Usage and Examples
 
@@ -23,7 +23,7 @@ console.log(projectRoot); // Output: /path/to/Memento
 ```
 
 ### Copying Ingested Mementos
-The `copyIngestedMementos` function can be used to copy ingested mementos from one database to another. This is useful for creating backups or for migrating data between different environments.
+The `copyIngestedMementos` function can be used to copy ingested mementos (documents, summaries, etc.) from one database to another. This is useful for creating backups or for migrating data between different environments.
 
 ```typescript
 import { copyIngestedMementos } from '@memento-ai/utils';
@@ -36,7 +36,7 @@ await copyIngestedMementos(fromDb.pool, toDb.pool);
 ```
 
 ### Parsing with Zod
-The `zodParse` function provides a convenient way to parse input using Zod schemas while handling errors gracefully.
+The `zodParse` function provides a convenient way to parse input using Zod schemas while handling errors gracefully. It includes stack trace support for easier debugging.
 
 ```typescript
 import { zodParse } from '@memento-ai/utils';
@@ -65,13 +65,10 @@ const text = `
 `;
 
 const strippedText = stripCommonIndent(text);
-```
-
-In this example, `strippedText` will be as if it had been declared as:
-
-```typescript
-const text = `This is some text
-with common indentation.`;
+console.log(strippedText);
+// Output:
+// This is some text
+// with common indentation.
 ```
 
 ### Adding Path Comments

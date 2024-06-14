@@ -1,7 +1,7 @@
 # @memento-ai/system
 
 ## Description
-The `@memento-ai/system` package provides functionality for creating and managing the core components of the Memento AI system, including the database, agents, and conversation interfaces.
+The `@memento-ai/system` package provides functionality for creating and managing the core components of the Memento AI system, including the database, agents, and conversation interfaces. It allows for the creation of a complete Memento system with all the necessary components.
 
 ## Key Features
 - Creates instances of the `MementoDb`, `MementoAgent`, `SynopsisAgent`, and `ResolutionAgent` classes based on the provided configuration.
