@@ -23,7 +23,7 @@ import { ResolutionAgent } from '@memento-ai/resolution-agent';
 import { createConversation } from '@memento-ai/conversation';
 import { MementoDb } from '@memento-ai/memento-db';
 
-const db = await MementoDb.create('my_database');
+const db = await MementoDb.connect('my_database');
 const conversation = createConversation('anthropic', { model: 'haiku' });
 
 const resolutionAgentArgs = {
