@@ -4,3 +4,8 @@ src/notes
 logs
 sonnet.toml
 opus.toml
+
+
+
+.nx/cache
+.nx/workspace-data
