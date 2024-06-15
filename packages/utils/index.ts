@@ -3,4 +3,3 @@
 export * from './src/project-root';
 export * from './src/zodParse';
 export * from './src/strip-common-indent'
-export * from './src/copy-ingested-mementos'

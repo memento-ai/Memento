@@ -5,7 +5,6 @@ The `@memento-ai/utils` package provides a set of utility functions and tools fo
 
 ## Key Features
 - `getProjectRoot()` function to obtain the root directory of the Memento project.
-- `copyIngestedMementos` function to copy ingested mementos (documents, summaries, etc.) from one database to another.
 - `zodParse` function to parse input using Zod schemas with error handling and stack trace support.
 - `stripCommonIndent` function to remove common indentation from a block of text.
 - `addPathComment` utility to add or update the path comment at the top of TypeScript files.
@@ -20,19 +19,6 @@ import { getProjectRoot } from '@memento-ai/utils';
 
 const projectRoot = getProjectRoot();
 console.log(projectRoot); // Output: /path/to/Memento
-```
-
-### Copying Ingested Mementos
-The `copyIngestedMementos` function can be used to copy ingested mementos (documents, summaries, etc.) from one database to another. This is useful for creating backups or for migrating data between different environments.
-
-```typescript
-import { copyIngestedMementos } from '@memento-ai/utils';
-import { MementoDb } from '@memento-ai/memento-db';
-
-const fromDb = await MementoDb.create('from_db');
-const toDb = await MementoDb.create('to_db');
-
-await copyIngestedMementos(fromDb.pool, toDb.pool);
 ```
 
 ### Parsing with Zod
