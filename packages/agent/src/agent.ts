@@ -1,10 +1,7 @@
 // Path: packages/agent/src/agent.ts
 
 import type { ConversationInterface, SendMessageArgs } from "@memento-ai/conversation";
-import { FUNCTION_RESULT_HEADER, type FunctionRegistry } from "@memento-ai/function-calling";
-import type { MementoDb } from "@memento-ai/memento-db";
-import { constructUserMessage, UserMessage, AssistantMessage, USER } from "@memento-ai/types";
-import type { Message } from "@memento-ai/types";
+import { constructUserMessage, AssistantMessage } from "@memento-ai/types";
 
 // An Agent is a class that may represent:
 // 1. a conversational agent/chatbot that interacts with the user, or
@@ -21,11 +18,6 @@ import type { Message } from "@memento-ai/types";
 
 export type AgentArgs = {
     conversation: ConversationInterface;
-    db?: MementoDb;
-}
-
-export type FunctionCallingAgentArgs = AgentArgs & {
-    registry: FunctionRegistry;
 }
 
 export interface SendArgs {
@@ -34,11 +26,9 @@ export interface SendArgs {
 
 export abstract class Agent  {
     private conversation: ConversationInterface;
-    protected db?: MementoDb;
 
-    constructor({conversation, db}: AgentArgs) {
+    constructor({conversation}: AgentArgs) {
         this.conversation = conversation;
-        this.db = db;
         Object.defineProperty(this, 'send', {
             value: this.send,
             writable: false,
@@ -69,37 +59,5 @@ export abstract class Agent  {
         const prompt = await this.generatePrompt();
         const message = constructUserMessage(content);
         return this.forward({prompt, messages: [message]})
-    }
-
-    get DB(): MementoDb
-    {
-        if (!this.db)
-        {
-            throw new Error("Agent: Database connection is not set");
-        }
-        return this.db;
-    }
-
-}
-
-export abstract class FunctionCallingAgent extends Agent {
-    protected registry: FunctionRegistry;
-    lastUserMessage: UserMessage;
-
-    constructor(args: FunctionCallingAgentArgs) {
-        super(args);
-        this.registry = args.registry;
-        this.lastUserMessage = { content: "", role: USER };
-    }
-
-    checkForFunctionResults(userMessage: UserMessage): void {
-        if (!userMessage.content.startsWith(FUNCTION_RESULT_HEADER)) {
-            this.lastUserMessage = userMessage;
-        }
-    }
-
-    get Registry(): FunctionRegistry
-    {
-        return this.registry;
     }
 }

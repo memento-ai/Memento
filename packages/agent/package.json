@@ -7,17 +7,10 @@
     "check": "tsc --skipLibCheck --noEmit"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/debug": "^4.1.12"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
+    "@types/bun": "latest"
   },
   "dependencies": {
-    "@memento-ai/conversation": "workspace:*",
-    "@memento-ai/function-calling": "workspace:*",
-    "@memento-ai/memento-db": "workspace:*",
-    "@memento-ai/types": "workspace:*",
-    "debug": "^4.3.4"
+    "@memento-ai/conversation": "1.0.0",
+    "@memento-ai/types": "1.0.0"
   }
 }
