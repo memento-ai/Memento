@@ -1,9 +1,9 @@
 // Path: packages/memento-agent/src/asyncAgentGlue.ts
 
-import { ASSISTANT, type Message } from "@memento-ai/types";
-import debug from "debug";
+import { ASSISTANT } from "@memento-ai/types";
 import type { ID } from "@memento-ai/postgres-db";
 import type { MementoDb } from "@memento-ai/memento-db";
+import type { Message } from "@memento-ai/types";
 import type { ResolutionAgent } from "@memento-ai/resolution-agent";
 import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
 
@@ -29,19 +29,19 @@ export function startAsyncAgentActions(
 
     let promise: Promise<string> = Promise.resolve("");
 
-    if (!!synopsisAgent) {
+    if (synopsisAgent) {
         promise = synopsisAgent.run()
         .then(async (response: string) => {
             const message: Message = { content: response, role: ASSISTANT };
             const id = await db.addSynopsisMem({content: message.content});
-            if (!!xchgId) {
+            if (xchgId) {
                 await db.linkExchangeSynopsis({xchg_id: xchgId.id, synopsis_id: id.id});
             }
             return message.content;
         });
     }
 
-    if (!!resolutionAgent) {
+    if (resolutionAgent) {
         promise = resolutionAgent.run()
         .then(async (response: string) => {
             const message: Message = { content: response, role: ASSISTANT };

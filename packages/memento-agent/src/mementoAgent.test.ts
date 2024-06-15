@@ -2,16 +2,16 @@
 
 import { AssistantMessage } from "@memento-ai/types";
 import { createMementoDb, dropDatabase } from "@memento-ai/postgres-db";
-import { makeTestSystem, type MementoSystem } from "@memento-ai/system"
 import { expect, it, describe, beforeEach, afterEach} from "bun:test";
 import { getProjectRoot } from "@memento-ai/utils";
 import { ingestDirectory } from "@memento-ai/ingester";
-import { MementoAgent } from "./mementoAgent";
+import { MementoAgent, createMementoSystem, type MementoSystem } from "./mementoAgent";
 import { MementoDb } from "@memento-ai/memento-db";
 import { nanoid } from "nanoid";
 import debug from "debug";
 import type { Interceptor } from "slonik";
 import type { SendArgs } from "@memento-ai/agent";
+import { ConversationConfig, Config } from "@memento-ai/config";
 
 const dlog = debug("mementoAgent:test");
 
@@ -24,6 +24,33 @@ function sendArgs(content: string): SendArgs {
 const timeout = 60000;
 
 const interceptors: Interceptor[] = [{queryExecutionError: async (e, query) => { dlog({e, query}); return null; }}];
+
+export type MakeTestSystemArgs = {
+    database: string;
+
+    // True if the agent is wanted.
+    synopsis?: boolean;
+    resolution?: boolean;
+}
+
+const provider = 'none';
+
+export async function makeTestSystem(args: MakeTestSystemArgs ) : Promise<MementoSystem> {
+    const { database, synopsis, resolution } = args;
+
+    // If the agent is not wanted, we pass in disabledAgent.
+    // If the agent is wanted, we pass in undefined, which will create an agent from default configuration.
+    const settings: Partial<Config> = { database };
+    if (!synopsis) {
+        settings.synopsis_agent = { ...ConversationConfig.parse({provider}), max_tokens: 100};
+    }
+    if (!resolution) {
+        settings.resolution_agent = ConversationConfig.parse({provider});
+    }
+    const config = Config.parse(settings);
+    const system: MementoSystem = await createMementoSystem(config);
+    return system;
+}
 
 describe("MementoAgent", () => {
 
@@ -72,8 +99,8 @@ describe("MementoAgent", () => {
 
     it("can chat with the agent about ingested content", async () => {
         await ingestDirectory({db, dirPath: `${getProjectRoot()}/packages/types`});
-        let args = sendArgs("What are the various kinds of MemMetaData?");
-        let message: AssistantMessage = await mementoAgent.run(args);
+        const args = sendArgs("What are the various kinds of MemMetaData?");
+        const message: AssistantMessage = await mementoAgent.run(args);
         expect(message.content).toBeTruthy();
 
         // geneatePrompt() is normally called from run(). We can call it directly here because run() has been called.
