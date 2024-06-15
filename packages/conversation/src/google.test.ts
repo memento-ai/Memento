@@ -24,7 +24,7 @@ describe("Google", () => {
         }
         const message = await conversation.sendMessage(args)
 
-        let expected: string = '5';
+        const expected = '5';
         expect(message.content.trim()).toBe(expected);
     });
 });

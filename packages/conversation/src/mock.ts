@@ -5,8 +5,8 @@ import type { ConversationInterface, SendMessageArgs } from "./conversation";
 import { type ConversationOptions } from './factory';
 
 export class MockConversation implements ConversationInterface {
-
-    constructor(_: ConversationOptions) {}
+    private opts: ConversationOptions;
+    constructor(opts: ConversationOptions) { this.opts = opts; }
 
     async sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {
         // This "mock" is maybe more of a "dummy" than a mock,

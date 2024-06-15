@@ -104,7 +104,7 @@ export class OllamaConversation implements ConversationInterface {
         if (this.stream) {
             const outStream = this.stream as Writable;
             const eventStream = await this.session.client.chat({...body, stream: true});
-            let parts: string[] = [];
+            const parts: string[] = [];
             for await (const event of eventStream) {
                 const { message } = event;
                 const { content } = message;
