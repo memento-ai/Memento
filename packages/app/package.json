@@ -5,14 +5,14 @@
         "check": "tsc --skipLibCheck --noEmit"
     },
     "dependencies": {
-        "@memento-ai/types": "workspace:*",
-        "@memento-ai/conversation": "workspace:*",
-        "@memento-ai/embedding": "workspace:*",
-        "@memento-ai/encoding": "workspace:*",
-        "@memento-ai/function-calling": "workspace:*",
-        "@memento-ai/memento-db": "workspace:*",
-        "@memento-ai/postgres-db": "workspace:*",
-        "@memento-ai/readme-agents": "workspace:*",
-        "@memento-ai/utils": "workspace:*"
+        "@memento-ai/types": "^1.0.0*",
+        "@memento-ai/conversation": "^1.0.0*",
+        "@memento-ai/embedding": "^1.0.0*",
+        "@memento-ai/encoding": "^1.0.0*",
+        "@memento-ai/function-calling": "^1.0.0*",
+        "@memento-ai/memento-db": "^1.0.0*",
+        "@memento-ai/postgres-db": "^1.0.0*",
+        "@memento-ai/readme-agents": "^1.0.0*",
+        "@memento-ai/utils": "^1.0.0*"
     }
 }

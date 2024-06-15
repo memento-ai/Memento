@@ -2,7 +2,7 @@
 
 import { cleanUpLastUserMem } from '@memento-ai/postgres-db';
 import { Command } from 'commander';
-import { createMementoSystem } from '../../system/src/factory';
+import { createMementoSystem } from '@memento-ai/memento-agent'
 import { loadAggregateConfig } from '@memento-ai/config';
 import { type Writable } from 'node:stream';
 import c from 'ansi-colors';

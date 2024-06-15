@@ -2,7 +2,7 @@
 
 import { Command } from 'commander';
 import { connectDatabase, createMementoDb, delete_unreferenced_mems, wipeDatabase } from '@memento-ai/postgres-db';
-import { copyIngestedMementos } from '@memento-ai/utils';
+import { copyIngestedMementos } from '@memento-ai/ingester';
 import { DocumentMemento } from '@memento-ai/types';
 import { ingestDirectory, createModelSummarizer, SUPPORTED_EXTENSIONS, dropIngestedFiles, dropAbandonedFiles } from '@memento-ai/ingester';
 import { isProvider, ProviderNames } from '@memento-ai/conversation';
@@ -99,7 +99,7 @@ async function main() {
         process.exit(1);
     }
 
-    const db: MementoDb = await MementoDb.create(template_db_name);
+    const db: MementoDb = await MementoDb.connect(template_db_name);
     const dirPath = directory ?? 'packages';
 
     await ingestDirectory({db, dirPath, summarizer, log: true});
@@ -109,7 +109,7 @@ async function main() {
         await wipeDatabase(database);
     }
 
-    const target: MementoDb = await MementoDb.create(database);
+    const target: MementoDb = await MementoDb.connect(database);
     await dropIngestedFiles(target);
     await copyIngestedMementos(db.pool, target.pool);
     await db.close();
