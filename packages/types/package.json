@@ -11,11 +11,11 @@
     "@types/debug": "^4.1.12"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "@memento-ai/encoding": "1.0.0",
+    "@memento-ai/embedding": "1.0.0",
+    "@memento-ai/utils": "1.0.0"
   },
   "dependencies": {
-    "debug": "^4.3.4",
-    "trace-error": "^1.0.3",
     "zod": "^3.22.4"
   }
 }
