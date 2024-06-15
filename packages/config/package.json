@@ -12,7 +12,7 @@
     "@types/lodash": "^4.17.5"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "@memento-ai/utils": "^1.0.0"
   },
   "dependencies": {
     "debug": "^4.3.4",

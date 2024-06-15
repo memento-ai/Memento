@@ -90,7 +90,7 @@ function directoryOf(path?: string): string | undefined {
     if (stats.isDirectory()) {
         return path;
     }
-    let p = parse(normalize(resolved));
+    const p = parse(normalize(resolved));
     return p.dir;
 }
 
@@ -100,7 +100,7 @@ function directoryOf(path?: string): string | undefined {
 // from that file with that file taking precedence.
 export async function loadAggregateConfig(leafPath: string): Promise<Config> {
     dlog(`Loading aggregate config from path ${leafPath}`);
-    let leafDir = directoryOf(leafPath);
+    const leafDir = directoryOf(leafPath);
     dlog(`Loading aggregate config from ${leafDir}`);
     // Start with a config that is a pure default
     let config = loadDefaultConfig();
