@@ -1,7 +1,7 @@
 // Path: packages/synopsis-agent/src/synopsisAgent.ts
 
 import { Agent, type AgentArgs } from '@memento-ai/agent';
-import { getSynopses } from '@memento-ai/memento-db';
+import { MementoDb, getSynopses } from '@memento-ai/memento-db';
 import { get_last_assistant_message, get_last_user_message } from '@memento-ai/postgres-db';
 import { Message } from '@memento-ai/types';
 import debug from 'debug';
@@ -9,14 +9,19 @@ import c from 'ansi-colors';
 import { count_tokens } from '@memento-ai/encoding';
 import { stripCommonIndent } from '@memento-ai/utils';
 import { synopsisPromptTemplate } from './synopsis-prompt-template';
+import type { Config } from '@memento-ai/config';
+import { createConversationFromConfig } from '@memento-ai/conversation';
 
 const dlog = debug('synopsis');
 
-export type SynopsisAgentArgs = AgentArgs;
+export type SynopsisAgentArgs = AgentArgs & { db: MementoDb };
 
 export class SynopsisAgent extends Agent {
+    private db: MementoDb;
+
     constructor(args: SynopsisAgentArgs) {
         super(args);
+        this.db = args.db;
     }
 
     async run(): Promise<string> {
@@ -32,15 +37,15 @@ export class SynopsisAgent extends Agent {
     }
 
     private async getSynopses(): Promise<string[]> {
-        return await getSynopses(this.DB.readonlyPool, 1000);
+        return await getSynopses(this.db.readonlyPool, 1000);
     }
 
     private async getLatestUserMessage(): Promise<Message> {
-        return await get_last_user_message(this.DB.readonlyPool);
+        return await get_last_user_message(this.db.readonlyPool);
     }
 
     private async getLatestAssistantMessage(): Promise<Message> {
-        return await get_last_assistant_message(this.DB.readonlyPool);
+        return await get_last_assistant_message(this.db.readonlyPool);
     }
 
     async generatePrompt(): Promise<string> {
@@ -49,4 +54,16 @@ export class SynopsisAgent extends Agent {
         const assistant = (await this.getLatestAssistantMessage()).content;
         return synopsisPromptTemplate({synopses, user, assistant});
     }
+}
+
+export async function createSynopsisAgent(config: Config, db: MementoDb): Promise<SynopsisAgent | undefined> {
+    const conversation = createConversationFromConfig(config.synopsis_agent);
+    if (conversation == undefined) {
+        return undefined;
+    }
+    const agentArgs: SynopsisAgentArgs = {
+        db,
+        conversation
+    };
+    return new SynopsisAgent(agentArgs);
 }

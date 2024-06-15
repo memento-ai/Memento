@@ -14,7 +14,7 @@ describe('SynopsisAgent', () => {
     beforeEach(async () => {
         dbname = `test_${nanoid()}`;
         await createMementoDb(dbname);
-        db = await MementoDb.create(dbname);
+        db = await MementoDb.connect(dbname);
     });
 
     afterEach(async () => {
@@ -35,7 +35,7 @@ describe('SynopsisAgent', () => {
 
         const { provider, model } = defaultProviderAndModel;
         const conversation: ConversationInterface = createConversation(provider, { model, temperature: 0.0, max_response_tokens: 70, logging: { name: 'synopsis'} });
-        const synopsisAgent = new SynopsisAgent({ db, conversation });
+        const synopsisAgent = new SynopsisAgent({ conversation, db });
         const synopsis = await synopsisAgent.run();
 
         expect(synopsis).toBeTruthy();

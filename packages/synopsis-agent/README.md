@@ -17,7 +17,7 @@ import { MementoDb } from '@memento-ai/memento-db';
 import { createConversation } from '@memento-ai/conversation';
 
 // Create a Memento DB instance
-const db = await MementoDb.create('my-database');
+const db = await MementoDb.connect('my-database');
 
 // Create a conversation instance
 const conversation = createConversation('anthropic', { model: 'haiku', temperature: 0.0, max_response_tokens: 70, logging: { name: 'synopsis' } });
