@@ -29,14 +29,12 @@ export async function ingestFile(db: MementoDb, filePath: string, summarizer?: S
     const mem = await createMem(content);
 
     let result: DocAndSummaryResult | undefined = undefined;
-    let skip: boolean = false;
     await db.pool.connect(async (conn) => {
         const row = await conn.maybeOne(sql.type(DocumentIdTuple)`SELECT id, summaryid, memid, tokens FROM memento WHERE source = ${source} AND kind = ${DOC};`);
         if (row) {
             const { id, memid, summaryid, tokens } = row;
             if (memid === mem.id) {
                 dlog(`Document ${source} with ${tokens} tokens unchanged since previous ingestas id=${id}`);
-                skip = true;
                 result = { docid: id, summaryid }
             } else {
                 dlog(`Document ${source} already ingested as id=${id}, deleting and re-ingesting.`);
@@ -111,9 +109,10 @@ export async function dropIngestedFiles(db: MementoDb) {
 }
 
 export async function getIngestedFiles(db: MementoDb) : Promise<string[]> {
+    const Source = z.object({ source: z.string() });
     return await db.pool.connect(async (conn) => {
-        const result = await conn.query(sql.unsafe`SELECT source FROM meta WHERE kind = ${DOC};`)
-        dlog(result.rows)
-        return result.rows.map((row: any) => row.source);
+        const result = await conn.query(sql.type(Source)`SELECT source FROM meta WHERE kind = ${DOC};`)
+        dlog(result)
+        return result.rows.map((row: z.infer<typeof Source>) => row.source);
     });
 }

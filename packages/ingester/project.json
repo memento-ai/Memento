@@ -1,0 +1,31 @@
+{
+  "name": "@memento-ai/ingester",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/ingester/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx-bun/nx:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "entrypoints": ["packages/ingester/src/index.ts"],
+        "outputPath": "dist/ingester",
+        "tsConfig": "packages/ingester/tsconfig.lib.json",
+        "smol": false,
+        "bun": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx-bun/nx:test",
+      "options": {
+        "smol": false,
+        "bail": true,
+        "bun": false
+      }
+    }
+  }
+}

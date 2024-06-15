@@ -20,7 +20,7 @@ The `@memento-ai/ingester` package provides functionality for ingesting and summ
 import { MementoDb } from '@memento-ai/memento-db';
 import { ingestFile, createMockSummarizer } from '@memento-ai/ingester';
 
-const db = await MementoDb.create('my-database');
+const db = await MementoDb.connect('my-database');
 const summarizer = createMockSummarizer();
 
 const { docid, summaryid } = await ingestFile(db, 'path/to/file.ts', summarizer);
@@ -31,7 +31,7 @@ const { docid, summaryid } = await ingestFile(db, 'path/to/file.ts', summarizer)
 import { MementoDb } from '@memento-ai/memento-db';
 import { ingestDirectory, createMockSummarizer } from '@memento-ai/ingester';
 
-const db = await MementoDb.create('my-database');
+const db = await MementoDb.connect('my-database');
 const summarizer = createMockSummarizer();
 
 await ingestDirectory({ db, dirPath: 'path/to/directory', summarizer });
@@ -42,7 +42,7 @@ await ingestDirectory({ db, dirPath: 'path/to/directory', summarizer });
 import { MementoDb } from '@memento-ai/memento-db';
 import { getIngestedFiles } from '@memento-ai/ingester';
 
-const db = await MementoDb.create('my-database');
+const db = await MementoDb.connect('my-database');
 const ingestedFiles = await getIngestedFiles(db);
 ```
 
@@ -51,7 +51,7 @@ const ingestedFiles = await getIngestedFiles(db);
 import { MementoDb } from '@memento-ai/memento-db';
 import { dropIngestedFiles } from '@memento-ai/ingester';
 
-const db = await MementoDb.create('my-database');
+const db = await MementoDb.connect('my-database');
 await dropIngestedFiles(db);
 ```
 
@@ -60,7 +60,7 @@ await dropIngestedFiles(db);
 import { MementoDb } from '@memento-ai/memento-db';
 import { summarizeAndStoreDocuments, createModelSummarizer } from '@memento-ai/ingester';
 
-const db = await MementoDb.create('my-database');
+const db = await MementoDb.connect('my-database');
 const summarizer = createModelSummarizer({ provider: 'anthropic', model: 'haiku' });
 
 const { docid, summaryid } = await summarizeAndStoreDocuments({
@@ -101,7 +101,7 @@ import { MementoDb } from '@memento-ai/memento-db';
 import { ingestFile } from '@memento-ai/ingester';
 import { CustomSummarizer } from './CustomSummarizer';
 
-const db = await MementoDb.create('my-database');
+const db = await MementoDb.connect('my-database');
 const summarizer = new CustomSummarizer();
 
 const { docid, summaryid } = await ingestFile(db, 'path/to/file.ts', summarizer);

@@ -2,3 +2,4 @@
 
 export * from './src/ingester';
 export * from './src/summarizeDocument'
+export * from './src/copy-ingested-mementos'
