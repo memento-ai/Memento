@@ -41,7 +41,6 @@ The Memento monorepo contains the following packages:
 - `@memento-ai/resolution-agent`: Responsible for identifying and extracting explicit resolutions made by the assistant to change its future behavior based on user feedback.
 - `@memento-ai/search`: Provides functionality for searching and retrieving relevant mementos from a Memento database based on keyword matching and semantic similarity.
 - `@memento-ai/synopsis-agent`: Responsible for generating a concise summary or "synopsis" of the latest conversational exchange between a user and an assistant.
-- `@memento-ai/system`: Provides functionality for creating and managing the core components of the Memento AI system.
 - `@memento-ai/types`: Provides the core data types and schemas used throughout the Memento application.
 - `@memento-ai/utils`: Provides a set of utility functions and tools for the Memento project.
 
