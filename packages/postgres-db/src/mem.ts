@@ -1,9 +1,14 @@
 // Path: packages/postgres-db/src/mem.ts
 
-import { CONV, ConvExchangeMetaArgs, ConversationMetaArgs, DOC, DSUM, DocSummaryMetaArgs, DocumentMetaArgs, FRAG, FragmentMetaArgs, Mem, MetaArgs, MetaId, RES, ResolutionMetaArgs, SYN, SynopsisMetaArgs, XCHG, createMem } from '@memento-ai/types';
-import { sql, type DatabasePool, type CommonQueryMethods, type QueryResult } from 'slonik';
-import debug from 'debug';
+import {
+    CONV, DOC, DSUM, FRAG, RES, SYN, XCHG,
+    ConversationMetaArgs, ConvExchangeMetaArgs, DocSummaryMetaArgs, DocumentMetaArgs,
+    FragmentMetaArgs, MetaArgs, ResolutionMetaArgs, SynopsisMetaArgs,
+    createMem, Mem, MetaId } from '@memento-ai/types';
+import { sql } from 'slonik';
 import { zodParse } from '@memento-ai/utils';
+import debug from 'debug';
+import type { DatabasePool, CommonQueryMethods, QueryResult } from 'slonik';
 
 const dlog = debug("postgres-db:mem");
 
@@ -26,7 +31,7 @@ export async function insertMem(pool: CommonQueryMethods, mem: Mem) : Promise<vo
 
 export async function insertMeta(conn: CommonQueryMethods, memId: string, metaId: string, metaArgs: MetaArgs) : Promise<ID[]> {
     const { kind } = metaArgs;
-    let results: QueryResult<any>;
+    let results: QueryResult<ID>;
     switch (kind) {
         case CONV: {
             const { role, source, priority, docid } = zodParse(ConversationMetaArgs, metaArgs);

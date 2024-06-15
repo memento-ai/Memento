@@ -5,7 +5,7 @@ import { raw } from 'slonik-sql-tag-raw';
 import { getProjectRoot } from '@memento-ai/utils';
 import { Message } from '@memento-ai/types';
 
-export async function executeFileQuery(conn: CommonQueryMethods, fileName: string): Promise<QueryResult<any>> {
+export async function executeFileQuery(conn: CommonQueryMethods, fileName: string): Promise<QueryResult<unknown>> {
     const root = getProjectRoot();
     const fullPath = `${root}/packages/postgres-db/sql/${fileName}`;
     const file = Bun.file(fullPath);
