@@ -6,7 +6,6 @@
   },
   "workspaces": [
     "packages/agent",
-    "packages/app",
     "packages/config",
     "packages/conversation",
     "packages/embedding",
@@ -20,11 +19,26 @@
     "packages/resolution-agent",
     "packages/search",
     "packages/synopsis-agent",
-    "packages/system",
     "packages/types",
     "packages/utils"
   ],
-  "dependencies": {
-    "zod": "^3.23.8"
+  "devDependencies": {
+    "@nx-bun/nx": "^1.2.0",
+    "@nx-bun/task-worker-runner": "^0.0.4",
+    "@nx/eslint": "19.3.0",
+    "@nx/eslint-plugin": "19.3.0",
+    "@nx/js": "19.3.0",
+    "@swc-node/register": "~1.9.1",
+    "@swc/core": "~1.5.7",
+    "@swc/helpers": "~0.5.11",
+    "@types/node": "18.16.9",
+    "@typescript-eslint/eslint-plugin": "^7.3.0",
+    "@typescript-eslint/parser": "^7.3.0",
+    "bun-types": "latest",
+    "eslint": "~8.57.0",
+    "eslint-config-prettier": "^9.0.0",
+    "nx": "19.3.0",
+    "prettier": "^2.6.2",
+    "typescript": "~5.4.2"
   }
 }
