@@ -7,14 +7,11 @@
     "check": "tsc --skipLibCheck --noEmit"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/debug": "^4.1.12"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
   },
   "dependencies": {
-    "debug": "^4.3.4",
     "ollama": "^0.4.4"
   }
 }
