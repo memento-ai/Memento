@@ -18,7 +18,7 @@ export async function selectMemsBySemanticSimilarity(dbPool: DatabasePool, args:
     const queryEmbedding = await embedding.generateOne(content);
     const queryVector = pgvector.toSql(queryEmbedding);
 
-    let result = await dbPool.connect(async (conn) => {
+    const result = await dbPool.connect(async (conn) => {
         const result: QueryResult<MementoSearchResult> = await conn.query(sql.type(MementoSearchResult)`
             WITH cte AS (
                 SELECT

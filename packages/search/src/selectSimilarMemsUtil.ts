@@ -23,40 +23,43 @@ async function main() {
     console.info('Running selectMemsBySemanticSimilarity utility...');
     const options = program.opts();
 
-    let { database, tokens, content } = options;
-    tokens = parseInt(tokens);
+    const { database, tokens, content } = options;
+    const maxTokens = parseInt(tokens);
 
     if (!database) {
         console.error('You must provide a database name');
         program.help();
     }
 
-    const db: MementoDb = await MementoDb.create(database);
+    const db: MementoDb = await MementoDb.connect(database);
 
     const keywords = await extractKeywordsFromContent(db.pool, {content});
     console.info(c.bold('Keywords:'));
     console.table(keywords);
 
-    const keywordSearchMems = await selectMemsByKeywordSearch(db.pool, {content, maxTokens: tokens});
+    const keywordSearchMems = await selectMemsByKeywordSearch(db.pool, {content, maxTokens});
 
     console.info(c.bold('Keyword similar mementos:'));
     console.table(keywordSearchMems.map(m => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { created_at, ...rest} = {...m, content: m.content.split('\n')[0].slice(0, 60) };
         return rest;
     }));
 
-    const semanticSearchMems = await selectMemsBySemanticSimilarity(db.pool, { content, maxTokens: tokens });
+    const semanticSearchMems = await selectMemsBySemanticSimilarity(db.pool, { content, maxTokens });
 
     console.info(c.bold('Semantically similar mementos:'));
     console.table(semanticSearchMems.map(m => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { created_at, ...rest} = {...m, content: m.content.split('\n')[0].slice(0, 60) };
         return rest;
     }));
 
-    const fullSearchMems = await selectSimilarMementos(db.pool, { content, maxTokens: tokens });
+    const fullSearchMems = await selectSimilarMementos(db.pool, { content, maxTokens });
 
     console.info(c.bold('Full search similar mementos:'));
     console.table(Object.values(fullSearchMems).map(m => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { created_at, ...rest} = {...m, content: m.content.split('\n')[0].slice(0, 60) };
         return rest;
     }));

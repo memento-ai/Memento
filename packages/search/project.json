@@ -1,0 +1,31 @@
+{
+  "name": "@memento-ai/search",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/search/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx-bun/nx:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "entrypoints": ["packages/search/src/index.ts"],
+        "outputPath": "dist/search",
+        "tsConfig": "packages/search/tsconfig.lib.json",
+        "smol": false,
+        "bun": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx-bun/nx:test",
+      "options": {
+        "smol": false,
+        "bail": true,
+        "bun": false
+      }
+    }
+  }
+}
