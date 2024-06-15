@@ -1,16 +1,13 @@
 // Path: packages/memento-db/src/mementoDb-types.ts
 
-import { type Role } from '@memento-ai/types';
+import type { Role } from '@memento-ai/types';
 import { z } from 'zod';
-import debug from 'debug';
 
 export const Context = z.object({
     readonlyPool: z.any(),
     pool: z.any()
 });
 export type Context = z.infer<typeof Context>;
-
-const dlog = debug("mementoDb:types");
 
 export type AddResponse = {
     error: string;

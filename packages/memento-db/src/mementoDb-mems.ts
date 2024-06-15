@@ -1,7 +1,7 @@
 // Path: packages/memento-db/src/mementoDb-mems.ts
 
 import { addMemento, type ID } from '@memento-ai/postgres-db';
-import { CONV, DOC, DSUM, FRAG, Mem, MemId, MetaId, RES, SYN, createMem } from '@memento-ai/types';
+import { CONV, DOC, DSUM, FRAG, Mem, MemId, RES, SYN, createMem } from '@memento-ai/types';
 import { ConversationMetaArgs, DocumentMetaArgs, DocSummaryMetaArgs, FragmentMetaArgs, ResolutionMetaArgs, SynopsisMetaArgs } from '@memento-ai/types';
 import { nanoid } from 'nanoid';
 import { sql } from 'slonik';
