@@ -1,0 +1,13 @@
+{
+    "name": "@memento-ai/update-readmes",
+    "version": "1.0.0",
+    "peerDependencies": {
+        "@memento-ai/conversation": "^1.0.0",
+        "@memento-ai/readme-agents": "^1.0.0",
+        "@memento-ai/utils": "^1.0.0"
+    },
+    "dependencies": {
+        "commander": "11.1.0",
+        "debug": "4.3.5"
+    }
+}

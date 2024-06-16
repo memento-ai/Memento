@@ -1,0 +1,43 @@
+{
+  "name": "update-readmes",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/update-readmes/src",
+  "targets": {
+    "build": {
+      "executor": "@nx-bun/nx:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "entrypoints": ["apps/update-readmes/src/main.ts"],
+        "outputPath": "dist/update-readmes",
+        "tsConfig": "apps/update-readmes/tsconfig.app.json",
+        "smol": false,
+        "bun": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "serve": {
+      "executor": "@nx-bun/nx:run",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "update-readmes:build",
+        "tsConfig": "apps/update-readmes/tsconfig.app.json",
+        "watch": true,
+        "hot": true,
+        "bun": true,
+        "smol": false
+      }
+    },
+    "test": {
+      "executor": "@nx-bun/nx:test",
+      "options": {
+        "smol": false,
+        "bail": true,
+        "tsConfig": "apps/update-readmes/tsconfig.json",
+        "bun": true
+      }
+    }
+  }
+}
