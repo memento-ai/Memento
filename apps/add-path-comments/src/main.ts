@@ -1,4 +1,4 @@
-// Path: packages/utils/src/add-path-comment.ts
+// Path: apps/add-path-comments/src/main.ts
 
 import fs from 'fs';
 import path from 'path';

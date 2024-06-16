@@ -1,0 +1,43 @@
+{
+  "name": "add-path-comments",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/add-path-comments/src",
+  "targets": {
+    "build": {
+      "executor": "@nx-bun/nx:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "entrypoints": ["apps/add-path-comments/src/main.ts"],
+        "outputPath": "dist/add-path-comments",
+        "tsConfig": "apps/add-path-comments/tsconfig.app.json",
+        "smol": false,
+        "bun": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "serve": {
+      "executor": "@nx-bun/nx:run",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "add-path-comments:build",
+        "tsConfig": "apps/add-path-comments/tsconfig.app.json",
+        "watch": true,
+        "hot": true,
+        "bun": true,
+        "smol": false
+      }
+    },
+    "test": {
+      "executor": "@nx-bun/nx:test",
+      "options": {
+        "smol": false,
+        "bail": true,
+        "tsConfig": "apps/add-path-comments/tsconfig.json",
+        "bun": true
+      }
+    }
+  }
+}
