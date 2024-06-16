@@ -13,23 +13,23 @@ const dlog = debug("update-readmes");
 
 export type AddPackageReadmeAgentArgs = ProviderAndModel & {
     projectRoot: string;
-    pkg: string;
+    pkgPath: string;
 }
 
 export class AddPackageReadmeAgent extends Agent {
     private projectRoot: string;
     private package: string;
 
-    constructor({ projectRoot, pkg, provider, model }: AddPackageReadmeAgentArgs) {
+    constructor({ projectRoot, pkgPath, provider, model }: AddPackageReadmeAgentArgs) {
         const conversation: ConversationInterface = createConversation(provider, { model, temperature: 0.0, max_response_tokens: 1500, logging: {name: 'pkg_readme'}  });
         super({conversation});
         this.projectRoot = projectRoot;
-        this.package = pkg;
+        this.package = pkgPath;
     }
 
     async getSources() : Promise<{ path: string, content: string }[]> {
         dlog(`Getting sources for package ${this.package}`);
-        const { stdout, stderr, exitCode } = await $`git ls-files packages/${this.package}`.nothrow();
+        const { stdout, stderr, exitCode } = await $`git ls-files ${this.package}`.nothrow();
         if (exitCode !== 0) {
           throw new Error(stderr.toString());
         }
@@ -44,7 +44,7 @@ export class AddPackageReadmeAgent extends Agent {
     async generatePrompt() : Promise<string> {
         dlog(`Generating prompt for package ${this.package}`);
         const project_readme: string = await fs.promises.readFile(`${this.projectRoot}/README.md`, 'utf-8');
-        const package_readme: string = await fs.promises.readFile(`${this.projectRoot}/packages/${this.package}/README.md`, 'utf-8');
+        const package_readme: string = await fs.promises.readFile(`${this.projectRoot}/${this.package}/README.md`, 'utf-8');
         const sources: { path: string, content: string }[] = await this.getSources();
         return packageReadmePromptTemplate({project_readme, package_readme, sources});
     }
