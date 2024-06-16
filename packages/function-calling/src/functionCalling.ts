@@ -5,7 +5,7 @@ import debug from "debug";
 import type { AssistantMessage } from "@memento-ai/types";
 import type { Context } from "@memento-ai/memento-db";
 import type { FunctionCallResult, FunctionCallRequest, FunctionCall } from "./functionCallingTypes";
-import type { FunctionConfig, FunctionRegistry } from "./functionRegistry";
+import type { FunctionRegistry } from "./functionRegistry";
 
 const dlog = debug("functionCalling");
 
@@ -17,7 +17,7 @@ export interface InvokeOneFunctionArgs {
 
 export async function invokeOneFunction({registry, context, call}: InvokeOneFunctionArgs) : Promise<FunctionCallResult> {
     const { name, input } = call;
-    const functionDef: FunctionConfig<any, any> = registry[name];
+    const functionDef = registry[name];
 
     if (functionDef) {
         // Execute the function with the provided input and additional context

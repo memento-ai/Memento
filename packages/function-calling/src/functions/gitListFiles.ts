@@ -14,6 +14,7 @@ export type GitListFilesOutput = z.infer<typeof outputSchema>;
 const fnSchema = z.function().args(inputSchema).returns(outputSchema)
     .describe('Returns list of file paths tracked by git for the current repository.');
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function gitListFiles(_: GitListFilesInput): Promise<string[]> {
     try {
         const { stdout, stderr, exitCode } = await $`git ls-files`.quiet();

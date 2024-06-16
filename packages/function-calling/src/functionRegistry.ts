@@ -19,7 +19,7 @@ export type BaseInput = z.infer<typeof baseInputSchema>;
 export const ErrorMessage = z.object({ error: z.string() });
 export type ErrorMessage = z.infer<typeof ErrorMessage>;
 
-export interface Function<Input, Output> {
+export interface IFunction<Input, Output> {
     (input: Input): Promise<Output>;
 }
 
@@ -28,11 +28,12 @@ export interface FunctionConfig<Input, Output> {
     async?: z.ZodSchema<boolean>;
     inputSchema: z.ZodSchema<Input>;
     outputSchema: z.ZodSchema<Promise<Output>>;
-    fnSchema: z.ZodSchema<Function<Input, Output>>;
-    fn: Function<Input, Output>;
+    fnSchema: z.ZodSchema<IFunction<Input, Output>>;
+    fn: IFunction<Input, Output>;
     extraTypes?: Record<string, z.ZodTypeAny>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FunctionRegistry = Record<string, FunctionConfig<any, any>>;
 
 export function registerFunction<Input, Output>(registry: FunctionRegistry, config: FunctionConfig<Input, Output>) {
@@ -41,7 +42,7 @@ export function registerFunction<Input, Output>(registry: FunctionRegistry, conf
 
 function generateDescription(schema: z.ZodTypeAny, key: string, indent: number): string[] {
     dlog('Generating description for:', key);
-    let lines : string[] = [];
+    const lines : string[] = [];
     const prefix = '    '.repeat(indent);
     lines.push(`${prefix}${key}: ${schema.description || "<no description>"}`);
     if (schema instanceof ZodObject) {
@@ -65,9 +66,8 @@ function generateExtraTypesDescription(indent: number, extraTypes?: Record<strin
     return prefix.concat(Object.entries(extraTypes).map(([key, schema]) => generateDescription(schema, key, indent+1).join('\n')));
 }
 
-export function generateFunctionDescription(
-    config: FunctionConfig<any, any>
-): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function generateFunctionDescription(config: FunctionConfig<any, any>): string {
     const { name, async, inputSchema, outputSchema, fnSchema, extraTypes } = config;
 
     const functionDescription = generateDescription(fnSchema, 'Purpose', 1).join('\n');
