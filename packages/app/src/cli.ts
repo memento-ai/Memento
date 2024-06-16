@@ -18,7 +18,7 @@ program
 program.parse(process.argv);
 
 const configPath = program.args[0];
-let configData: Config = await loadAggregateConfig(configPath);
+const configData: Config = await loadAggregateConfig(configPath);
 
 const outStream: Writable = process.stdout;
 

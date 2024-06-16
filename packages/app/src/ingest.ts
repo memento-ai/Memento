@@ -43,7 +43,8 @@ const Documents = DocumentMemento.pick({
 async function main() {
     const options: Options = program.opts() as Options;
 
-    let { provider, model, database, cleanSlate, cwd, directory } = options;
+    const { provider, model, database } = options;
+    let { cleanSlate, cwd, directory } = options;
 
     cleanSlate = cleanSlate ?? false;
     cwd = cwd ?? '.';
