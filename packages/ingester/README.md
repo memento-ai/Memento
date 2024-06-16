@@ -1,6 +1,7 @@
 # @memento-ai/ingester
+
 ## Description
-The `@memento-ai/ingester` package provides functionality for ingesting and summarizing documents into a Memento database. It supports ingesting both individual files and entire directories, and uses a configurable summarizer to generate concise summaries of the documents.
+The `@memento-ai/ingester` package provides functionality for ingesting and summarizing documents into a Memento database. It supports ingesting individual files, entire directories, and generating concise summaries of the ingested documents using a configurable summarizer.
 
 ## Key Features
 - Ingest individual files or entire directories
@@ -87,7 +88,6 @@ class CustomSummarizer extends SummarizerAgent {
   }
 
   async summarize({ content, source }: SummarizerArgs): Promise<AssistantMessage> {
-    // Implement your custom summarization logic here
     const summary = `Custom summary for ${source}: ${content.slice(0, 50)}...`;
     return { role: 'assistant', content: summary };
   }

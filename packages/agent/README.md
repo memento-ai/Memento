@@ -6,7 +6,6 @@ The `@memento-ai/agent` package provides an abstract `Agent` class that represen
 ## Key Features
 - Provides an abstract `Agent` base class with `forward` and `send` methods for sending messages via a `ConversationInterface`.
 - Requires subclasses to implement a `generatePrompt` method to provide an agent-specific prompt.
-- Agents can optionally have a database connection via a `MementoDb` instance.
 - The `send` method constructs a `UserMessage` from the provided content and sends it along with the generated prompt to the `forward` method.
 - The `forward` method delegates the message sending to the underlying `ConversationInterface`.
 
@@ -35,7 +34,6 @@ To use an agent, create an instance with the required `AgentArgs`:
 ```typescript
 const myAgent = new MyAgent({
   conversation: myConversationInterface,
-  db: myMementoDb,
 });
 
 const response = await myAgent.send({ content: 'Hello, agent!' });

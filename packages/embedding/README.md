@@ -5,7 +5,7 @@ The `@memento-ai/embedding` package provides functionality for generating text e
 
 ## Key Features
 - Generate embeddings for one or more text inputs
-- Support for different Ollama models (default: 'nomic-embed-text')
+- Support for the 'nomic-embed-text' Ollama model
 - Efficient batch processing of multiple text inputs
 
 ## Usage and Examples
@@ -18,8 +18,6 @@ import { MyEmbeddingFunction, embedding } from '@memento-ai/embedding';
 ### Creating an Instance
 ```typescript
 const embeddingInstance = new MyEmbeddingFunction();
-// or with a custom model
-const embeddingInstance = new MyEmbeddingFunction('custom-model');
 ```
 
 ### Using the Default Instance
