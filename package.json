@@ -4,25 +4,7 @@
   "scripts": {
     "check": "for package in packages/*; do echo $package; bun --cwd $package check; done"
   },
-  "workspaces": [
-    "packages/agent",
-    "packages/config",
-    "packages/conversation",
-    "packages/embedding",
-    "packages/encoding",
-    "packages/function-calling",
-    "packages/ingester",
-    "packages/memento-agent",
-    "packages/memento-db",
-    "packages/postgres-db",
-    "packages/readme-agents",
-    "packages/resolution-agent",
-    "packages/search",
-    "packages/synopsis-agent",
-    "packages/types",
-    "packages/utils",
-    "packages/app"
-  ],
+  "workspaces": ["packages/*", "apps/*"],
   "devDependencies": {
     "@nx-bun/nx": "^1.2.0",
     "@nx-bun/task-worker-runner": "^0.0.4",
