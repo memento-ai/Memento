@@ -101,7 +101,7 @@ async function main() {
     }
 
     const db: MementoDb = await MementoDb.connect(template_db_name);
-    const dirPath = directory ?? 'packages';
+    const dirPath = directory ?? '.';
 
     await ingestDirectory({db, dirPath, summarizer, log: true});
     await delete_unreferenced_mems(db.pool);
