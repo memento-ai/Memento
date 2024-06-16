@@ -21,13 +21,17 @@ program
 
 program.parse(process.argv);
 
-async function updateOnePackageReadme(projectRoot: string, pkg: string, provider: Provider, model: string) {
-    const args: AddPackageReadmeAgentArgs = { projectRoot, pkg, provider, model };
+async function updateOnePackageReadme(projectRoot: string, pkgPath: string, provider: Provider, model: string) {
+    const args: AddPackageReadmeAgentArgs = { projectRoot, pkgPath, provider, model };
     const agent: AddPackageReadmeAgent = new AddPackageReadmeAgent(args);
     const readme = await agent.run();
     dlog(readme)
-    const readme_path = `${projectRoot}/packages/${pkg}/README.md`;
+    const readme_path = `${projectRoot}/${pkgPath}/README.md`;
     await Bun.write(readme_path, readme);
+}
+
+async function packagesInDir(dir: string): Promise<string[]> {
+    return Array.from(await readdir(dir, { withFileTypes: true })).filter(dirent => dirent.isDirectory()).map(dirent => `${dir}/${dirent.name}`);
 }
 
 async function main() {
@@ -45,7 +49,8 @@ async function main() {
 
     console.info(`Project root: ${projectRoot}`)
 
-    const package_paths = Array.from(await readdir('packages', { withFileTypes: true })).filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
+    const package_paths
+        = (await packagesInDir('apps')).concat(await packagesInDir('packages'));
 
     if (options.package) {
         if (!package_paths.includes(options.package)) {
