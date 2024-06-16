@@ -20,7 +20,8 @@
     "packages/search",
     "packages/synopsis-agent",
     "packages/types",
-    "packages/utils"
+    "packages/utils",
+    "packages/app"
   ],
   "devDependencies": {
     "@nx-bun/nx": "^1.2.0",
