@@ -11,19 +11,15 @@
         "@types/debug": "^4.1.12"
     },
     "peerDependencies": {
-        "typescript": "^5.0.0"
+        "@memento-ai/config": "^1.0.0",
+        "@memento-ai/postgres-db": "^1.0.0",
+        "@memento-ai/types": "^1.0.0",
+        "@memento-ai/utils": "^1.0.0"
     },
     "dependencies": {
-        "@memento-ai/postgres-db": "workspace:*",
-        "@memento-ai/types": "workspace:*",
-        "@memento-ai/conversation": "workspace:*",
-        "@memento-ai/ingester": "workspace:*",
-        "@memento-ai/utils": "workspace:*",
         "debug": "^4.3.4",
         "nanoid": "^5.0.6",
-        "pgvector": "^0.1.8",
         "slonik": "^40.2.1",
-        "slonik-sql-tag-raw": "^2.0.0",
-        "tiktoken": "^1.0.13"
+        "zod": "^3.22.4"
     }
-  }
+}

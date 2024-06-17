@@ -7,6 +7,7 @@ import { z } from 'zod';
 import type { MementoDb } from '@memento-ai/memento-db';
 import type { MementoSearchResult, MementoSimilarityMap } from '@memento-ai/search';
 import type { MemKind, Message } from '@memento-ai/types';
+import type { Config } from '@memento-ai/config';
 
 type ID = string;
 export type MementoSearchResultMap = Record<ID, MementoSearchResult>;
@@ -19,16 +20,16 @@ export type DynamicContent = {
 };
 
 function makeAdditionalContextIndex(): AdditionalContextIndex {
-    let mementosByKind: Partial<AdditionalContextIndex> = {};
+    const mementosByKind: Partial<AdditionalContextIndex> = {};
     MemKindValues.forEach((kind: MemKind) => { mementosByKind[kind] = {}; });
     return mementosByKind as AdditionalContextIndex;
 }
 
 function indexMementosByKind(mementos: MementoSimilarityMap): AdditionalContextIndex {
-    let mementosByKind: AdditionalContextIndex = makeAdditionalContextIndex();
+    const mementosByKind: AdditionalContextIndex = makeAdditionalContextIndex();
 
-    for (let [id, memento] of Object.entries(mementos)) {
-        if ((memento.kind as any) !== 'csum')
+    for (const [id, memento] of Object.entries(mementos)) {
+        if ((memento.kind as string) !== 'csum')
             mementosByKind[memento.kind][id] = memento;
     }
 
@@ -55,7 +56,7 @@ const MessageIdPair = z.object({
 });
 type MessageIdPair = z.infer<typeof MessageIdPair>;
 
-export async function getRecentConversation(db: MementoDb, maxMessagePairs: number = 10): Promise<MessageIdPair[]> {
+export async function getRecentConversation(db: MementoDb, max_exchanges: number): Promise<MessageIdPair[]> {
     const query = sql.type(MessageIdPair)`
         WITH recent_messages AS (
             SELECT
@@ -65,7 +66,7 @@ export async function getRecentConversation(db: MementoDb, maxMessagePairs: numb
                 kind = 'conv'
             ORDER BY
                 created_at DESC
-            LIMIT ${maxMessagePairs} * 2
+            LIMIT ${max_exchanges} * 2
         )
         SELECT
             id, docid, role, content
@@ -85,7 +86,7 @@ const SynopsesIdPair = z.object({
 });
 type SynopsesIdPair = z.infer<typeof SynopsesIdPair>;
 
-export async function getRecentSynopses(db: MementoDb, maxSynopses: number = 30): Promise<SynopsesIdPair[]> {
+export async function getRecentSynopses(db: MementoDb, maxSynopses = 30): Promise<SynopsesIdPair[]> {
     const query = sql.type(SynopsesIdPair)`
         WITH recent_synopses AS (
             SELECT
@@ -109,15 +110,15 @@ export async function getRecentSynopses(db: MementoDb, maxSynopses: number = 30)
     return result.rows.map((row) => SynopsesIdPair.parse(row));
 }
 
-export async function gatherContent(db: MementoDb, results: MementoSearchResult[]): Promise<DynamicContent> {
+export async function gatherContent(db: MementoDb, results: MementoSearchResult[], config: Config): Promise<DynamicContent> {
     const similarMementos: MementoSimilarityMap = await asSimilarityMap(results);
     const mementosByKind = indexMementosByKind(similarMementos);
 
-    const maxMessagePairs = 5;
-    const messages: MessageIdPair[] = await getRecentConversation(db, maxMessagePairs);
+    const max_exchanges = config.conversation.max_exchanges;
+    const messages: MessageIdPair[] = await getRecentConversation(db, max_exchanges);
 
     // If the recent conversation message are contained in the additional context, remove them.
-    for (let message of messages) {
+    for (const message of messages) {
         removeConv(message.id, mementosByKind);
         removeXchg(message.docid, mementosByKind);
     }
@@ -125,7 +126,7 @@ export async function gatherContent(db: MementoDb, results: MementoSearchResult[
     const synopses: SynopsesIdPair[] = await getRecentSynopses(db);
 
     // If the recent synopses are contained in the additional context, remove them.
-    for (let synopsis of synopses) {
+    for (const synopsis of synopses) {
         removeSyn(synopsis.id, mementosByKind);
     }
 

@@ -24,7 +24,7 @@ describe("Anthropic", () => {
         }
         const message = await conversation.sendMessage(args)
 
-        let expected: string = '5';
+        const expected = '5';
         expect(message.content).toBe(expected);
     });
 });

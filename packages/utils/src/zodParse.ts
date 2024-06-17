@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import TraceError from "trace-error";
 
-export function zodParse<T extends z.ZodTypeAny>(schema: T, input: any): z.infer<T> {
+export function zodParse<T extends z.ZodTypeAny>(schema: T, input: unknown): z.infer<T> {
     try {
         return schema.parse(input);
     } catch (error) {

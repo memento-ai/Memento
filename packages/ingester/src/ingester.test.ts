@@ -20,7 +20,7 @@ describe("Ingester", () => {
     beforeEach(async () => {
         dbname = `test_${nanoid()}`;
         await createMementoDb(dbname);
-        db = await MementoDb.create(dbname);
+        db = await MementoDb.connect(dbname);
         expect(db).toBeTruthy();
         expect(db.name).toBe(dbname);
         expect(db.pool).toBeTruthy();

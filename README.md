@@ -28,8 +28,8 @@ The project is organized as a monorepo, with multiple packages that provide diff
 The Memento monorepo contains the following packages:
 
 - `@memento-ai/agent`: Provides an abstract `Agent` class that represents a conversational agent or a specialized tool.
-- `@memento-ai/app`: Provides a command-line interface (CLI) for the Memento AI system and a utility for ingesting files into the Memento database.
-- `@memento-ai/conversation`: Provides an abstraction for interacting with different language models, such as OpenAI, Anthropic, and Ollama.
+- `@memento-ai/config`: Provides functionality for loading and managing configuration settings for the Memento AI application.
+- `@memento-ai/conversation`: Provides an abstraction for interacting with different language models, such as OpenAI, Anthropic, Google, Groq, and Ollama.
 - `@memento-ai/embedding`: Provides functionality for generating text embeddings using the Ollama language model.
 - `@memento-ai/encoding`: Provides utility functions for encoding and decoding text using the `cl100k_base` encoding.
 - `@memento-ai/function-calling`: Provides a framework for defining and invoking functions within the Memento application.
@@ -41,9 +41,18 @@ The Memento monorepo contains the following packages:
 - `@memento-ai/resolution-agent`: Responsible for identifying and extracting explicit resolutions made by the assistant to change its future behavior based on user feedback.
 - `@memento-ai/search`: Provides functionality for searching and retrieving relevant mementos from a Memento database based on keyword matching and semantic similarity.
 - `@memento-ai/synopsis-agent`: Responsible for generating a concise summary or "synopsis" of the latest conversational exchange between a user and an assistant.
-- `@memento-ai/system`: Provides functionality for creating and managing the core components of the Memento AI system.
 - `@memento-ai/types`: Provides the core data types and schemas used throughout the Memento application.
 - `@memento-ai/utils`: Provides a set of utility functions and tools for the Memento project.
+
+### Applications
+
+The Memento monorepo also includes the following applications:
+
+- `add-path-comments`: A utility application that adds or updates the "Path" comment at the top of TypeScript files in the Memento project.
+- `ingest`: A command-line utility for ingesting files into a Memento database.
+- `memento-cli`: A command-line interface (CLI) for interacting with the Memento AI system.
+- `select-similar-mems`: A utility for selecting mementos from a Memento database based on their similarity to a given content.
+- `update-readmes`: A utility for updating the README.md files across the Memento monorepo project.
 
 ## Requirements
 - Memento requires ollama for generating embeddings, using the model 'nomic-embed-text'.
@@ -64,7 +73,9 @@ The Memento monorepo contains the following packages:
 
 To get started with the Memento project, please refer to the README.md file in the individual packages for more information on their usage and examples.
 
-See [packages/app/README.md](packages/app/README.md) for how to run the `ingest` and `cli` apps.
+See [apps/memento-cli/README.md](apps/memento-cli/README.md) for how to  chat with Memento (web client UI coming soon.)
+
+See [apps/ingest/README.md](apps/ingest/README.md) for how to ingest files.
 
 ## Contributing
 

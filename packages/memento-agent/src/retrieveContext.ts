@@ -20,10 +20,10 @@ ${Object.values(registry)
 export async function retrieveContext(agent: MementoAgent, aggregateSearchResults: MementoSearchResult[]): Promise<MementoPromptTemplateArgs> {
     const functions = functionCallingInstructions();
 
-    const dynamicContent: DynamicContent = await gatherContent(agent.DB, aggregateSearchResults);
+    const dynamicContent: DynamicContent = await gatherContent(agent.db, aggregateSearchResults, agent.config);
     const { additionalContext } = dynamicContent;
 
-    const resolutions = await agent.DB.getResolutions();
+    const resolutions = await agent.db.getResolutions();
 
     const retrievedContext = {
         functions,

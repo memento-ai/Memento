@@ -23,7 +23,7 @@ test("Ollama nominal test", async () => {
     }
     const message = await conversation.sendMessage(args)
 
-    let expected: string = '5 fingers.';
+    const expected = '5 fingers.';
     expect(message.content).toBe(expected);
 });
 
@@ -39,6 +39,6 @@ test("Ollama nominal test", async () => {
     }
     const message = await conversation.sendMessage(args)
 
-    let expected: string = '5';
+    const expected = '5';
     expect(message.content).toBe(expected);
 });

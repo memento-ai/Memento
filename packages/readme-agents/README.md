@@ -6,9 +6,9 @@ The `@memento-ai/readme-agents` package provides agents for generating comprehen
 
 ## Key Features
 
-- **`AddPackageReadmeAgent`**: Generates a README.md file for a specific package in the Memento monorepo. It analyzes the package's source code, existing documentation (if present), and provides a description, key features, and usage examples.
+- **`AddPackageReadmeAgent`**: Generates a README.md file for a specific package in the Memento monorepo. It analyzes the package's source code, existing documentation (if present), and provides a description, key features, usage examples, and ensures the documentation is up-to-date with the latest codebase.
 
-- **`AddProjectReadmeAgent`**: Generates the main README.md file for the entire Memento project. It provides an overview of the project, its organization, requirements, getting started guide, and information about contributing and licensing.
+- **`AddProjectReadmeAgent`**: Generates the main README.md file for the entire Memento project. It provides an overview of the project, its organization, requirements, getting started guide, and information about contributing and licensing. It also ensures that the documentation accurately reflects the current state of the project, including any new or removed packages.
 
 ## Usage and Examples
 

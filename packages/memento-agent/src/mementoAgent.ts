@@ -2,7 +2,7 @@
 
 import { awaitAsyncAgentActions, startAsyncAgentActions } from "./asyncAgentGlue";
 import { constructUserMessage } from "@memento-ai/types";
-import { FunctionCallingAgent } from "@memento-ai/agent";
+import { FunctionCallingAgent } from "@memento-ai/function-calling";
 import { FunctionHandler, registry, type FunctionCallResult } from "@memento-ai/function-calling";
 import { getDatabaseSchema } from "@memento-ai/postgres-db";
 import { mementoPromptTemplate } from "./mementoPromptTemplate";
@@ -15,11 +15,15 @@ import type { MementoPromptTemplateArgs } from "./mementoPromptTemplate";
 import type { MementoSearchResult } from "@memento-ai/search";
 import type { Message, UserMessage, AssistantMessage } from "@memento-ai/types";
 import type { ResolutionAgent } from "@memento-ai/resolution-agent";
-import type { SynopsisAgent } from "@memento-ai/synopsis-agent";
+import { createSynopsisAgent, type SynopsisAgent } from "@memento-ai/synopsis-agent";
 import type { Config } from "@memento-ai/config";
+import { createMementoDbFromConfig, type MementoDb } from "@memento-ai/memento-db";
+import { createConversationFromConfig } from "@memento-ai/conversation";
+import { createResolutionAgent } from "@memento-ai/resolution-agent";
 
 export type MementoAgentArgs = AgentArgs & {
     config: Config;
+    db: MementoDb;
     outStream?: Writable;
     resolutionAgent?: ResolutionAgent;
     synopsisAgent?: SynopsisAgent;
@@ -46,7 +50,7 @@ export class MementoAgent extends FunctionCallingAgent
     constructor(args: MementoAgentArgs)
     {
         const { conversation, db, outStream, resolutionAgent, synopsisAgent, config } = args;
-        super({ conversation, db, registry });
+        super({ db, conversation, registry });
         this.databaseSchema = getDatabaseSchema();
         this.outStream = outStream;
         this.resolutionAgent = resolutionAgent;
@@ -59,7 +63,7 @@ export class MementoAgent extends FunctionCallingAgent
     }
 
     close(): Promise<void> {
-        return this.DB.close();
+        return this.db.close();
     }
 
     // Create the prompt, overriden from the Agent base class
@@ -69,7 +73,7 @@ export class MementoAgent extends FunctionCallingAgent
             numKeywords: this.config.search.keywords,
             content: this.lastUserMessage.content,
         };
-        const currentSearchResults = await selectSimilarMementos(this.DB.pool, args);
+        const currentSearchResults = await selectSimilarMementos(this.db.pool, args);
         const {maxTokens} = args;
         const p = this.config.search.decay.user;
         let results = combineSearchResults({ lhs: currentSearchResults, rhs: this.aggregateSearchResults, maxTokens, p });
@@ -92,12 +96,12 @@ export class MementoAgent extends FunctionCallingAgent
         // but only the first user message and the last assistant message will be stored in the database.
 
         // Any async actions should be handled here.
-        const asyncResult = await awaitAsyncAgentActions({ asyncActionsPromise: this.asyncResponsePromise});
+        await awaitAsyncAgentActions({ asyncActionsPromise: this.asyncResponsePromise});
 
-        let priorMessages: Message[] = await this.DB.getConversation(this.config);
-        let userMessage: UserMessage = constructUserMessage(content);
+        const priorMessages: Message[] = await this.db.getConversation(this.config);
+        const userMessage: UserMessage = constructUserMessage(content);
 
-        let assistantMessage: AssistantMessage = await this.functionHandler.handle(userMessage, priorMessages);
+        const assistantMessage: AssistantMessage = await this.functionHandler.handle(userMessage, priorMessages);
 
         // Also use the assistant's response to update the search context.
         // This will only be used for the next user message.
@@ -106,7 +110,7 @@ export class MementoAgent extends FunctionCallingAgent
             numKeywords: this.config.search.keywords,
             content: assistantMessage.content,
         };
-        const currentSearchResults = await selectSimilarMementos(this.DB.pool, args);
+        const currentSearchResults = await selectSimilarMementos(this.db.pool, args);
         const {maxTokens} = args;
         const p = this.config.search.decay.asst;
         const results = combineSearchResults({ lhs: this.aggregateSearchResults, rhs: currentSearchResults, maxTokens, p });
@@ -114,7 +118,7 @@ export class MementoAgent extends FunctionCallingAgent
 
         let xchgId: ID;
         try {
-            xchgId = await this.DB.addConvExchangeMementos({ userContent: userMessage.content, asstContent: assistantMessage.content });
+            xchgId = await this.db.addConvExchangeMementos({ userContent: userMessage.content, asstContent: assistantMessage.content });
         }
         catch (e) {
             console.error("Failed to store a Message to the db:", e);
@@ -125,11 +129,49 @@ export class MementoAgent extends FunctionCallingAgent
             resolutionAgent: this.resolutionAgent,
             synopsisAgent: this.synopsisAgent,
             xchgId,
-            db: this.DB,
+            db: this.db,
             max_message_pairs: this.config.conversation.max_exchanges,
         };
         this.asyncResponsePromise = startAsyncAgentActions(startAsyncAgentActionsArgs);
 
         return assistantMessage;
     }
+}
+
+export type MementoAgentExtraArgs =  {
+    synopsisAgent?: SynopsisAgent;
+    resolutionAgent?: ResolutionAgent;
+    outStream?: Writable;
+}
+
+export async function createMementoAgent(config: Config, db: MementoDb, extra : MementoAgentExtraArgs): Promise<MementoAgent> {
+    const { synopsisAgent, resolutionAgent, outStream } = extra;
+    const conversation = createConversationFromConfig(config.memento_agent, outStream);
+    if (conversation == undefined) {
+        throw new Error('MementoAgent requires a conversation provider.');
+    }
+    const agentArgs: MementoAgentArgs = {
+        db,
+        conversation,
+        synopsisAgent,
+        resolutionAgent,
+        outStream,
+        config
+    };
+    return new MementoAgent(agentArgs);
+}
+
+export type MementoSystem = {
+    db: MementoDb;
+    mementoAgent: MementoAgent;
+    synopsisAgent?: SynopsisAgent;
+    resolutionAgent?: ResolutionAgent;
+}
+
+export async function createMementoSystem(config: Config, outStream?: Writable): Promise<MementoSystem> {
+    const db = await createMementoDbFromConfig(config);
+    const synopsisAgent = await createSynopsisAgent(config, db);
+    const resolutionAgent = await createResolutionAgent(config, db);
+    const mementoAgent = await createMementoAgent(config, db, {synopsisAgent, resolutionAgent, outStream});
+    return { db, mementoAgent, synopsisAgent, resolutionAgent };
 }

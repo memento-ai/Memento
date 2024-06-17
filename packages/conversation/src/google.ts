@@ -1,7 +1,7 @@
 // Path: packages/conversation/src/google.ts
 
 import { GoogleGenerativeAI,} from "@google/generative-ai";
-import type { GenerateContentResult, ChatSession as GooogleChatSession, StartChatParams, EnhancedGenerateContentResponse, GenerativeModel, GenerateContentStreamResult, GenerationConfig } from "@google/generative-ai";
+import type { ChatSession as GooogleChatSession, StartChatParams, EnhancedGenerateContentResponse, GenerativeModel, GenerateContentStreamResult, GenerationConfig } from "@google/generative-ai";
 import type { ConversationInterface, SendMessageArgs } from "./conversation";
 import type { ConversationOptions } from "./factory";
 import { Writable } from 'node:stream';
@@ -112,7 +112,7 @@ export class GoogleConversation implements ConversationInterface {
 
             const response: EnhancedGenerateContentResponse = await r.response;
 
-            let text = response.text();
+            const text = response.text();
             if (this.session.outStream && text != check) {
                 console.error(`Mismatch between streamed and response text!`);
                 console.error(`text: ${text}`);

@@ -23,7 +23,7 @@ The main entry point is the `MementoDb` class, which provides methods for intera
 import { MementoDb } from '@memento-ai/memento-db';
 
 // Create a new MementoDb instance
-const db = await MementoDb.create('my-memento-db');
+const db = await MementoDb.connect('my-memento-db');
 
 // Add a conversation memento
 const convId = await db.addConversationMem({

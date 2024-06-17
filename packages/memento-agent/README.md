@@ -38,7 +38,7 @@ const interceptors: Interceptor[] = [{
 async function main() {
     const dbname = `test_${nanoid()}`;
     await createMementoDb(dbname, interceptors);
-    const db = await MementoDb.create(dbname, interceptors);
+    const db = await MementoDb.connect(dbname, interceptors);
 
     const mementoChatArgs: MementoAgentArgs = {
         conversation: createConversation(provider, { model, temperature: 0.0 }),

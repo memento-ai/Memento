@@ -11,15 +11,13 @@
     "@types/debug": "^4.1.12"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "@memento-ai/agent": "^1.0.0",
+    "@memento-ai/conversation": "^1.0.0",
+    "@memento-ai/encoding": "^1.0.0",
+    "@memento-ai/utils": "^1.0.0"
   },
   "dependencies": {
-    "@memento-ai/agent": "workspace:*",
-    "@memento-ai/conversation": "workspace:*",
-    "@memento-ai/encoding": "workspace:*",
-    "@memento-ai/utils": "workspace:*",
     "debug": "^4.3.4",
-    "handlebars": "^4.7.8",
-    "trace-error": "^1.0.3"
+    "handlebars": "^4.7.8"
   }
 }

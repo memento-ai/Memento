@@ -15,7 +15,7 @@ import { combineSearchResults } from './combineSearchResults';
 // We do not trim the result here but rather leave it to the caller to decide when to trim.
 export async function selectSimilarMementos(dbPool: DatabasePool, args: MementoSearchArgs): Promise<MementoSearchResult[]> {
     const { content, maxTokens=5000, numKeywords=5 } = args;
-    let keywordSelection: MementoSearchResult[] = await selectMemsByKeywordSearch(dbPool, {content, maxTokens, numKeywords});
-    let similaritySelection: MementoSearchResult[] = await selectMemsBySemanticSimilarity(dbPool, {content, maxTokens});
+    const keywordSelection: MementoSearchResult[] = await selectMemsByKeywordSearch(dbPool, {content, maxTokens, numKeywords});
+    const similaritySelection: MementoSearchResult[] = await selectMemsBySemanticSimilarity(dbPool, {content, maxTokens});
     return combineSearchResults({lhs: keywordSelection, rhs: similaritySelection, maxTokens, p: 0.5});
 }

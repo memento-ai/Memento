@@ -14,7 +14,7 @@ describe('AddProjectReadmeAgent', () => {
     it('should get the file listing', async () => {
         const paths = await agent.getSourcePaths();
         expect(paths.length).toBeGreaterThan(0);
-        expect(paths[0]).toContain('.gitattributes');
+        expect(paths).toContain('.gitattributes');
     });
 
     it('should get the README.md files', async () => {

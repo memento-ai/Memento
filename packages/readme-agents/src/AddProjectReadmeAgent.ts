@@ -31,7 +31,7 @@ export class AddProjectReadmeAgent extends Agent {
     }
 
     async getReadmes() : Promise<{ package: string, content: string }[]> {
-        const { stdout, stderr, exitCode } = await $`ls packages/*/README.md`.quiet();
+        const { stdout, stderr, exitCode } = await $`git ls-files */*/README.md`.quiet();
         if (exitCode !== 0) {
           throw new Error(stderr.toString());
         }

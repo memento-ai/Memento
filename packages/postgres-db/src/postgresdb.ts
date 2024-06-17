@@ -15,6 +15,7 @@ import debug from 'debug';
 
 const dlog = debug('postgresdb');
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (BigInt.prototype as unknown as any).toJSON = function() { return this.toString() }
 
 /// Create a new database. Due to requirements imposed by the slonik API, we must first create

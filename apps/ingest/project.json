@@ -1,0 +1,41 @@
+{
+  "name": "ingest",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/ingest/src",
+  "targets": {
+    "build": {
+      "executor": "@nx-bun/nx:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "entrypoints": ["apps/ingest/src/ingest.ts"],
+        "outputPath": "dist/ingest",
+        "tsConfig": "apps/ingest/tsconfig.app.json",
+        "smol": false,
+        "bun": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "serve": {
+      "executor": "@nx-bun/nx:run",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "ingest:build",
+        "tsConfig": "apps/ingest/tsconfig.app.json",
+        "bun": true,
+        "smol": false
+      }
+    },
+    "test": {
+      "executor": "@nx-bun/nx:test",
+      "options": {
+        "smol": false,
+        "bail": true,
+        "tsConfig": "apps/ingest/tsconfig.json",
+        "bun": true
+      }
+    }
+  }
+}

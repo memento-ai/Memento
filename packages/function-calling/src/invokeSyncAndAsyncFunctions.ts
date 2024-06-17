@@ -45,7 +45,7 @@ function checkForFunctionCalls(content: string): CategorizedFunctionCalls {
 async function getAsyncErrorResults(asyncResultsP: Promise<FunctionCallResult[]>): Promise<FunctionError[]> {
 
     let asyncErrorResults: FunctionError[] = [];
-    let asyncResults = await asyncResultsP;
+    const asyncResults = await asyncResultsP;
     if (asyncResults.length > 0) {
         asyncErrorResults = asyncResults.filter(result => isFunctionError(result)) as FunctionError[];
     }
@@ -56,7 +56,7 @@ async function getAsyncErrorResults(asyncResultsP: Promise<FunctionCallResult[]>
 export async function invokeSyncAndAsyncFunctions({ assistantMessage, context, registry, asyncResultsP, cycleCount }: InvokeFunctionsArgs): Promise<InvokeFunctionsResults> {
     let newAsyncResultsP: Promise<FunctionCallResult[]> = Promise.resolve([]);
 
-    let { syncCalls, asyncCalls, badCalls } = checkForFunctionCalls(assistantMessage.content);
+    const { syncCalls, asyncCalls, badCalls } = checkForFunctionCalls(assistantMessage.content);
 
     if ((syncCalls.length > 0 || asyncCalls.length > 0 && badCalls.length > 0) && cycleCount > 4) {
         const error = {
@@ -65,8 +65,8 @@ export async function invokeSyncAndAsyncFunctions({ assistantMessage, context, r
             Please wait for the results of the current function calls before making more requests.`),
         };
         console.error("Function call limit exceeded");
-        syncCalls = [];
-        asyncCalls = [];
+        syncCalls.length = 0;
+        asyncCalls.length = 0;
         badCalls.push(error);
     }
 
@@ -76,7 +76,7 @@ export async function invokeSyncAndAsyncFunctions({ assistantMessage, context, r
         dlog("Bad function calls:", Bun.inspect(badCalls));
         functionResultContent = badCalls.map((result: FunctionCallResult) => {
             const header = `${FUNCTION_RESULT_HEADER} ${result.name}\n`;
-            return header + `\'\'\'result\n${functionCallResultAsString(result)}\n\'\'\'`;
+            return header + `'''result\n${functionCallResultAsString(result)}\n'''`;
         }).join('\n\n');
     } else {
         const syncResults: FunctionCallResult[] = await invokeMultFunctions({registry, calls: syncCalls, context});
@@ -90,7 +90,7 @@ export async function invokeSyncAndAsyncFunctions({ assistantMessage, context, r
 
         functionResultContent = (syncResults.concat(badCalls).concat(asyncErrorResults)).map((result: FunctionCallResult) => {
             const header = `${FUNCTION_RESULT_HEADER} ${result.name}\n`;
-            return header + `\'\'\'result\n${functionCallResultAsString(result)}\n\'\'\'`;
+            return header + `'''result\n${functionCallResultAsString(result)}\n'''`;
         }).join('\n\n');
     }
 

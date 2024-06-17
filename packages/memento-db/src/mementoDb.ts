@@ -4,7 +4,6 @@ import { addConversationMem, addDocAndSummary, addFragmentMem, addResolutionMem,
 import { addConvExchangeMementos } from './mementoDb-addConvXchg';
 import { connectDatabase, connectReadonlyDatabase, get_last_assistant_message, get_last_user_message, getConversation, type ID } from '@memento-ai/postgres-db';
 import { getSynopses } from './getSynopses';
-import { registry, type FunctionRegistry } from "@memento-ai/function-calling";
 import { sql } from 'slonik';
 import { z } from 'zod';
 import debug from 'debug';
@@ -30,7 +29,6 @@ export class MementoDb {
     private _pool: DatabasePool | null = null;
     private _readonlyPool: DatabasePool | null = null;
     private interceptors: Interceptor[];
-    functionRegistry: FunctionRegistry;
 
     context() : Context {
         return {
@@ -43,7 +41,6 @@ export class MementoDb {
         dlog('Connecting MementoDb:', name);
         this.name = name;
         this.interceptors = interceptors;
-        this.functionRegistry = registry;
     }
 
     async init() {
@@ -51,7 +48,7 @@ export class MementoDb {
         this._readonlyPool = await connectReadonlyDatabase(this.name, this.interceptors);
     }
 
-    static async create(name: string, interceptors: Interceptor[] = []): Promise<MementoDb> {
+    static async connect(name: string, interceptors: Interceptor[] = []): Promise<MementoDb> {
         const db = new MementoDb(name, interceptors);
         await db.init();
         return db;
@@ -153,4 +150,8 @@ export class MementoDb {
         const result = await this.pool.query(query);
         return result.rows.map((row) => Resolution.parse(row).content);
     }
+}
+
+export async function createMementoDbFromConfig(config: Config): Promise<MementoDb> {
+    return await MementoDb.connect(config.database);
 }

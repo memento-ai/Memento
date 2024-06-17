@@ -57,4 +57,5 @@ export class PolyfillTextDecoderStream extends TransformStream<Uint8Array, strin
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as unknown as any).TextDecoderStream = PolyfillTextDecoderStream;

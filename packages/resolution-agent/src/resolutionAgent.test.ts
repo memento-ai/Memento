@@ -4,11 +4,10 @@ import { expect, it, describe, beforeEach, afterEach } from "bun:test";
 import { createMementoDb, dropDatabase } from "@memento-ai/postgres-db";
 import { ResolutionAgent } from "./resolutionAgent";
 import { MementoDb } from "@memento-ai/memento-db";
-import { MementoAgent } from "@memento-ai/memento-agent";
 import { nanoid } from "nanoid";
 import { type Interceptor } from "slonik";
 import debug from "debug";
-import { makeTestSystem, type MementoSystem } from "@memento-ai/system";
+import { createConversation } from "@memento-ai/conversation";
 
 const dlog = debug("resolutionAgent:test");
 
@@ -18,25 +17,17 @@ describe("ResolutionAgent", () => {
 
     let db: MementoDb;
     let dbname: string;
-    let system: MementoSystem;
-    let mementoAgent: MementoAgent;
     let resolutionAgent: ResolutionAgent;
     beforeEach(async () => {
         dbname = `test_${nanoid()}`;
         await createMementoDb(dbname, interceptors);
-        system = await makeTestSystem({database: dbname, resolution: true});
-
-        db = system.db;
+        db = await MementoDb.connect(dbname);
         expect(db).toBeTruthy();
         expect(db.name).toBe(dbname);
         expect(db.pool).toBeTruthy();
 
-        mementoAgent = system.mementoAgent;
-
-        if (system.resolutionAgent == undefined) {
-            throw new Error("Resolution agent is undefined");
-        }
-        resolutionAgent = system.resolutionAgent;
+        const conversation = createConversation('anthropic', { model: 'haiku', temperature: 0.0, max_response_tokens: 70, logging: { name: 'resolution'} });
+        resolutionAgent = new ResolutionAgent({ db, conversation });
     });
 
     afterEach(async () => {
@@ -52,5 +43,7 @@ describe("ResolutionAgent", () => {
     });
 
     // TODO
-
+    it.todo("placeholder", () => {
+        expect(resolutionAgent).toBeTruthy();
+    });
 });

@@ -26,23 +26,23 @@ export function combineSearchResults(args: CombineMementoResultArgs): MementoSea
     const { lhs, rhs, p } = args;
 
     let combined: MementoSearchResult[] = [];
-    let lhsMap: Record<string, MementoSearchResult> = {};
-    let rhsMap: Record<string, MementoSearchResult> = {};
+    const lhsMap: Record<string, MementoSearchResult> = {};
+    const rhsMap: Record<string, MementoSearchResult> = {};
 
-    let idSet: Set<string> = new Set<string>();
-    for (let m of lhs) {
+    const idSet: Set<string> = new Set<string>();
+    for (const m of lhs) {
         idSet.add(m.id);
         lhsMap[m.id] = m;
     }
-    for (let m of rhs) {
+    for (const m of rhs) {
         idSet.add(m.id);
         rhsMap[m.id] = m;
     }
-    for (let id of idSet) {
-        let lhsScore = id in lhsMap ? lhsMap[id].score : 0;
-        let rhsScore = id in rhsMap ? rhsMap[id].score : 0;
-        let entry = lhsMap[id] ?? rhsMap[id];
-        let score = lhsScore*p + rhsScore*(1-p) ;
+    for (const id of idSet) {
+        const lhsScore = id in lhsMap ? lhsMap[id].score : 0;
+        const rhsScore = id in rhsMap ? rhsMap[id].score : 0;
+        const entry = lhsMap[id] ?? rhsMap[id];
+        const score = lhsScore*p + rhsScore*(1-p) ;
         combined.push({...entry, score});
     }
 

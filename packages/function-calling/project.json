@@ -1,0 +1,31 @@
+{
+  "name": "@memento-ai/function-calling",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/function-calling/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx-bun/nx:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "entrypoints": ["packages/function-calling/src/index.ts"],
+        "outputPath": "dist/function-calling",
+        "tsConfig": "packages/function-calling/tsconfig.lib.json",
+        "smol": false,
+        "bun": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx-bun/nx:test",
+      "options": {
+        "smol": false,
+        "bail": true,
+        "bun": false
+      }
+    }
+  }
+}

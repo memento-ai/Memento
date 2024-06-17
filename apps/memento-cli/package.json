@@ -1,0 +1,13 @@
+{
+    "name": "@memento-ai/memento-cli",
+    "version": "1.0.0",
+    "peerDependencies": {
+        "@memento-ai/config": "^1.0.0",
+        "@memento-ai/memento-agent": "^1.0.0",
+        "@memento-ai/postgres-db": "^1.0.0"
+    },
+    "dependencies": {
+        "ansi-colors": "4.1.3",
+        "commander": "11.1.0"
+    }
+}

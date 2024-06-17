@@ -30,7 +30,7 @@ const fnSchema = z.function().args(inputSchema).returns(outputSchema)
 
 async function queryMementoView(input: queryMementoViewInput): Promise<RowsOrError> {
     dlog('queryMementoView:', input);
-    let { query, context } = input;
+    const { query, context } = input;
 
     // If either of these errors happen, we should throw, as these are not errors that the LLM can attempt to correct.
     if (!context) {
@@ -46,7 +46,7 @@ async function queryMementoView(input: queryMementoViewInput): Promise<RowsOrErr
         const result = await readonlyPool.query(sql.unsafe`${sqlFragment}`);
         dlog('Result:', result);
         if (result && result.rows && Array.isArray(result.rows)) {
-            const tokens = result.rows.reduce((row: any) => {
+            const tokens = result.rows.reduce((row: unknown) => {
                 return count_tokens(Bun.inspect(row));
             }, 0);
             const max_query_result_tokens = 4000;

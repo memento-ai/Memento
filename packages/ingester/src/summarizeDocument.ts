@@ -2,9 +2,9 @@
 
 import { Agent, type AgentArgs } from "@memento-ai/agent";
 import { count_tokens } from "@memento-ai/encoding";
-import { createConversation, type ConversationInterface, type SendMessageArgs, type Provider } from "@memento-ai/conversation";
+import { createConversation, type ConversationInterface, type Provider } from "@memento-ai/conversation";
 import { MementoDb, type DocAndSummaryResult } from "@memento-ai/memento-db";
-import { ASSISTANT, AssistantMessage, Message, USER } from "@memento-ai/types";
+import { ASSISTANT, AssistantMessage } from "@memento-ai/types";
 
 import debug from "debug";
 import { stripCommonIndent } from "@memento-ai/utils";

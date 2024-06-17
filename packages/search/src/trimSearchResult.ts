@@ -1,6 +1,6 @@
 // Path: packages/search/src/trimSearchResult.ts
 
-import { CONV, DOC, DSUM, SYN } from "@memento-ai/types";
+import { CONV, DSUM, SYN } from "@memento-ai/types";
 import type { MementoSearchResult } from "./mementoSearchTypes";
 import debug from "debug";
 
@@ -13,7 +13,7 @@ export function trimSearchResult(result: MementoSearchResult[], maxTokens: numbe
     }
 
     const idSet: Set<string> = new Set<string>();
-    for (let m of result) {
+    for (const m of result) {
         idSet.add(m.id);
     }
 
@@ -31,7 +31,7 @@ export function trimSearchResult(result: MementoSearchResult[], maxTokens: numbe
         }
     });
 
-    let afterTokens = result.reduce((acc, m) => acc + m.tokens, 0);
+    const afterTokens = result.reduce((acc, m) => acc + m.tokens, 0);
     dlog(`Redundant mementos: removed ${tokens - afterTokens} tokens`);
     tokens = afterTokens;
     if (tokens <= maxTokens) {

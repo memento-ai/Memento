@@ -17,7 +17,7 @@ type ConvResult = z.infer<typeof ConvResult>;
 export async function getConversation(pool: DatabasePool, config: Config): Promise<Message[]> {
     const { conversation } = config;
     const { max_exchanges, max_tokens } = conversation;
-    let result: Message[] = await pool.connect(async conn => {
+    const result: Message[] = await pool.connect(async conn => {
         const conversation = await conn.query(sql.type(ConvResult)`
             WITH recent_messages AS (
                 SELECT

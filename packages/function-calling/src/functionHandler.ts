@@ -7,7 +7,7 @@ import c from 'ansi-colors';
 import debug from "debug";
 import type { AssistantMessage, Message, UserMessage } from "@memento-ai/types";
 import type { Context } from "@memento-ai/memento-db";
-import type { FunctionCallingAgent } from "@memento-ai/agent";
+import type { FunctionCallingAgent } from "./functionCallingAgent";
 import type { FunctionCallResult } from "./functionCallingTypes";
 import type { FunctionRegistry } from "./functionRegistry";
 import type { InvokeFunctionsResults, InvokeFunctionsArgs } from "./functionCalling";
@@ -66,7 +66,7 @@ export class FunctionHandler {
         let assistantMessage: AssistantMessage = await this.agent.forward({ prompt, messages });
 
         // Check if the assistant's response contains a function call
-        const context: Context = this.agent.DB.context();
+        const context: Context = this.agent.db.context();
         const invokeFunctionsArgs: InvokeFunctionsArgs = {assistantMessage, context, registry: this.registry, asyncResultsP: this.asyncResults, cycleCount: this.cycleCount};
         const {functionResultContent, newAsyncResultsP } : InvokeFunctionsResults = await invokeSyncAndAsyncFunctions(invokeFunctionsArgs)
         this.asyncResults = newAsyncResultsP;

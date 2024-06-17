@@ -11,9 +11,10 @@ import dayjs from 'dayjs';
 import fs from 'fs';
 import type { ConversationInterface, SendMessageArgs } from "./conversation";
 import type { AssistantMessage } from "@memento-ai/types";
-import type { Provider } from "./provider";
+import { isProvider, type Provider } from "./provider";
 import { GoogleConversation } from "./google";
 import { loggingTemplate } from "./loggingTemplate";
+import type { ConversationConfig } from "@memento-ai/config";
 
 export interface Logging {
     name: string;
@@ -73,4 +74,21 @@ export function createConversation(provider: Provider, options: ConversationOpti
     const path = `${name}/${provider}/${options.model}`;
     const conversation = _createConversation(provider, options);
     return withLogger(conversation, path);
+}
+
+export function createConversationFromConfig(config: ConversationConfig, stream?: Writable): ConversationInterface | undefined {
+    const { provider, model, temperature, role } = config;
+    if (provider === 'none') {
+        return undefined;
+    }
+    if (!isProvider(provider)) {
+        throw new Error(`Invalid provider: ${provider}`);
+    }
+    const conversationOptions: ConversationOptions = {
+        model,
+        stream,
+        logging: { name: role },
+        temperature
+    };
+    return createConversation(provider, conversationOptions);
 }

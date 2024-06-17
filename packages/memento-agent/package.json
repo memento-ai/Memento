@@ -11,17 +11,24 @@
     "@types/debug": "^4.1.12"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "@memento-ai/agent": "^1.0.0",
+    "@memento-ai/config": "^1.0.0",
+    "@memento-ai/conversation": "^1.0.0",
+    "@memento-ai/function-calling": "^1.0.0",
+    "@memento-ai/ingester": "^1.0.0",
+    "@memento-ai/memento-db": "^1.0.0",
+    "@memento-ai/postgres-db": "^1.0.0",
+    "@memento-ai/resolution-agent": "^1.0.0",
+    "@memento-ai/search": "^1.0.0",
+    "@memento-ai/synopsis-agent": "^1.0.0",
+    "@memento-ai/types": "^1.0.0",
+    "@memento-ai/utils": "^1.0.0"
   },
   "dependencies": {
-    "@memento-ai/conversation": "workspace:*",
-    "@memento-ai/function-calling": "workspace:*",
-    "@memento-ai/postgres-db": "workspace:*",
-    "@memento-ai/synopsis-agent": "workspace:*",
-    "@memento-ai/utils": "workspace:*",
     "debug": "^4.3.4",
     "handlebars": "^4.7.8",
-    "ollama": "^0.4.4",
-    "trace-error": "^1.0.3"
+    "nanoid": "^5.0.7",
+    "slonik": "^40.2.6",
+    "zod": "^3.23.8"
   }
 }

@@ -11,10 +11,8 @@
     "@types/debug": "^4.1.12"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
   },
   "dependencies": {
-    "debug": "^4.3.4",
     "tiktoken": "^1.0.13"
   }
 }
