@@ -1,8 +1,8 @@
 // Path: packages/types/src/metaSchema.ts
 
-import { z } from 'zod';
-import { Role } from './role';
-import { CONV, DOC, FRAG, DSUM, SYN, MemKind, XCHG, RES } from './memKind';
+import { z } from 'zod'
+import { CONV, DOC, DSUM, FRAG, MemKind, RES, SYN, XCHG } from './memKind'
+import { Role } from './role'
 
 // The various *MetaData types are the logical database schema for each of the mem kinds.
 // All metas are stored in one table, so all kinds could potentially use all columns,
@@ -12,15 +12,15 @@ import { CONV, DOC, FRAG, DSUM, SYN, MemKind, XCHG, RES } from './memKind';
 
 // Every kind must have these three columns:
 
-export const MetaId = z.string().max(21);
-export type MetaId = z.infer<typeof MetaId>;
+export const MetaId = z.string().max(21)
+export type MetaId = z.infer<typeof MetaId>
 
 export const RequiredMetaBase = z.object({
-    kind: MemKind,      // The kind of the meta record
-    id: MetaId,     // The id of the meta record
-    memId: z.string(),  // The foreign key to the associated mem content.
+    kind: MemKind, // The kind of the meta record
+    id: MetaId, // The id of the meta record
+    memId: z.string(), // The foreign key to the associated mem content.
     created_at: z.coerce.date(), // The time the meta record was created.
-});
+})
 
 export const MemBaseMetaData = RequiredMetaBase.extend({
     priority: z.optional(z.number()).default(0),
@@ -29,49 +29,49 @@ export const MemBaseMetaData = RequiredMetaBase.extend({
     docid: z.optional(z.string()),
     source: z.optional(z.string()),
     summaryid: z.optional(z.string()),
-});
-export type MemBaseMetaData = z.TypeOf<typeof MemBaseMetaData>;
+})
+export type MemBaseMetaData = z.TypeOf<typeof MemBaseMetaData>
 
 export const ConversationMetaData = RequiredMetaBase.extend({
     kind: z.literal(CONV),
     role: Role,
-    docid: z.string()
-});
-export type ConversationMetaData = z.TypeOf<typeof ConversationMetaData>;
+    docid: z.string(),
+})
+export type ConversationMetaData = z.TypeOf<typeof ConversationMetaData>
 
 export const FragmentMetaData = RequiredMetaBase.extend({
     kind: z.literal(FRAG),
     docid: z.string(),
-});
-export type FragmentMetaData = z.TypeOf<typeof FragmentMetaData>;
+})
+export type FragmentMetaData = z.TypeOf<typeof FragmentMetaData>
 
 export const DocumentMetaData = RequiredMetaBase.extend({
     kind: z.literal(DOC),
     source: z.string(),
-    summaryid: z.string()
-});
-export type DocumentMetaData = z.TypeOf<typeof DocumentMetaData>;
+    summaryid: z.string(),
+})
+export type DocumentMetaData = z.TypeOf<typeof DocumentMetaData>
 
 export const DocSummaryMetaData = RequiredMetaBase.extend({
     kind: z.literal(DSUM),
-    docid: z.string()
-});
-export type DocSummaryMetaData = z.TypeOf<typeof DocSummaryMetaData>;
+    docid: z.string(),
+})
+export type DocSummaryMetaData = z.TypeOf<typeof DocSummaryMetaData>
 
 export const ResolutionMetaData = RequiredMetaBase.extend({
     kind: z.literal(RES),
-});
-export type ResolutionMetaData = z.TypeOf<typeof ResolutionMetaData>;
+})
+export type ResolutionMetaData = z.TypeOf<typeof ResolutionMetaData>
 
 export const SynopsisMetaData = RequiredMetaBase.extend({
     kind: z.literal(SYN),
-});
-export type SynopsisMetaData = z.TypeOf<typeof SynopsisMetaData>;
+})
+export type SynopsisMetaData = z.TypeOf<typeof SynopsisMetaData>
 
 export const ConvExchangeMetaData = RequiredMetaBase.extend({
     kind: z.literal(XCHG),
-});
-export type ConvExchangeMetaData = z.TypeOf<typeof ConvExchangeMetaData>;
+})
+export type ConvExchangeMetaData = z.TypeOf<typeof ConvExchangeMetaData>
 
 export const MemMetaData = z.discriminatedUnion('kind', [
     ConversationMetaData,
@@ -81,5 +81,5 @@ export const MemMetaData = z.discriminatedUnion('kind', [
     ResolutionMetaData,
     SynopsisMetaData,
     ConvExchangeMetaData,
-]);
-export type MemMetaData = z.TypeOf<typeof MemMetaData>;
+])
+export type MemMetaData = z.TypeOf<typeof MemMetaData>

@@ -5,38 +5,38 @@ export function stripCommonIndent(text: string): string {
     // We assume that the first line may be empty or not indented and will be ignored.
     // We assume that the first indented line will set the indent level for the entire block.
 
-    const lines = text.split('\n');
-    const indentedLines = lines.filter(line => line.length > 0 && line[0]===' ');
+    const lines = text.split('\n')
+    const indentedLines = lines.filter((line) => line.length > 0 && line[0] === ' ')
 
     if (indentedLines.length === 0) {
-        return text;
+        return text
     }
-    const firstIndentedLine: string = indentedLines[0];
+    const firstIndentedLine: string = indentedLines[0]
 
-    const m = firstIndentedLine.match(/^( +)/);
+    const m = firstIndentedLine.match(/^( +)/)
     if (!m) {
-        return text;
+        return text
     }
 
-    const indent = m[1];
+    const indent = m[1]
 
-    const outDentedLines = lines.map(line => {
+    const outDentedLines = lines.map((line) => {
         if (line.startsWith(indent)) {
-            return line.slice(indent.length);
+            return line.slice(indent.length)
         } else {
-            return line;
+            return line
         }
-    });
+    })
 
     // Remove leading empty lines
     while (outDentedLines[0].trim() === '') {
-        outDentedLines.shift();
+        outDentedLines.shift()
     }
 
     // Remove trailing empty lines
-    while (outDentedLines.length > 0 && outDentedLines[outDentedLines.length-1].trim() === '') {
-        outDentedLines.pop();
+    while (outDentedLines.length > 0 && outDentedLines[outDentedLines.length - 1].trim() === '') {
+        outDentedLines.pop()
     }
 
-    return outDentedLines.join('\n') + '\n';
+    return outDentedLines.join('\n') + '\n'
 }

@@ -1,3 +1,3 @@
 // Path: packages/embedding/index.ts
 
-export * from './src/embedding';
+export * from './src/embedding'

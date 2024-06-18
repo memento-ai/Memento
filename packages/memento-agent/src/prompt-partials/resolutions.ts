@@ -1,7 +1,7 @@
 // Path: packages/memento-agent/src/prompt-partials/resolutions.ts
 
-import { stripCommonIndent } from "@memento-ai/utils"
-import Handlebars from "handlebars"
+import { stripCommonIndent } from '@memento-ai/utils'
+import Handlebars from 'handlebars'
 
 const resolutionsText = stripCommonIndent(`
     {{#if resolutions}}
@@ -19,6 +19,6 @@ const resolutionsText = stripCommonIndent(`
     {{/each}}
     </resolutions>
     {{/if}}
-`);
+`)
 
-export const resolutions = Handlebars.compile(resolutionsText);
+export const resolutions = Handlebars.compile(resolutionsText)

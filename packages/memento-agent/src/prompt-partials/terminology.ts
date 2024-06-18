@@ -1,7 +1,7 @@
 // Path: packages/memento-agent/src/prompt-partials/terminology.ts
 
-import { stripCommonIndent } from "@memento-ai/utils"
-import Handlebars from "handlebars"
+import { stripCommonIndent } from '@memento-ai/utils'
+import Handlebars from 'handlebars'
 
 const terminologyText = stripCommonIndent(`
     <structure_and_terminology>
@@ -41,6 +41,6 @@ const terminologyText = stripCommonIndent(`
     stored in the PostgreSQL database.
 
     </structure_and_terminology>
-    `);
+    `)
 
-export const terminology = Handlebars.compile(terminologyText);
+export const terminology = Handlebars.compile(terminologyText)

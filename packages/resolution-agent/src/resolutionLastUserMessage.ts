@@ -1,7 +1,7 @@
 // Path: packages/resolution-agent/src/resolutionLastUserMessage.ts
 
-import { stripCommonIndent } from "@memento-ai/utils";
-import Handlebars from "handlebars";
+import { stripCommonIndent } from '@memento-ai/utils'
+import Handlebars from 'handlebars'
 
 export const lastUserMessageText = stripCommonIndent(`
     <exchange>
@@ -9,11 +9,11 @@ export const lastUserMessageText = stripCommonIndent(`
     <user>{{{user}}}</user>
     <assistant>{{{asst}}}</assistant>
     </exchange>
-`);
+`)
 
 export type LastUserMessage = {
-    user: string;
-    asst: string;
-};
+    user: string
+    asst: string
+}
 
-export const lastUserMessageTemplate = Handlebars.compile<LastUserMessage>(lastUserMessageText);
+export const lastUserMessageTemplate = Handlebars.compile<LastUserMessage>(lastUserMessageText)

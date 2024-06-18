@@ -2,5 +2,5 @@
 
 declare global {
     // eslint-disable-next-line no-var
-    var TextDecoderStream: TransformStream<Uint8Array, string>;
+    var TextDecoderStream: TransformStream<Uint8Array, string>
 }

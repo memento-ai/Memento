@@ -1,7 +1,7 @@
 // Path: packages/memento-agent/src/prompt-partials/pronouns.ts
 
-import { stripCommonIndent } from "@memento-ai/utils"
-import Handlebars from "handlebars"
+import { stripCommonIndent } from '@memento-ai/utils'
+import Handlebars from 'handlebars'
 
 const pronounsText = stripCommonIndent(`
     <pronouns>
@@ -13,6 +13,6 @@ const pronounsText = stripCommonIndent(`
     First-person singular pronouns ('I', 'me', 'my') refer to the Memento agent.
     Second-person singular pronouns ('you', 'your') refer to the user.
     </pronouns>
-    `);
+    `)
 
-export const pronouns = Handlebars.compile(pronounsText);
+export const pronouns = Handlebars.compile(pronounsText)

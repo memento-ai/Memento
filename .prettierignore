@@ -2,7 +2,9 @@
 dist
 coverage
 .nx/cache
-/nx/workspace-data
+.nx/workspace-data
 logs/
-*.svelte
-*.md
+**/*.svelte
+**/*.md
+**/out
+**/.svelte-kit/*

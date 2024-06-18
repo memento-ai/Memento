@@ -1,6 +1,6 @@
 // Path: packages/function-calling/src/functionRegistryTemplate.ts
 
-import Handlebars from "handlebars";
+import Handlebars from 'handlebars'
 
 export const function_description_template = Handlebars.compile(`
 Function: {{name}}
@@ -16,19 +16,16 @@ Nested Types:
 {{this}}
 {{/each}}
 {{/if}}
-`);
+`)
 
 export const function_registry_template = Handlebars.compile(`
 ## Function Registry
 {{#each function}}
 {{> function_description this}}
 {{/each}}
-`);
+`)
 
-Handlebars.registerPartial(
-    "function_registry",
-    function_registry_template
-)
+Handlebars.registerPartial('function_registry', function_registry_template)
 
 export const function_prompt_template = Handlebars.compile(`
 ## Function Calling Instructions
@@ -56,4 +53,4 @@ Notes:
    In this case, use a regular \`json\` code fence instead of a \`function\` code fence.
 
 {{> function_registry functions}}
-`);
+`)

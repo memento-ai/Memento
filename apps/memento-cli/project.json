@@ -1,43 +1,43 @@
 {
-  "name": "memento-cli",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "application",
-  "sourceRoot": "apps/memento-cli/src",
-  "targets": {
-    "build": {
-      "executor": "@nx-bun/nx:build",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "entrypoints": ["apps/memento-cli/src/main.ts"],
-        "outputPath": "dist/memento-cli",
-        "tsConfig": "apps/memento-cli/tsconfig.app.json",
-        "smol": false,
-        "bun": true
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
-    "serve": {
-      "executor": "@nx-bun/nx:run",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "memento-cli:build",
-        "tsConfig": "apps/memento-cli/tsconfig.app.json",
-        "watch": true,
-        "hot": true,
-        "bun": true,
-        "smol": false
-      }
-    },
-    "test": {
-      "executor": "@nx-bun/nx:test",
-      "options": {
-        "smol": false,
-        "bail": true,
-        "tsConfig": "apps/memento-cli/tsconfig.json",
-        "bun": true
-      }
+    "name": "memento-cli",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "application",
+    "sourceRoot": "apps/memento-cli/src",
+    "targets": {
+        "build": {
+            "executor": "@nx-bun/nx:build",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "entrypoints": ["apps/memento-cli/src/main.ts"],
+                "outputPath": "dist/memento-cli",
+                "tsConfig": "apps/memento-cli/tsconfig.app.json",
+                "smol": false,
+                "bun": true
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint"
+        },
+        "serve": {
+            "executor": "@nx-bun/nx:run",
+            "defaultConfiguration": "development",
+            "options": {
+                "buildTarget": "memento-cli:build",
+                "tsConfig": "apps/memento-cli/tsconfig.app.json",
+                "watch": true,
+                "hot": true,
+                "bun": true,
+                "smol": false
+            }
+        },
+        "test": {
+            "executor": "@nx-bun/nx:test",
+            "options": {
+                "smol": false,
+                "bail": true,
+                "tsConfig": "apps/memento-cli/tsconfig.json",
+                "bun": true
+            }
+        }
     }
-  }
 }

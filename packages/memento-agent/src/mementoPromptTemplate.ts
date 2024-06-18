@@ -1,37 +1,37 @@
 // Path: packages/memento-agent/src/mementoPromptTemplate.ts
 
-import { additional_context } from "./prompt-partials/additional_context";
-import { core_system } from "./prompt-partials/core_system";
-import { function_calling } from "./prompt-partials/function_calling";
-import { pronouns } from "./prompt-partials/pronouns";
-import { resolutions } from "./prompt-partials/resolutions";
-import { sql_schema } from "./prompt-partials/sql_schema";
-import { terminology } from "./prompt-partials/terminology";
-import { stripCommonIndent } from "@memento-ai/utils";
-import Handlebars from "handlebars";
-import type { MementoSearchResult } from "@memento-ai/search";
+import type { MementoSearchResult } from '@memento-ai/search'
+import { stripCommonIndent } from '@memento-ai/utils'
+import Handlebars from 'handlebars'
+import { additional_context } from './prompt-partials/additional_context'
+import { core_system } from './prompt-partials/core_system'
+import { function_calling } from './prompt-partials/function_calling'
+import { pronouns } from './prompt-partials/pronouns'
+import { resolutions } from './prompt-partials/resolutions'
+import { sql_schema } from './prompt-partials/sql_schema'
+import { terminology } from './prompt-partials/terminology'
 
 export type MementoPromptTemplateArgs = {
-    functions: string,
-    databaseSchema: string,
+    functions: string
+    databaseSchema: string
     resolutions: string[]
-    dsumMems: MementoSearchResult[],
-    docMems: MementoSearchResult[],
-    synMems: MementoSearchResult[],
-    xchgMems: MementoSearchResult[],
-};
+    dsumMems: MementoSearchResult[]
+    docMems: MementoSearchResult[]
+    synMems: MementoSearchResult[]
+    xchgMems: MementoSearchResult[]
+}
 
-Handlebars.registerHelper('obj', function(context) {
-    return Bun.inspect(context);
-});
+Handlebars.registerHelper('obj', function (context) {
+    return Bun.inspect(context)
+})
 
-Handlebars.registerPartial('core_system', core_system);
-Handlebars.registerPartial('pronouns', pronouns);
-Handlebars.registerPartial('function_calling', function_calling);
-Handlebars.registerPartial('sql_schema', sql_schema);
-Handlebars.registerPartial('additional_context', additional_context);
-Handlebars.registerPartial('resolutions', resolutions);
-Handlebars.registerPartial('terminology', terminology);
+Handlebars.registerPartial('core_system', core_system)
+Handlebars.registerPartial('pronouns', pronouns)
+Handlebars.registerPartial('function_calling', function_calling)
+Handlebars.registerPartial('sql_schema', sql_schema)
+Handlebars.registerPartial('additional_context', additional_context)
+Handlebars.registerPartial('resolutions', resolutions)
+Handlebars.registerPartial('terminology', terminology)
 
 const mementoPromptTemplateText = stripCommonIndent(`
     <system>
@@ -59,6 +59,6 @@ const mementoPromptTemplateText = stripCommonIndent(`
        If you want to invoke a function, the code fence block must be the only content in the message.
        Save any commentary or explanation for a subsequent message.
     </system>
-`);
+`)
 
-export const mementoPromptTemplate = Handlebars.compile<MementoPromptTemplateArgs>(mementoPromptTemplateText);
+export const mementoPromptTemplate = Handlebars.compile<MementoPromptTemplateArgs>(mementoPromptTemplateText)
