@@ -1,6 +1,6 @@
 // Path: packages/memento-db/src/getSynopses.ts
 
-import { sql, type DatabasePool } from 'slonik';
+import { sql, type DatabasePool } from 'slonik'
 
 export async function getSynopses(pool: DatabasePool, tokenLimit: number): Promise<string[]> {
     const query = sql.unsafe`
@@ -14,7 +14,7 @@ export async function getSynopses(pool: DatabasePool, tokenLimit: number): Promi
         ) AS subquery
         WHERE cumulative_tokens <= ${tokenLimit}
         ORDER BY created_at;
-    `;
-    const result = await pool.query(query);
-    return result.rows.map(row => row.content);
+    `
+    const result = await pool.query(query)
+    return result.rows.map((row) => row.content)
 }

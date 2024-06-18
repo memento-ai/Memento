@@ -1,42 +1,49 @@
 // Path: packages/function-calling/src/functions/addSynopsis.ts
 
-import { baseInputSchema, type FunctionConfig, ID } from '../functionRegistry';
-import { z } from 'zod';
-import { SYN, SynopsisMetaArgs } from '@memento-ai/types';
-import { addMemento } from '@memento-ai/postgres-db';
-import { nanoid } from 'nanoid';
+import { addMemento } from '@memento-ai/postgres-db'
+import { SYN, SynopsisMetaArgs } from '@memento-ai/types'
+import { nanoid } from 'nanoid'
+import { z } from 'zod'
+import { ID, baseInputSchema, type FunctionConfig } from '../functionRegistry'
 
-const inputSchema = baseInputSchema.extend({
-    content: z.string().describe('A brief synopsis of one conversational exchange -- the assistants inner thoughts.'),
-}).describe('The input for synopsis');
-export type SynopsisInput = z.input<typeof inputSchema>;
+const inputSchema = baseInputSchema
+    .extend({
+        content: z
+            .string()
+            .describe('A brief synopsis of one conversational exchange -- the assistants inner thoughts.'),
+    })
+    .describe('The input for synopsis')
+export type SynopsisInput = z.input<typeof inputSchema>
 
-const outputSchema = z.promise(ID).describe('The id of the created synopsis meta.');
+const outputSchema = z.promise(ID).describe('The id of the created synopsis meta.')
 
-const fnSchema = z.function().args(inputSchema).returns(outputSchema)
-    .describe('Creates one synopsis memento from the input.');
+const fnSchema = z
+    .function()
+    .args(inputSchema)
+    .returns(outputSchema)
+    .describe('Creates one synopsis memento from the input.')
 
 async function addSynopsis(input: SynopsisInput): Promise<ID> {
-    const { content, context } = input;
+    const { content, context } = input
     if (!context) {
-        throw new Error('Context is required');
+        throw new Error('Context is required')
     }
-    const pool = context.pool;
+    const pool = context.pool
     if (!pool) {
-        throw new Error('Pool is required');
+        throw new Error('Pool is required')
     }
 
-    const metaArgs: SynopsisMetaArgs = { kind: SYN };
-    const metaId = nanoid();
-    return await addMemento({ pool, metaId, content, metaArgs });
+    const metaArgs: SynopsisMetaArgs = { kind: SYN }
+    const metaId = nanoid()
+    return await addMemento({ pool, metaId, content, metaArgs })
 }
 
 export const AddSynopsis = z.object({
     name: z.literal('addSynopsis'),
     inputSchema,
     outputSchema,
-    fnSchema
-});
+    fnSchema,
+})
 
 const config: FunctionConfig<SynopsisInput, ID> = {
     name: 'addSynopsis',
@@ -44,7 +51,7 @@ const config: FunctionConfig<SynopsisInput, ID> = {
     inputSchema,
     outputSchema,
     fnSchema,
-    fn: addSynopsis
-};
+    fn: addSynopsis,
+}
 
-export default config;
+export default config

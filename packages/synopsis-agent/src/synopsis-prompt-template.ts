@@ -1,14 +1,14 @@
 // Path: packages/synopsis-agent/src/synopsis-prompt-template.ts
 
-import { stripCommonIndent } from "@memento-ai/utils";
+import { stripCommonIndent } from '@memento-ai/utils'
 
-import Handlebars from "handlebars";
+import Handlebars from 'handlebars'
 
 export type SynopsisPromptTemplateArgs = {
-    synopses: string[],
-    user: string,
+    synopses: string[]
+    user: string
     assistant: string
-};
+}
 
 const synopsisPromptTemplateText = stripCommonIndent(`
     # Instructions
@@ -43,11 +43,9 @@ const synopsisPromptTemplateText = stripCommonIndent(`
     \`\`\`
     {{assistant}}
     \`\`\`
-`);
+`)
 
-export const synopsisPromptTemplate = Handlebars.compile<SynopsisPromptTemplateArgs>(synopsisPromptTemplateText);
-
-
+export const synopsisPromptTemplate = Handlebars.compile<SynopsisPromptTemplateArgs>(synopsisPromptTemplateText)
 
 // {{#if synopses.length > 0}}
 // {{each synopses}}

@@ -1,7 +1,7 @@
 // Path: packages/resolution-agent/src/resolutionPromptTemplate.ts
 
-import { stripCommonIndent } from "@memento-ai/utils";
-import Handlebars from "handlebars";
+import { stripCommonIndent } from '@memento-ai/utils'
+import Handlebars from 'handlebars'
 
 const resolutionPromptTemplateText = stripCommonIndent(`
     <system>
@@ -45,10 +45,10 @@ const resolutionPromptTemplateText = stripCommonIndent(`
 
     </instructions>
     </system>
-`);
+`)
 
 export type ResolutionPromptTemplateArgs = {
-    resolutions: string[];
-};
+    resolutions: string[]
+}
 
-export const resolutionPromptTemplate = Handlebars.compile<ResolutionPromptTemplateArgs>(resolutionPromptTemplateText);
+export const resolutionPromptTemplate = Handlebars.compile<ResolutionPromptTemplateArgs>(resolutionPromptTemplateText)

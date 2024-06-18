@@ -7,22 +7,22 @@
 // 1. we will want to be able to create multiple registries that have different subsets of functions
 // 2. by manually importing we can create the RegisteredFunctions discrimated union
 
-import { z } from 'zod';
-import  { registerFunction, type FunctionRegistry } from '../functionRegistry';
+import { z } from 'zod'
+import { registerFunction, type FunctionRegistry } from '../functionRegistry'
 
-export const registry: FunctionRegistry = {};
+export const registry: FunctionRegistry = {}
 
-import addSynopsis, { AddSynopsis } from './addSynopsis';
-import getCurrentTime, { GetCurrentTime } from './getCurrentTime';
-import gitListFiles, { GitListFiles } from './gitListFiles';
-import queryMementoView, { QueryMementoView } from './queryMementoView';
-import readSourceFile, { ReadSourceFile } from './readSourceFile';
+import addSynopsis, { AddSynopsis } from './addSynopsis'
+import getCurrentTime, { GetCurrentTime } from './getCurrentTime'
+import gitListFiles, { GitListFiles } from './gitListFiles'
+import queryMementoView, { QueryMementoView } from './queryMementoView'
+import readSourceFile, { ReadSourceFile } from './readSourceFile'
 
-registerFunction(registry, addSynopsis);
-registerFunction(registry, getCurrentTime);
-registerFunction(registry, gitListFiles);
-registerFunction(registry, queryMementoView);
-registerFunction(registry, readSourceFile);
+registerFunction(registry, addSynopsis)
+registerFunction(registry, getCurrentTime)
+registerFunction(registry, gitListFiles)
+registerFunction(registry, queryMementoView)
+registerFunction(registry, readSourceFile)
 
 export const RegisteredFunctions = z.discriminatedUnion('name', [
     AddSynopsis,
@@ -30,5 +30,5 @@ export const RegisteredFunctions = z.discriminatedUnion('name', [
     GitListFiles,
     QueryMementoView,
     ReadSourceFile,
-]);
-export type RegisteredFunctions = z.infer<typeof RegisteredFunctions>;
+])
+export type RegisteredFunctions = z.infer<typeof RegisteredFunctions>

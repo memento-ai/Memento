@@ -1,29 +1,31 @@
 // Path: packages/memento-agent/src/retrieveContext.ts
 
-import { DSUM,  SYN, XCHG, DOC } from "@memento-ai/types";
-import { gatherContent, kindContent } from "./dynamicContent";
-import { generateFunctionDescription } from "@memento-ai/function-calling";
-import { registry } from "@memento-ai/function-calling";
-import type { DynamicContent } from "./dynamicContent";
-import type { MementoAgent } from "./mementoAgent";
-import type { MementoPromptTemplateArgs } from "./mementoPromptTemplate";
-import type { MementoSearchResult } from "@memento-ai/search";
+import { generateFunctionDescription, registry } from '@memento-ai/function-calling'
+import type { MementoSearchResult } from '@memento-ai/search'
+import { DOC, DSUM, SYN, XCHG } from '@memento-ai/types'
+import type { DynamicContent } from './dynamicContent'
+import { gatherContent, kindContent } from './dynamicContent'
+import type { MementoAgent } from './mementoAgent'
+import type { MementoPromptTemplateArgs } from './mementoPromptTemplate'
 
-export function functionCallingInstructions() : string {
+export function functionCallingInstructions(): string {
     return `
 ${Object.values(registry)
-    .map(config => generateFunctionDescription(config))
+    .map((config) => generateFunctionDescription(config))
     .join('\n')}
 `.trim()
 }
 
-export async function retrieveContext(agent: MementoAgent, aggregateSearchResults: MementoSearchResult[]): Promise<MementoPromptTemplateArgs> {
-    const functions = functionCallingInstructions();
+export async function retrieveContext(
+    agent: MementoAgent,
+    aggregateSearchResults: MementoSearchResult[]
+): Promise<MementoPromptTemplateArgs> {
+    const functions = functionCallingInstructions()
 
-    const dynamicContent: DynamicContent = await gatherContent(agent.db, aggregateSearchResults, agent.config);
-    const { additionalContext } = dynamicContent;
+    const dynamicContent: DynamicContent = await gatherContent(agent.db, aggregateSearchResults, agent.config)
+    const { additionalContext } = dynamicContent
 
-    const resolutions = await agent.db.getResolutions();
+    const resolutions = await agent.db.getResolutions()
 
     const retrievedContext = {
         functions,
@@ -33,7 +35,7 @@ export async function retrieveContext(agent: MementoAgent, aggregateSearchResult
         docMems: kindContent(DOC, additionalContext),
         synMems: kindContent(SYN, additionalContext),
         xchgMems: kindContent(XCHG, additionalContext),
-    };
+    }
 
-    return retrievedContext;
+    return retrievedContext
 }

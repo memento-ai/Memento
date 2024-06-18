@@ -1,41 +1,41 @@
 {
-  "name": "select-similar-mems",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "application",
-  "sourceRoot": "apps/select-similar-mems/src",
-  "targets": {
-    "build": {
-      "executor": "@nx-bun/nx:build",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "entrypoints": ["apps/select-similar-mems/src/main.ts"],
-        "outputPath": "dist/select-similar-mems",
-        "tsConfig": "apps/select-similar-mems/tsconfig.app.json",
-        "smol": false,
-        "bun": true
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
-    "serve": {
-      "executor": "@nx-bun/nx:run",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "select-similar-mems:build",
-        "tsConfig": "apps/select-similar-mems/tsconfig.app.json",
-        "bun": true,
-        "smol": false
-      }
-    },
-    "test": {
-      "executor": "@nx-bun/nx:test",
-      "options": {
-        "smol": false,
-        "bail": true,
-        "tsConfig": "apps/select-similar-mems/tsconfig.json",
-        "bun": true
-      }
+    "name": "select-similar-mems",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "application",
+    "sourceRoot": "apps/select-similar-mems/src",
+    "targets": {
+        "build": {
+            "executor": "@nx-bun/nx:build",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "entrypoints": ["apps/select-similar-mems/src/main.ts"],
+                "outputPath": "dist/select-similar-mems",
+                "tsConfig": "apps/select-similar-mems/tsconfig.app.json",
+                "smol": false,
+                "bun": true
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint"
+        },
+        "serve": {
+            "executor": "@nx-bun/nx:run",
+            "defaultConfiguration": "development",
+            "options": {
+                "buildTarget": "select-similar-mems:build",
+                "tsConfig": "apps/select-similar-mems/tsconfig.app.json",
+                "bun": true,
+                "smol": false
+            }
+        },
+        "test": {
+            "executor": "@nx-bun/nx:test",
+            "options": {
+                "smol": false,
+                "bail": true,
+                "tsConfig": "apps/select-similar-mems/tsconfig.json",
+                "bun": true
+            }
+        }
     }
-  }
 }

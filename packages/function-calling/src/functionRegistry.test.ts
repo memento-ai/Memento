@@ -1,30 +1,30 @@
 // Path: packages/function-calling/src/functionRegistry.test.ts
 
-import { describe, it, expect } from 'bun:test';
-import { registry } from './functions/index';
-import { generateFunctionDescription, getRegistryDescription } from './functionRegistry';
-import debug from 'debug';
-import { getProjectRoot } from '@memento-ai/utils';
+import { getProjectRoot } from '@memento-ai/utils'
+import { describe, expect, it } from 'bun:test'
+import debug from 'debug'
+import { generateFunctionDescription, getRegistryDescription } from './functionRegistry'
+import { registry } from './functions/index'
 
-const dlog = debug('functionRegistry');
+const dlog = debug('functionRegistry')
 
 describe('generateFunctionDescription', () => {
     it('should generate a description for getCurrentTime', async () => {
-        const testConfig = registry['getCurrentTime'];
-        const description = generateFunctionDescription(testConfig);
-        dlog(description);
+        const testConfig = registry['getCurrentTime']
+        const description = generateFunctionDescription(testConfig)
+        dlog(description)
         const expected = `
 Function: getCurrentTime
     Purpose: Returns the current UTC time
     Input: No input parameters are necessary, so provide an empty object.
         context: An optional context object. Leave unspecified -- Memento will provide.
-    Output: ISO string`.trim();
-        expect(description).toEqual(expected);
-    });
+    Output: ISO string`.trim()
+        expect(description).toEqual(expected)
+    })
 
     it('should generate all function descriptions', async () => {
-        const descriptions = getRegistryDescription(registry);
-        dlog(descriptions);
+        const descriptions = getRegistryDescription(registry)
+        dlog(descriptions)
         const expected = `
 Available functions:
 
@@ -63,43 +63,42 @@ Function: readSourceFile
     Output: The content of the source file as a single string.
 `.trim()
 
-        const expectedLines = expected.split('\n');
-        const descriptionsLines = descriptions.split('\n');
-        expect(descriptionsLines).toEqual(expectedLines);
-    });
-});
-
+        const expectedLines = expected.split('\n')
+        const descriptionsLines = descriptions.split('\n')
+        expect(descriptionsLines).toEqual(expectedLines)
+    })
+})
 
 describe('getCurrentTime', () => {
     it('should return the current time as an ISO 8601 formatted string', async () => {
-      const getCurrentTime = registry['getCurrentTime'];
-      expect(getCurrentTime).toBeDefined();
-      const currentTime: string = await getCurrentTime.fn({});
-      expect(typeof currentTime).toBe('string');
-      const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
-      expect(currentTime).toMatch(dateRegex);
-    });
-});
+        const getCurrentTime = registry['getCurrentTime']
+        expect(getCurrentTime).toBeDefined()
+        const currentTime: string = await getCurrentTime.fn({})
+        expect(typeof currentTime).toBe('string')
+        const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+        expect(currentTime).toMatch(dateRegex)
+    })
+})
 
 describe('readSourceFile', () => {
     it('should read a source file by path', async () => {
-        const projectRoot = getProjectRoot();
-        const readSourceFile = registry['readSourceFile'];
-        expect(readSourceFile).toBeDefined();
+        const projectRoot = getProjectRoot()
+        const readSourceFile = registry['readSourceFile']
+        expect(readSourceFile).toBeDefined()
         const content: string = await readSourceFile.fn({
-            filePath: `${projectRoot}/packages/function-calling/src/functions/getCurrentTime.ts`
-        });
-        expect(typeof content).toBe('string');
-        expect(content).toContain("Path: packages/function-calling/src/functions/getCurrentTime.ts");
-    });
-});
+            filePath: `${projectRoot}/packages/function-calling/src/functions/getCurrentTime.ts`,
+        })
+        expect(typeof content).toBe('string')
+        expect(content).toContain('Path: packages/function-calling/src/functions/getCurrentTime.ts')
+    })
+})
 
 describe('gitListFiles', () => {
     it('should list tracked git files', async () => {
-        const gitListFiles = registry['gitListFiles'];
-        expect(gitListFiles).toBeDefined();
-        const content: string[] = await gitListFiles.fn({});
-        expect(content).toContain("packages/function-calling/src/functions/getCurrentTime.ts");
-        expect(content).toContain("packages/types/src/mementoSchema.ts");
-    });
-});
+        const gitListFiles = registry['gitListFiles']
+        expect(gitListFiles).toBeDefined()
+        const content: string[] = await gitListFiles.fn({})
+        expect(content).toContain('packages/function-calling/src/functions/getCurrentTime.ts')
+        expect(content).toContain('packages/types/src/mementoSchema.ts')
+    })
+})

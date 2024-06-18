@@ -1,3 +1,3 @@
 // Path: packages/agent/index.ts
 
-export * from './src/agent';
+export * from './src/agent'

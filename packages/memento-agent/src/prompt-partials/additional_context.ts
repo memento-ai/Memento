@@ -1,15 +1,15 @@
 // Path: packages/memento-agent/src/prompt-partials/additional_context.ts
 
-import type { MementoSearchResult } from "@memento-ai/search";
-import { stripCommonIndent } from "@memento-ai/utils";
-import Handlebars from "handlebars";
+import type { MementoSearchResult } from '@memento-ai/search'
+import { stripCommonIndent } from '@memento-ai/utils'
+import Handlebars from 'handlebars'
 
 export type AdditionalContextTemplateArgs = {
-    dsumMems: MementoSearchResult[],
-    docMems: MementoSearchResult[],
-    synMems: MementoSearchResult[],
-    xchgMems: MementoSearchResult[],
-};
+    dsumMems: MementoSearchResult[]
+    docMems: MementoSearchResult[]
+    synMems: MementoSearchResult[]
+    xchgMems: MementoSearchResult[]
+}
 
 const additional_context_text = stripCommonIndent(`
     <additional_context>
@@ -56,6 +56,6 @@ const additional_context_text = stripCommonIndent(`
     {{/if}}
 
     </additional_context>
-`);
+`)
 
-export const additional_context = Handlebars.compile<AdditionalContextTemplateArgs>(additional_context_text);
+export const additional_context = Handlebars.compile<AdditionalContextTemplateArgs>(additional_context_text)

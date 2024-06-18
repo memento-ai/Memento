@@ -1,27 +1,27 @@
 {
-  "name": "@memento-ai/conversation",
-  "version": "1.0.0",
-  "type": "module",
-  "module": "index.ts",
-  "scripts": {
-    "check": "tsc --skipLibCheck --noEmit"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@types/debug": "^4.1.12"
-  },
-  "peerDependencies": {
-    "@memento-ai/config": "^1.0.0",
-    "@memento-ai/types": "^1.0.0"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.17.1",
-    "@google/generative-ai": "^0.11.3",
-    "handlebars": "^4.7.8",
-    "dayjs": "^1.11.11",
-    "debug": "^4.3.4",
-    "groq-sdk": "^0.3.3",
-    "ollama": "^0.4.4",
-    "openai": "^4.40.2"
-  }
+    "name": "@memento-ai/conversation",
+    "version": "1.0.0",
+    "type": "module",
+    "module": "index.ts",
+    "scripts": {
+        "check": "tsc --skipLibCheck --noEmit"
+    },
+    "devDependencies": {
+        "@types/bun": "latest",
+        "@types/debug": "^4.1.12"
+    },
+    "peerDependencies": {
+        "@memento-ai/config": "^1.0.0",
+        "@memento-ai/types": "^1.0.0"
+    },
+    "dependencies": {
+        "@anthropic-ai/sdk": "^0.17.1",
+        "@google/generative-ai": "^0.11.3",
+        "handlebars": "^4.7.8",
+        "dayjs": "^1.11.11",
+        "debug": "^4.3.4",
+        "groq-sdk": "^0.3.3",
+        "ollama": "^0.4.4",
+        "openai": "^4.40.2"
+    }
 }

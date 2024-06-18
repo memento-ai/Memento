@@ -1,14 +1,14 @@
 // Path: packages/readme-agents/src/project-readme-prompt-template.ts
 
-import { stripCommonIndent } from "@memento-ai/utils";
+import { stripCommonIndent } from '@memento-ai/utils'
 
-import Handlebars from "handlebars";
+import Handlebars from 'handlebars'
 
 export type RootReadmePromptTemplateArgs = {
-    paths: string[],
-    root: string,
-    readmes: { package: string, content: string }[]
-};
+    paths: string[]
+    root: string
+    readmes: { package: string; content: string }[]
+}
 
 const rootReadmePromptTemplateText = stripCommonIndent(`
     <system>
@@ -49,6 +49,6 @@ const rootReadmePromptTemplateText = stripCommonIndent(`
     </package_readmes>
 
     </system>
-`);
+`)
 
-export const rootReadmePromptTemplate = Handlebars.compile<RootReadmePromptTemplateArgs>(rootReadmePromptTemplateText);
+export const rootReadmePromptTemplate = Handlebars.compile<RootReadmePromptTemplateArgs>(rootReadmePromptTemplateText)

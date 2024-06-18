@@ -1,20 +1,23 @@
 // Path: packages/search/src/extractKeywordsFromContent.ts
 
-import { sql } from "slonik";
-import { z } from "zod";
-import type { DatabasePool } from "slonik";
-import type { MementoSearchArgs } from "..";
+import type { DatabasePool } from 'slonik'
+import { sql } from 'slonik'
+import { z } from 'zod'
+import type { MementoSearchArgs } from '..'
 
 export const ExtractKeywordsFromContentResult = z.object({
     lexeme: z.string(),
     tf: z.number(),
     idf: z.number(),
     tf_idf: z.number(),
-});
-export type ExtractKeywordsFromContentResult = z.infer<typeof ExtractKeywordsFromContentResult>;
+})
+export type ExtractKeywordsFromContentResult = z.infer<typeof ExtractKeywordsFromContentResult>
 
-export async function extractKeywordsFromContent(dbPool: DatabasePool, args: MementoSearchArgs): Promise<ExtractKeywordsFromContentResult[]> {
-    const {content, numKeywords=5 } = args;
+export async function extractKeywordsFromContent(
+    dbPool: DatabasePool,
+    args: MementoSearchArgs
+): Promise<ExtractKeywordsFromContentResult[]> {
+    const { content, numKeywords = 5 } = args
     const query = sql.type(ExtractKeywordsFromContentResult)`
         WITH msg_stats AS (
             SELECT
@@ -38,10 +41,10 @@ export async function extractKeywordsFromContent(dbPool: DatabasePool, args: Mem
         JOIN corpus_stats ON msg_stats.lexeme = corpus_stats.lexeme
         ORDER BY tf_idf DESC
         LIMIT ${numKeywords};
-        `;
+        `
 
     return dbPool.connect(async (connection) => {
-        const result = await connection.query(query);
-        return result.rows.map((row) => row);
-    });
+        const result = await connection.query(query)
+        return result.rows.map((row) => row)
+    })
 }

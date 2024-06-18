@@ -1,7 +1,7 @@
 // Path: packages/memento-agent/src/prompt-partials/core_system.ts
 
-import { stripCommonIndent } from "@memento-ai/utils";
-import Handlebars from "handlebars";
+import { stripCommonIndent } from '@memento-ai/utils'
+import Handlebars from 'handlebars'
 
 const mementoCoreSystemPromptText = stripCommonIndent(`
     <instructions>
@@ -92,6 +92,6 @@ const mementoCoreSystemPromptText = stripCommonIndent(`
     </dpt>
     </metaphors>
     </instructions>
-`);
+`)
 
-export const core_system = Handlebars.compile(mementoCoreSystemPromptText);
+export const core_system = Handlebars.compile(mementoCoreSystemPromptText)

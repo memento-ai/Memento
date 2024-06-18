@@ -1,17 +1,16 @@
 {
-  "name": "@memento-ai/embedding",
-  "version": "1.0.0",
-  "type": "module",
-  "module": "index.ts",
-  "scripts": {
-    "check": "tsc --skipLibCheck --noEmit"
-  },
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-  },
-  "dependencies": {
-    "ollama": "^0.4.4"
-  }
+    "name": "@memento-ai/embedding",
+    "version": "1.0.0",
+    "type": "module",
+    "module": "index.ts",
+    "scripts": {
+        "check": "tsc --skipLibCheck --noEmit"
+    },
+    "devDependencies": {
+        "@types/bun": "latest"
+    },
+    "peerDependencies": {},
+    "dependencies": {
+        "ollama": "^0.4.4"
+    }
 }

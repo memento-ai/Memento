@@ -1,11 +1,11 @@
 // Path: packages/memento-agent/src/prompt-partials/function_calling.ts
 
-import { stripCommonIndent } from "@memento-ai/utils";
-import Handlebars from "handlebars";
+import { stripCommonIndent } from '@memento-ai/utils'
+import Handlebars from 'handlebars'
 
 export type FunctionCallingTemplateArgs = {
-    functions: string,
-};
+    functions: string
+}
 
 const function_calling_text = stripCommonIndent(`
     <function_calling>
@@ -50,6 +50,6 @@ const function_calling_text = stripCommonIndent(`
     {{{functions}}}
     </function_registry>
     </function_calling>
-`);
+`)
 
-export const function_calling = Handlebars.compile<FunctionCallingTemplateArgs>(function_calling_text);
+export const function_calling = Handlebars.compile<FunctionCallingTemplateArgs>(function_calling_text)

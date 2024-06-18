@@ -1,7 +1,7 @@
 // Path: packages/conversation/src/loggingTemplate.ts
 
-import Handlebars from 'handlebars';
-import type { SendMessageArgs } from './conversation';
+import Handlebars from 'handlebars'
+import type { SendMessageArgs } from './conversation'
 
 export const loggingTemplate = Handlebars.compile<SendMessageArgs>(`
 {{#*inline "inlinePrompt"}}
@@ -25,4 +25,4 @@ export const loggingTemplate = Handlebars.compile<SendMessageArgs>(`
     {{> inlineMessages }}
 </conversation_log>
 </send_message_log>
-`);
+`)
