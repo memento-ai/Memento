@@ -24,7 +24,9 @@
     {
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:@nx/typescript"],
-      "rules": {}
+      "rules": {
+        "semi": ["error", "never"]
+      }
     },
     {
       "files": ["*.js", "*.jsx"],

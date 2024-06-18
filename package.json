@@ -2,7 +2,8 @@
   "name": "workspaces",
   "private": true,
   "scripts": {
-    "check": "for package in packages/*; do echo $package; bun --cwd $package check; done"
+    "check": "for package in packages/*; do echo $package; bun --cwd $package check; done",
+    "format": "prettier --write ."
   },
   "workspaces": ["packages/*", "apps/*"],
   "devDependencies": {
@@ -22,6 +23,7 @@
     "eslint-config-prettier": "^9.0.0",
     "nx": "19.3.0",
     "prettier": "^2.6.2",
+    "prettier-plugin-organize-imports": "^3.2.4",
     "typescript": "~5.4.2"
   }
 }
