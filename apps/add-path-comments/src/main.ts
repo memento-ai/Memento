@@ -1,13 +1,7 @@
 // Path: apps/add-path-comments/src/main.ts
 
-import { execSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
-
-const getTrackedFiles = (): string[] => {
-    const output = execSync('git ls-files', { encoding: 'utf-8' })
-    return output.trim().split('\n')
-}
 
 const updateFilePath = (filePath: string) => {
     const content = fs.readFileSync(filePath, 'utf-8')
@@ -29,7 +23,7 @@ const updateFilePath = (filePath: string) => {
     }
 }
 
-const trackedFiles = getTrackedFiles()
+const trackedFiles = await getTrackedFiles()
 trackedFiles.forEach((filePath) => {
     if (path.extname(filePath) === '.ts') {
         updateFilePath(filePath)
