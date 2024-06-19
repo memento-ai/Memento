@@ -2,12 +2,16 @@
 
 import path from 'node:path'
 
-/// getProjectRoot: this function is called from unit tests to find the root of the project.
-/// We want this function to be independent of the current working directory, so it is based
-/// on the path of this file instead. We assume that this file is located at the path
-/// `{projectRoot}/packages/utils/src/project-root.ts` so we can obtain the project root
-/// simply normalizing a relative path.
+/// getMementoProjectRoot: this function should only be called from contexts in which the
+/// Memento project layout is required. This includes:
+/// 1. unit tests
+/// 2. locating source files in the project (e.g. for SQL queries)
 
-export function getProjectRoot(): string {
+/// This function is similar in some respects to gitRepoRoot, and for many contexts the
+/// two functions will give the same result, but there are some important differences.
+/// gitRepoRoot uses the git command line tool to find the root of the git repository,
+/// whereas getMementoProjectRoot uses the path of this file to find the root of the project.
+
+export function getMementoProjectRoot(): string {
     return path.normalize(`${import.meta.dirname}/../../..`)
 }
