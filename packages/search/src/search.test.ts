@@ -3,7 +3,7 @@
 import { ingestDirectory } from '@memento-ai/ingester'
 import { MementoDb } from '@memento-ai/memento-db'
 import { createMementoDb, dropDatabase } from '@memento-ai/postgres-db'
-import { getProjectRoot } from '@memento-ai/utils'
+import { getMementoProjectRoot } from '@memento-ai/utils'
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
 import debug from 'debug'
 import { nanoid } from 'nanoid'
@@ -30,7 +30,7 @@ describe('Search', () => {
         expect(db).toBeTruthy()
         expect(db.name).toBe(dbname)
         expect(db.pool).toBeTruthy()
-        await ingestDirectory({ db, dirPath: `${getProjectRoot()}/packages/types` })
+        await ingestDirectory({ db, dirPath: `${getMementoProjectRoot()}/packages/types` })
     })
 
     afterAll(async () => {
