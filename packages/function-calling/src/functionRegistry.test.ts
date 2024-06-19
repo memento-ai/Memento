@@ -1,6 +1,6 @@
 // Path: packages/function-calling/src/functionRegistry.test.ts
 
-import { getProjectRoot } from '@memento-ai/utils'
+import { getMementoProjectRoot } from '@memento-ai/utils'
 import { describe, expect, it } from 'bun:test'
 import debug from 'debug'
 import { generateFunctionDescription, getRegistryDescription } from './functionRegistry'
@@ -82,7 +82,7 @@ describe('getCurrentTime', () => {
 
 describe('readSourceFile', () => {
     it('should read a source file by path', async () => {
-        const projectRoot = getProjectRoot()
+        const projectRoot = getMementoProjectRoot()
         const readSourceFile = registry['readSourceFile']
         expect(readSourceFile).toBeDefined()
         const content: string = await readSourceFile.fn({
