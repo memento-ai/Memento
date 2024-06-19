@@ -2,7 +2,7 @@
 
 import { MementoDb, type DocAndSummaryResult } from '@memento-ai/memento-db'
 import { DOC, DSUM, createMem } from '@memento-ai/types'
-import { $ } from 'bun'
+import { gitListFilesFor, gitListRepositoryFiles, gitRepoRootForDir } from '@memento-ai/utils'
 import debug from 'debug'
 import fs from 'fs'
 import path from 'path'
@@ -61,20 +61,6 @@ export async function ingestFile(
     return result
 }
 
-export async function getExistingGitFiles(dirPath: string): Promise<string[]> {
-    dlog('getExistingGitFiles: dirPath:', dirPath)
-    const { stdout, stderr, exitCode } = await $`git ls-files ${dirPath}`.nothrow()
-    dlog({ exitCode, stderr })
-    if (exitCode || stderr.length) {
-        throw new Error(`Error running git ls-files: ${stderr}`)
-    }
-    const paths = stdout
-        .toString()
-        .split('\n')
-        .filter((path) => path.length > 0)
-    return paths
-}
-
 export type IngestDirectoryArgs = {
     db: MementoDb
     dirPath: string
@@ -82,8 +68,8 @@ export type IngestDirectoryArgs = {
     log?: boolean
 }
 
-export async function dropAbandonedFiles(db: MementoDb, dirPath: string) {
-    const existingPaths = new Set(await getExistingGitFiles(dirPath))
+export async function dropAbandonedFiles(db: MementoDb) {
+    const existingPaths = new Set(await gitListRepositoryFiles())
     const ingestedPaths = new Set(await getIngestedFiles(db))
     const toDelete = [...ingestedPaths].filter((path) => !existingPaths.has(path))
     dlog(`Found ${toDelete.length} files to delete.`)
@@ -99,17 +85,19 @@ export async function ingestDirectory({ db, dirPath, summarizer, log }: IngestDi
     log = log ?? false
     if (log) debug.enable('ingester')
 
+    const root = await gitRepoRootForDir(dirPath)
     dlog(`Ingesting directory: ${dirPath}`)
-
-    await dropAbandonedFiles(db, dirPath)
+    await dropAbandonedFiles(db)
 
     summarizer = summarizer ?? (await import('./summarizeDocument')).createMockSummarizer()
 
-    // git ls-files only returns files, not directories, but that's exactly what we want
-    const existingPaths = new Set(await getExistingGitFiles(dirPath))
-    for (const fullPath of existingPaths) {
-        if (SUPPORTED_EXTENSIONS.includes(path.extname(fullPath))) {
-            await ingestFile(db, fullPath, summarizer)
+    // gitListFiles only returns files, not directories, but that's exactly what we want
+    const existingPaths = new Set(await gitListFilesFor(dirPath))
+    for (const relPath of existingPaths) {
+        const fullPath = path.join(dirPath, relPath)
+        const projectRelativePath = path.relative(root, fullPath)
+        if (SUPPORTED_EXTENSIONS.includes(path.extname(projectRelativePath))) {
+            await ingestFile(db, projectRelativePath, summarizer)
         }
     }
 }
