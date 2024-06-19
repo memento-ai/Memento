@@ -14,6 +14,20 @@ const dlog = debug('postgresdb')
     return this.toString()
 }
 
+export async function listDatabases(): Promise<string[]> {
+    const rootPool: DatabasePool = await createPool(`postgres://localhost`)
+    const result = await rootPool.query(sql.unsafe`SELECT datname FROM pg_database WHERE datistemplate = false`)
+    await rootPool.end()
+    return result.rows.map((row) => row.datname)
+}
+
+export async function databaseExists(dbname: string): Promise<boolean> {
+    const rootPool: DatabasePool = await createPool(`postgres://localhost`)
+    const result = await rootPool.exists(sql.unsafe`SELECT FROM pg_database WHERE datname = ${dbname}`)
+    await rootPool.end()
+    return result
+}
+
 /// Create a new database. Due to requirements imposed by the slonik API, we must first create
 /// a pool to an existing database where the owner of the DB has privileges to create new databases.
 /// Note that we do NOT use `IF NOT EXISTS`. We want an error if the DB already exists.
