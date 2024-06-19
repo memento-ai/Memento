@@ -2,17 +2,17 @@
 
 import { defaultProviderAndModel } from '@memento-ai/conversation'
 import { count_tokens } from '@memento-ai/encoding'
-import { getProjectRoot } from '@memento-ai/utils'
+import { getMementoProjectRoot } from '@memento-ai/utils'
 import { describe, expect, it } from 'bun:test'
 import { AddProjectReadmeAgent } from './AddProjectReadmeAgent'
 
 describe('AddProjectReadmeAgent', () => {
-    const projectRoot = getProjectRoot()
+    const projectRoot = getMementoProjectRoot()
     const { provider, model } = defaultProviderAndModel
     const agent = new AddProjectReadmeAgent({ provider, model, projectRoot })
 
     it('should get the file listing', async () => {
-        const paths = await agent.getSourcePaths()
+        const paths = agent.getSourcePaths()
         expect(paths.length).toBeGreaterThan(0)
         expect(paths).toContain('.gitattributes')
     })
