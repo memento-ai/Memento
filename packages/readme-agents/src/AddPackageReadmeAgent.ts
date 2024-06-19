@@ -3,10 +3,10 @@
 import { Agent } from '@memento-ai/agent'
 import type { ConversationInterface, ProviderAndModel } from '@memento-ai/conversation'
 import { createConversation } from '@memento-ai/conversation'
-import { stripCommonIndent } from '@memento-ai/utils'
-import { $ } from 'bun'
+import { gitListFilesFor, gitRepoRoot, stripCommonIndent } from '@memento-ai/utils'
 import debug from 'debug'
 import fs from 'node:fs'
+import path from 'node:path'
 import { packageReadmePromptTemplate } from './package-readme-prompt-template'
 
 const dlog = debug('update-readmes')
@@ -32,17 +32,17 @@ export class AddPackageReadmeAgent extends Agent {
         this.package = pkgPath
     }
 
-    async getSources(): Promise<{ path: string; content: string }[]> {
+    async getSources(): Promise<{ source: string; content: string }[]> {
         dlog(`Getting sources for package ${this.package}`)
-        const { stdout, stderr, exitCode } = await $`git ls-files ${this.package}`.nothrow()
-        if (exitCode !== 0) {
-            throw new Error(stderr.toString())
-        }
-        const filePaths = stdout.toString().trim().split('\n')
+        const root = gitRepoRoot()
+        const dirPath = path.join(root, this.package)
+        const filePaths = gitListFilesFor(dirPath)
         const sources = await Promise.all(
-            filePaths.map(async (path) => {
-                const content = await fs.promises.readFile(path, 'utf-8')
-                return { path, content }
+            filePaths.map(async (source) => {
+                const fullPath = path.join(dirPath, source)
+                const projectRelativePath = path.relative(root, fullPath)
+                const content = await fs.promises.readFile(fullPath, 'utf-8')
+                return { source: projectRelativePath, content }
             })
         )
         return sources
@@ -55,7 +55,7 @@ export class AddPackageReadmeAgent extends Agent {
             `${this.projectRoot}/${this.package}/README.md`,
             'utf-8'
         )
-        const sources: { path: string; content: string }[] = await this.getSources()
+        const sources: { source: string; content: string }[] = await this.getSources()
         return packageReadmePromptTemplate({ project_readme, package_readme, sources })
     }
 

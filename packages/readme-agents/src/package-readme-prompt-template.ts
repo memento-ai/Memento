@@ -7,7 +7,7 @@ import Handlebars from 'handlebars'
 export type PackageReadmePromptTemplateArgs = {
     project_readme: string
     package_readme: string
-    sources: { path: string; content: string }[]
+    sources: { source: string; content: string }[]
 }
 
 const packageReadmePromptTemplateText = stripCommonIndent(`
@@ -64,7 +64,7 @@ const packageReadmePromptTemplateText = stripCommonIndent(`
 
     <package_source_files>
     {{#each sources}}
-    <file path="{{this.path}}">
+    <file path="{{this.source}}">
     {{{this.content}}}
     </file>
     {{/each}}
