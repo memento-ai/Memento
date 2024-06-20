@@ -26,10 +26,6 @@ export type MementoAgentArgs = AgentArgs & {
     synopsisAgent?: SynopsisAgent
 }
 
-export type MessagePair = {
-    user: UserMessage
-    assistant: AssistantMessage
-}
 export class MementoAgent extends FunctionCallingAgent {
     databaseSchema: string
     outStream?: Writable

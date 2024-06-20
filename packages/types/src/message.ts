@@ -19,11 +19,6 @@ export const AssistantMessage = Message.extend({
 })
 export type AssistantMessage = z.TypeOf<typeof AssistantMessage>
 
-export type MessagePair = {
-    user: UserMessage
-    assistant: AssistantMessage
-}
-
 export function constructUserMessage(content: string): UserMessage {
     return { content, role: USER }
 }
