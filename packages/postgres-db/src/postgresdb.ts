@@ -49,7 +49,6 @@ export async function dropDatabase(dbname: string) {
 }
 
 export async function wipeDatabase(dbname: string) {
-    // TODO: would it be marginally better to just TRUNCATE the tables?
     dlog(`Wiping database ${dbname}`)
     await dropDatabase(dbname)
     await createMementoDb(dbname)
@@ -72,9 +71,6 @@ export async function connectReadonlyDatabase(dbname: string, interceptors: Inte
 /// A `mem` is entirely determined by its content, is immutable and distinct
 /// A `meta` is a "pointer" to a `mem`, and is mutable.
 /// Multiple meta can point to the same mem, but any given meta points to exactly one mem.
-/// The likelihood of one mem being used multiple times (i.e. pointed to by different mems)
-/// is low, but it is not zero. We will need to handle this case. It will come up in testing
-/// where the USER might ask multiple questions that are the same, e.g. "Why is the sky blue?".
 
 export function getDatabaseSchema(): string {
     const databaseSchema = [
@@ -102,12 +98,6 @@ export async function createMementoDb(dbname: string, interceptors: Interceptor[
             /// Memento Unified View
             await executeFileQuery(conn, 'memento_view.sql')
 
-            /// Stored Procedure insert_single_mem_meta
-            await executeFileQuery(conn, 'insert_single_mem_meta.sql')
-
-            /// Stored Procedure insert_related_mem_meta
-            await executeFileQuery(conn, 'insert_related_mem_meta.sql')
-
             /// Indexes -- we have yet to determine empirically when indexes are actually useful
             /// These are just some obvious guesses.
             await conn.query(sql.unsafe`CREATE INDEX idx_mem_tssearch ON mem USING GIN(tssearch)`)
@@ -116,7 +106,7 @@ export async function createMementoDb(dbname: string, interceptors: Interceptor[
             await conn.query(sql.unsafe`CREATE INDEX idx_meta_priority ON meta (priority)`)
             await conn.query(sql.unsafe`CREATE INDEX idx_meta_created_at ON meta (created_at)`)
 
-            // /// Create a readonly user
+            /// Create a readonly user
             await conn.query(sql.unsafe`GRANT pg_read_all_data TO ${sql.identifier([readonlyUser])}`)
         })
 
