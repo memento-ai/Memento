@@ -2,16 +2,14 @@
 
 import type { AgentArgs, SendArgs } from '@memento-ai/agent'
 import type { Config } from '@memento-ai/config'
-import { createConversationFromConfig } from '@memento-ai/conversation'
 import { FunctionCallingAgent, FunctionHandler, registry, type FunctionCallResult } from '@memento-ai/function-calling'
-import { createMementoDbFromConfig, type MementoDb } from '@memento-ai/memento-db'
+import { type MementoDb } from '@memento-ai/memento-db'
 import type { ID } from '@memento-ai/postgres-db'
 import { getDatabaseSchema } from '@memento-ai/postgres-db'
 import type { ResolutionAgent } from '@memento-ai/resolution-agent'
-import { createResolutionAgent } from '@memento-ai/resolution-agent'
 import type { MementoSearchResult } from '@memento-ai/search'
 import { combineSearchResults, selectSimilarMementos, trimSearchResult } from '@memento-ai/search'
-import { createSynopsisAgent, type SynopsisAgent } from '@memento-ai/synopsis-agent'
+import { type SynopsisAgent } from '@memento-ai/synopsis-agent'
 import type { AssistantMessage, Message, UserMessage } from '@memento-ai/types'
 import { constructUserMessage } from '@memento-ai/types'
 import { Writable } from 'node:stream'
@@ -145,46 +143,4 @@ export class MementoAgent extends FunctionCallingAgent {
 
         return assistantMessage
     }
-}
-
-export type MementoAgentExtraArgs = {
-    synopsisAgent?: SynopsisAgent
-    resolutionAgent?: ResolutionAgent
-    outStream?: Writable
-}
-
-export async function createMementoAgent(
-    config: Config,
-    db: MementoDb,
-    extra: MementoAgentExtraArgs
-): Promise<MementoAgent> {
-    const { synopsisAgent, resolutionAgent, outStream } = extra
-    const conversation = createConversationFromConfig(config.memento_agent, outStream)
-    if (conversation == undefined) {
-        throw new Error('MementoAgent requires a conversation provider.')
-    }
-    const agentArgs: MementoAgentArgs = {
-        db,
-        conversation,
-        synopsisAgent,
-        resolutionAgent,
-        outStream,
-        config,
-    }
-    return new MementoAgent(agentArgs)
-}
-
-export type MementoSystem = {
-    db: MementoDb
-    mementoAgent: MementoAgent
-    synopsisAgent?: SynopsisAgent
-    resolutionAgent?: ResolutionAgent
-}
-
-export async function createMementoSystem(config: Config, outStream?: Writable): Promise<MementoSystem> {
-    const db = await createMementoDbFromConfig(config)
-    const synopsisAgent = await createSynopsisAgent(config, db)
-    const resolutionAgent = await createResolutionAgent(config, db)
-    const mementoAgent = await createMementoAgent(config, db, { synopsisAgent, resolutionAgent, outStream })
-    return { db, mementoAgent, synopsisAgent, resolutionAgent }
 }
