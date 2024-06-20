@@ -61,7 +61,7 @@ async function main() {
     const options: Options = program.opts() as Options
 
     const { provider, model, database } = options
-    let { cleanSlate, cwd, directory } = options
+    let { cleanSlate, directory } = options
 
     cleanSlate = cleanSlate ?? false
     const root = await gitRepoRoot()
@@ -88,8 +88,8 @@ async function main() {
         program.help()
     }
 
-    if (cwd) {
-        process.chdir(cwd)
+    if (options.cwd) {
+        process.chdir(options.cwd)
     }
 
     const args: ProviderAndModel = { provider, model }

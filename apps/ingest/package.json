@@ -9,7 +9,8 @@
         "@memento-ai/ingester": "^1.0.0",
         "@memento-ai/memento-db": "^1.0.0",
         "@memento-ai/postgres-db": "^1.0.0",
-        "@memento-ai/types": "^1.0.0"
+        "@memento-ai/types": "^1.0.0",
+        "@memento-ai/utils": "^1.0.0"
     },
     "dependencies": {
         "commander": "11.1.0",
