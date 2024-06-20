@@ -11,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import debug from 'debug'
 import { nanoid } from 'nanoid'
 import type { Interceptor } from 'slonik'
-import { MementoAgent, createMementoSystem, type MementoSystem } from './mementoAgent'
+import { MementoAgent, createMementoSystem, type MementoSystem } from '..'
 
 const dlog = debug('mementoAgent:test')
 
