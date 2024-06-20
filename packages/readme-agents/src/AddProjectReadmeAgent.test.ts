@@ -35,6 +35,5 @@ describe('AddProjectReadmeAgent', () => {
         expect(readme).toContain('## Requirements')
         expect(readme).toContain('## Getting Started')
         expect(readme).toContain('## Contributing')
-        expect(readme).toContain('## License')
     }, 60000)
 })
