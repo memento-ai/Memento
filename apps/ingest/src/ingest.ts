@@ -11,8 +11,15 @@ import {
     ingestDirectory,
 } from '@memento-ai/ingester'
 import { MementoDb } from '@memento-ai/memento-db'
-import { connectDatabase, createMementoDb, delete_unreferenced_mems, wipeDatabase } from '@memento-ai/postgres-db'
+import {
+    connectDatabase,
+    createMementoDb,
+    databaseExists,
+    delete_unreferenced_mems,
+    wipeDatabase,
+} from '@memento-ai/postgres-db'
 import { DocumentMemento } from '@memento-ai/types'
+import { gitRepoRoot } from '@memento-ai/utils'
 import { Command } from 'commander'
 import type { DatabasePool } from 'slonik'
 import { sql } from 'slonik'
@@ -57,8 +64,9 @@ async function main() {
     let { cleanSlate, cwd, directory } = options
 
     cleanSlate = cleanSlate ?? false
-    cwd = cwd ?? '.'
-    directory = directory ?? '.'
+    const root = await gitRepoRoot()
+    directory = directory ?? root
+    console.info(`Ingesting files from ${directory}`)
 
     if (!provider) {
         console.error(`You must specify an LLM provider (${ProviderNames.join(', ')}`)
@@ -92,11 +100,11 @@ async function main() {
     try {
         console.info(`Ensuring template database ${template_db_name} exists.`)
         let template_db: DatabasePool
-        try {
+
+        if (!databaseExists(template_db_name)) {
             await createMementoDb(template_db_name)
-        } catch (e) {
-            console.info(`Database already exists: ${template_db_name}, connecting to it.`)
         }
+
         try {
             console.info(`Testing connection to template database ${template_db_name}.`)
             template_db = await connectDatabase(template_db_name)
@@ -111,9 +119,14 @@ async function main() {
     }
 
     const db: MementoDb = await MementoDb.connect(template_db_name)
-    const dirPath = directory ?? '.'
+    const dirPath = directory
 
+    console.info(
+        `Ingesting files from ${dirPath} into template database ${template_db_name} then into database ${database}`
+    )
     await ingestDirectory({ db, dirPath, summarizer, log: true })
+
+    console.info(`Deleting unreferenced mementos from template database ${template_db_name}`)
     await delete_unreferenced_mems(db.pool)
 
     if (cleanSlate) {
@@ -125,7 +138,7 @@ async function main() {
     await copyIngestedMementos(db.pool, target.pool)
     await db.close()
 
-    await dropAbandonedFiles(target, dirPath)
+    await dropAbandonedFiles(target)
 
     await delete_unreferenced_mems(target.pool)
 
