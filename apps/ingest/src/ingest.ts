@@ -101,7 +101,9 @@ async function main() {
         console.info(`Ensuring template database ${template_db_name} exists.`)
         let template_db: DatabasePool
 
-        if (!databaseExists(template_db_name)) {
+        const template_db_exists = await databaseExists(template_db_name)
+        if (!template_db_exists) {
+            console.log(`Creating template database ${template_db_name}`)
             await createMementoDb(template_db_name)
         }
 
