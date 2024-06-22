@@ -12,12 +12,12 @@ import { registerFunction, type FunctionRegistry } from '../functionRegistry'
 
 export const registry: FunctionRegistry = {}
 
+import writeSourceFile, { WriteSourceFile } from '../writeSourceFile'
 import addSynopsis, { AddSynopsis } from './addSynopsis'
 import getCurrentTime, { GetCurrentTime } from './getCurrentTime'
 import gitListFiles, { GitListFiles } from './gitListFiles'
 import queryMementoView, { QueryMementoView } from './queryMementoView'
 import readSourceFile, { ReadSourceFile } from './readSourceFile'
-import writeSourceFile, { WriteSourceFile } from './writeSourceFile'
 
 registerFunction(registry, addSynopsis)
 registerFunction(registry, getCurrentTime)
