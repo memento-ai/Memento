@@ -111,6 +111,7 @@ The package includes several pre-defined functions:
 - `gitListFiles`: Returns a list of file paths tracked by git for the current repository.
 - `queryMementoView`: Executes a SQL SELECT query on the memento view.
 - `readSourceFile`: Reads the content of a source file and returns it as a single string.
+- `writeSourceFile`: Writes content to a source file and returns a status message.
 
 These functions can be imported and used as part of the function registry.
 
