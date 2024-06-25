@@ -3,9 +3,6 @@
     "version": "1.0.0",
     "type": "module",
     "module": "index.ts",
-    "scripts": {
-        "check": "tsc --skipLibCheck --noEmit"
-    },
     "devDependencies": {
         "@types/bun": "latest",
         "@types/debug": "^4.1.12"
