@@ -15,6 +15,7 @@
         "@memento-ai/config": "^1.0.0",
         "@memento-ai/conversation": "^1.0.0",
         "@memento-ai/function-calling": "^1.0.0",
+        "@memento-ai/function-registry": "^1.0.0",
         "@memento-ai/ingester": "^1.0.0",
         "@memento-ai/memento-db": "^1.0.0",
         "@memento-ai/postgres-db": "^1.0.0",

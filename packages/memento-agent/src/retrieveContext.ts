@@ -1,6 +1,6 @@
 // Path: packages/memento-agent/src/retrieveContext.ts
 
-import { generateFunctionDescription, registry } from '@memento-ai/function-calling'
+import { generateFunctionDescription, registry } from '@memento-ai/function-registry'
 import type { MementoSearchResult } from '@memento-ai/search'
 import { DOC, DSUM, SYN, XCHG } from '@memento-ai/types'
 import type { DynamicContent } from './dynamicContent'

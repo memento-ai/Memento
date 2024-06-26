@@ -2,7 +2,8 @@
 
 import type { AgentArgs, SendArgs } from '@memento-ai/agent'
 import type { Config } from '@memento-ai/config'
-import { FunctionCallingAgent, FunctionHandler, registry, type FunctionCallResult } from '@memento-ai/function-calling'
+import { FunctionCallingAgent, FunctionHandler, type FunctionCallResult } from '@memento-ai/function-calling'
+import { registry } from '@memento-ai/function-registry'
 import { type MementoDb } from '@memento-ai/memento-db'
 import type { ID } from '@memento-ai/postgres-db'
 import { getDatabaseSchema } from '@memento-ai/postgres-db'
