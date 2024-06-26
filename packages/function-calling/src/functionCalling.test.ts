@@ -1,9 +1,15 @@
 // Path: packages/function-calling/src/functionCalling.test.ts
 
+import { registry } from '@memento-ai/function-registry'
 import { describe, expect, it } from 'bun:test'
-import type { FunctionCallRequest, FunctionCallResult } from '..'
-import { extractFunctionCalls, invokeOneFunction, isFunctionError, isFunctionResult } from '..'
-import { registry } from './functions'
+import {
+    extractFunctionCalls,
+    invokeOneFunction,
+    isFunctionError,
+    isFunctionResult,
+    type FunctionCallRequest,
+    type FunctionCallResult,
+} from '..'
 
 describe('functionCalling', () => {
     it('should return the current time as an ISO 8601 formatted string', async () => {

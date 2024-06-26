@@ -2,11 +2,11 @@
 
 import type { AgentArgs } from '@memento-ai/agent'
 import { Agent } from '@memento-ai/agent'
+import type { FunctionRegistry } from '@memento-ai/function-registry'
 import type { MementoDb } from '@memento-ai/memento-db'
 import type { UserMessage } from '@memento-ai/types'
 import { USER } from '@memento-ai/types'
 import { FUNCTION_RESULT_HEADER } from './functionCallingTypes'
-import type { FunctionRegistry } from './functionRegistry'
 
 export type FunctionCallingAgentArgs = AgentArgs & {
     db: MementoDb

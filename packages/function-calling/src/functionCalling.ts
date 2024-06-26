@@ -1,11 +1,11 @@
 // Path: packages/function-calling/src/functionCalling.ts
 
+import type { FunctionRegistry } from '@memento-ai/function-registry'
 import type { Context } from '@memento-ai/memento-db'
 import type { AssistantMessage } from '@memento-ai/types'
 import debug from 'debug'
 import type { FunctionCall, FunctionCallRequest, FunctionCallResult } from './functionCallingTypes'
 import { isFunctionCall, isFunctionError } from './functionCallingTypes'
-import type { FunctionRegistry } from './functionRegistry'
 
 const dlog = debug('functionCalling')
 

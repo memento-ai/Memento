@@ -1,7 +1,7 @@
 // Path: packages/function-calling/src/functionCallingTypes.ts
 
+import type { BaseInput } from '@memento-ai/function-registry'
 import type { Context } from '@memento-ai/memento-db'
-import type { BaseInput } from './functionRegistry'
 
 export const FUNCTION_RESULT_HEADER = 'SYSTEM: Function call result for'
 
