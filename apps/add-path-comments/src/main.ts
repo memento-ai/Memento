@@ -1,5 +1,6 @@
 // Path: apps/add-path-comments/src/main.ts
 
+import { gitListRepositoryFiles } from '@memento-ai/utils'
 import fs from 'fs'
 import path from 'path'
 
@@ -23,7 +24,7 @@ const updateFilePath = (filePath: string) => {
     }
 }
 
-const trackedFiles = await getTrackedFiles()
+const trackedFiles = gitListRepositoryFiles()
 trackedFiles.forEach((filePath) => {
     if (path.extname(filePath) === '.ts') {
         updateFilePath(filePath)

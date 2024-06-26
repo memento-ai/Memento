@@ -1,6 +1,8 @@
 {
     "name": "@memento-ai/add-path-comments",
     "version": "1.0.0",
-    "peerDependencies": {},
+    "peerDependencies": {
+        "@memento-ai/utils": "^1.0.0"
+    },
     "dependencies": {}
 }
