@@ -1,4 +1,4 @@
-// Path: packages/function-calling/src/functions/queryMementoView.test.ts
+// Path: packages/function-registry/src/queryMementoView/queryMementoView.test.ts
 
 import { MementoDb } from '@memento-ai/memento-db'
 import { createMementoDb, dropDatabase } from '@memento-ai/postgres-db'
@@ -6,7 +6,7 @@ import { ASSISTANT, USER } from '@memento-ai/types'
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import debug from 'debug'
 import { nanoid } from 'nanoid'
-import { registry } from './index'
+import { registry } from '../registry'
 
 const dlog = debug('queryMementoView')
 

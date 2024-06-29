@@ -1,4 +1,4 @@
-// Path: packages/function-calling/src/functions/getCurrentTime.ts
+// Path: packages/function-registry/src/getCurrentTime/getCurrentTime.ts
 
 import { z } from 'zod'
 import type { BaseInput, FunctionConfig } from '../functionRegistry'
@@ -8,7 +8,7 @@ const inputSchema = baseInputSchema.describe('No input parameters are necessary,
 const outputSchema = z.promise(z.string()).describe('ISO string')
 const fnSchema = z.function().args(inputSchema).returns(outputSchema).describe('Returns the current UTC time')
 
-function getCurrentTime(): Promise<string> {
+export function getCurrentTime(): Promise<string> {
     return Promise.resolve(new Date().toISOString())
 }
 

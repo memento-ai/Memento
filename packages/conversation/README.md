@@ -12,6 +12,7 @@ The `@memento-ai/conversation` package provides an abstraction for interacting w
 ## Usage and Examples
 ### Creating a Conversation
 To use the package, you'll first need to create a `ConversationInterface` instance by calling the `createConversation` function and providing the desired provider and options:
+
 ```typescript
 import { createConversation } from '@memento-ai/conversation';
 
@@ -28,6 +29,7 @@ const conversation = createConversation(provider, options);
 
 ### Sending Messages
 You can then use the `sendMessage` method to send a message to the language model and receive a response:
+
 ```typescript
 const prompt = "Answer all questions concisely, i.e give the shortest possible answer.";
 const messages = [{ role: 'user', content: 'How many fingers on one hand?' }];
@@ -43,6 +45,7 @@ console.log(response.content); // Output: '5'
 
 ### Streaming Responses
 The package also supports streaming responses, which can be enabled by providing a `Writable` stream when creating the `ConversationInterface` instance:
+
 ```typescript
 import { Writable } from 'stream';
 
@@ -70,6 +73,7 @@ In this example, the response from the language model will be written to the pro
 
 ### Logging Conversations
 Conversations can be logged to a file by providing a `logging` option when creating the `ConversationInterface` instance. The logs will be written to a directory structure based on the provider, model, and the provided name.
+
 ```
 logs/
   my-conversation/

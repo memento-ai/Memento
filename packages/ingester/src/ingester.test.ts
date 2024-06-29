@@ -71,8 +71,9 @@ describe('Ingester', () => {
         'can ingest a directory and then drop ingest',
         async () => {
             await ingestDirectory({ db, dirPath: 'packages/types', summarizer })
+            let files = await getIngestedFiles(db)
             await dropIngestedFiles(db)
-            const files = await getIngestedFiles(db)
+            files = await getIngestedFiles(db)
             return expect(files.length).toBe(0)
         },
         timeout

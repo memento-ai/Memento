@@ -1,6 +1,6 @@
 // Path: packages/config/src/config.test.ts
 
-import { getProjectRoot } from '@memento-ai/utils'
+import { getMementoProjectRoot } from '@memento-ai/utils'
 import { describe, expect, test } from 'bun:test'
 import type { PartialConfig } from '..'
 import { Config, loadAggregateConfig, loadConfig, loadDefaultConfig, loadPartialConfig, merge } from '..'
@@ -79,7 +79,7 @@ describe('Config', () => {
     })
 
     test('Can load a specific config', async () => {
-        const projectRoot = getProjectRoot()
+        const projectRoot = getMementoProjectRoot()
         const configPath = `${projectRoot}/packages/config/src/test/memento.toml`
         try {
             const config = await loadConfig(configPath)
@@ -91,13 +91,13 @@ describe('Config', () => {
     })
 
     test('Can load a partial config', async () => {
-        const projectRoot = getProjectRoot()
+        const projectRoot = getMementoProjectRoot()
         const partial = await loadConfig(`${projectRoot}/packages/config/src/test/b/a/foo.toml`)
         expect(partial).toStrictEqual(fullFoo)
     })
 
     test('Merge full config into partial config yields full config', async () => {
-        const projectRoot = getProjectRoot()
+        const projectRoot = getMementoProjectRoot()
         const partial = await loadConfig(`${projectRoot}/packages/config/src/test/b/a/foo.toml`)
         const full = await loadConfig(`${projectRoot}/packages/config/src/test/memento.toml`)
         expect(partial).not.toStrictEqual(full)
@@ -106,7 +106,7 @@ describe('Config', () => {
     })
 
     test('Merge partial config into full config yields changed config', async () => {
-        const projectRoot = getProjectRoot()
+        const projectRoot = getMementoProjectRoot()
         const full = await loadConfig(`${projectRoot}/packages/config/src/test/memento.toml`)
         const config = merge(full, foo)
         expect(config).not.toStrictEqual(full)
@@ -123,7 +123,7 @@ describe('Config', () => {
     })
 
     test('loadPartialConfig config of full config yields the config', async () => {
-        const projectRoot = getProjectRoot()
+        const projectRoot = getMementoProjectRoot()
         const configPath = `${projectRoot}/packages/config/src/test/b/memento.toml`
 
         const expected = await loadConfig(configPath)
@@ -134,7 +134,7 @@ describe('Config', () => {
     })
 
     test('loadAggregate config of full config yields the config', async () => {
-        const projectRoot = getProjectRoot()
+        const projectRoot = getMementoProjectRoot()
         const configPath = `${projectRoot}/packages/config/src/test/b/memento.toml`
 
         const expected = await loadConfig(configPath)
@@ -145,7 +145,7 @@ describe('Config', () => {
     })
 
     test('Can load an aggregate config from a directory', async () => {
-        const projectRoot = getProjectRoot()
+        const projectRoot = getMementoProjectRoot()
         const configPath = `${projectRoot}/packages/config/src/test/b/a/foo.toml`
         const config = await loadAggregateConfig(configPath)
         expect(config).toBeDefined()

@@ -1,4 +1,4 @@
-// Path: packages/function-calling/src/functionRegistryTemplate.ts
+// Path: packages/function-registry/src/functionRegistryTemplate.ts
 
 import Handlebars from 'handlebars'
 

@@ -1,28 +1,54 @@
 # @memento-ai/utils
 
 ## Description
-The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for finding the project root directory, parsing input using Zod schemas with error handling and stack trace support, and removing common indentation from text blocks.
+The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for finding the root directory of a Git repository or the Memento project, parsing input using Zod schemas with error handling and stack trace support, removing common indentation from text blocks, and listing files in a Git repository.
 
 ## Key Features
-- `getProjectRoot()` function to obtain the root directory of the Memento project.
+- Git repository utilities:
+  - `gitRepoRoot()` and `gitRepoRootForDir()` functions to obtain the root directory of the Git repository.
+  - `gitListFiles()`, `gitListFilesFor()`, and `gitListRepositoryFiles()` functions to list files in a Git repository.
+- `getMementoProjectRoot()` function to obtain the root directory of the Memento project.
 - `zodParse` function to parse input using Zod schemas with error handling and stack trace support.
 - `stripCommonIndent` function to remove common indentation from a block of text.
+- `spawnCommand` and `spawnCommandLine` functions for reliable command execution.
 
 ## Usage and Examples
 
-### Finding the Project Root
-The `getProjectRoot()` function can be used to obtain the root directory of the Memento project, regardless of the current working directory. This is useful for building paths to other project files and resources.
-
+### Finding the Git Repository Root
 ```typescript
-import { getProjectRoot } from '@memento-ai/utils';
+import { gitRepoRoot, gitRepoRootForDir } from '@memento-ai/utils';
 
-const projectRoot = getProjectRoot();
+const repoRoot = gitRepoRoot();
+console.log(repoRoot); // Output: /path/to/repo
+
+const dirPath = '/path/to/some/dir';
+const repoRootForDir = gitRepoRootForDir(dirPath);
+console.log(repoRootForDir); // Output: /path/to/repo
+```
+
+### Listing Git Repository Files
+```typescript
+import { gitListFiles, gitListFilesFor, gitListRepositoryFiles } from '@memento-ai/utils';
+
+const files = gitListFiles();
+console.log(files); // Output: ['file1.ts', 'file2.ts', ...]
+
+const filesInDir = gitListFilesFor('packages/utils');
+console.log(filesInDir); // Output: ['src/git-ls-files.ts', ...]
+
+const allRepoFiles = gitListRepositoryFiles();
+console.log(allRepoFiles); // Output: ['packages/utils/src/git-ls-files.ts', ...]
+```
+
+### Finding the Memento Project Root
+```typescript
+import { getMementoProjectRoot } from '@memento-ai/utils';
+
+const projectRoot = getMementoProjectRoot();
 console.log(projectRoot); // Output: /path/to/Memento
 ```
 
 ### Parsing with Zod
-The `zodParse` function provides a convenient way to parse input using Zod schemas while handling errors gracefully. It includes stack trace support for easier debugging.
-
 ```typescript
 import { zodParse } from '@memento-ai/utils';
 import { z } from 'zod';
@@ -39,8 +65,6 @@ console.log(parsedInput); // Output: { name: 'John', age: 30 }
 ```
 
 ### Stripping Common Indentation
-The `stripCommonIndent` function can be used to remove common indentation from a block of text. This is useful for creating multiline string literals in code which match the indent level of the code -- the function will strip the excess leading spaces.
-
 ```typescript
 import { stripCommonIndent } from '@memento-ai/utils';
 
@@ -55,3 +79,16 @@ console.log(strippedText);
 // This is some text
 // with common indentation.
 ```
+
+### Spawning Commands
+```typescript
+import { spawnCommand, spawnCommandLine } from '@memento-ai/utils';
+
+const output1 = spawnCommand(['ls', '-l']);
+console.log(output1);
+
+const output2 = spawnCommandLine('git status');
+console.log(output2);
+```
+
+These utility functions provide essential tools for working with Git repositories, managing project structure, and handling common tasks within the Memento project ecosystem.

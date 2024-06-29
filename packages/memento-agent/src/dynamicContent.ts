@@ -9,8 +9,7 @@ import { CONV, MemKindValues, Role, SYN, XCHG } from '@memento-ai/types'
 import { sql } from 'slonik'
 import { z } from 'zod'
 
-type ID = string
-export type MementoSearchResultMap = Record<ID, MementoSearchResult>
+export type MementoSearchResultMap = Record<string, MementoSearchResult>
 export type AdditionalContextIndex = Record<MemKind, MementoSearchResultMap>
 
 export type DynamicContent = {

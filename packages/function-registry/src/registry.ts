@@ -1,3 +1,5 @@
+// Path: packages/function-registry/src/registry.ts
+
 // Path: packages/function-calling/src/functions/index.ts
 
 // It is possible to dynamically import functions from a directory
@@ -8,7 +10,7 @@
 // 2. by manually importing we can create the RegisteredFunctions discrimated union
 
 import { z } from 'zod'
-import { registerFunction, type FunctionRegistry } from '../functionRegistry'
+import { registerFunction, type FunctionRegistry } from './functionRegistry'
 
 export const registry: FunctionRegistry = {}
 
@@ -17,12 +19,14 @@ import getCurrentTime, { GetCurrentTime } from './getCurrentTime'
 import gitListFiles, { GitListFiles } from './gitListFiles'
 import queryMementoView, { QueryMementoView } from './queryMementoView'
 import readSourceFile, { ReadSourceFile } from './readSourceFile'
+import writeSourceFile, { WriteSourceFile } from './writeSourceFile'
 
 registerFunction(registry, addSynopsis)
 registerFunction(registry, getCurrentTime)
 registerFunction(registry, gitListFiles)
 registerFunction(registry, queryMementoView)
 registerFunction(registry, readSourceFile)
+registerFunction(registry, writeSourceFile)
 
 export const RegisteredFunctions = z.discriminatedUnion('name', [
     AddSynopsis,
@@ -30,5 +34,6 @@ export const RegisteredFunctions = z.discriminatedUnion('name', [
     GitListFiles,
     QueryMementoView,
     ReadSourceFile,
+    WriteSourceFile,
 ])
 export type RegisteredFunctions = z.infer<typeof RegisteredFunctions>

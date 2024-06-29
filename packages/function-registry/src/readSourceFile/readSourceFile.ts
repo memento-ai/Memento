@@ -1,4 +1,4 @@
-// Path: packages/function-calling/src/functions/readSourceFile.ts
+// Path: packages/function-registry/src/readSourceFile/readSourceFile.ts
 
 import debug from 'debug'
 import fs from 'fs/promises'
@@ -20,7 +20,7 @@ const fnSchema = z
     .returns(outputSchema)
     .describe('Read the content of a source file and return it as a single string.')
 
-async function readSourceFile(input: ReadSourceFileInput): Promise<string> {
+export async function readSourceFile(input: ReadSourceFileInput): Promise<string> {
     const { filePath } = input
     dlog(`Reading source file: ${filePath}`)
 

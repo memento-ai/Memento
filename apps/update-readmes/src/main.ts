@@ -2,7 +2,7 @@
 
 import type { Provider } from '@memento-ai/conversation'
 import { AddPackageReadmeAgent, AddProjectReadmeAgent, type AddPackageReadmeAgentArgs } from '@memento-ai/readme-agents'
-import { getProjectRoot } from '@memento-ai/utils'
+import { getMementoProjectRoot } from '@memento-ai/utils'
 import { Command } from 'commander'
 import debug from 'debug'
 import { readdir } from 'node:fs/promises'
@@ -47,7 +47,10 @@ async function main() {
 
     const { provider, model } = options
 
-    const projectRoot = getProjectRoot()
+    // This utility assumes the Memento project.
+    // We might want to extend this utility to work on other projects, but it will need to be made more configurable
+    // for that to happen.
+    const projectRoot = getMementoProjectRoot()
 
     console.info(`Project root: ${projectRoot}`)
 

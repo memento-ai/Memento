@@ -1,9 +1,9 @@
-// Path: packages/function-calling/src/functionRegistryTemplate.test.ts
+// Path: packages/function-registry/src/functionRegistryTemplate.test.ts
 
 import { describe, expect, it } from 'bun:test'
 import debug from 'debug'
 import { generateFunctionDescription } from './functionRegistry'
-import { registry } from './functions/index'
+import { registry } from './registry'
 
 const dlog = debug('functionRegistry')
 

@@ -2,12 +2,12 @@
 
 import { defaultProviderAndModel } from '@memento-ai/conversation'
 import { count_tokens } from '@memento-ai/encoding'
-import { getProjectRoot } from '@memento-ai/utils'
+import { getMementoProjectRoot } from '@memento-ai/utils'
 import { describe, expect, it } from 'bun:test'
 import { AddPackageReadmeAgent } from './AddPackageReadmeAgent'
 
 describe('AddPackageReadmeAgent', () => {
-    const projectRoot = getProjectRoot()
+    const projectRoot = getMementoProjectRoot()
     const pkgPath = 'packages/readme-agents'
     const { provider, model } = defaultProviderAndModel
     const agent = new AddPackageReadmeAgent({ provider, model, projectRoot, pkgPath })
@@ -15,7 +15,7 @@ describe('AddPackageReadmeAgent', () => {
     it('should get the sources', async () => {
         const sources = await agent.getSources()
         expect(sources.length).toBeGreaterThan(0)
-        const paths = sources.map((s) => s.path)
+        const paths = sources.map((s) => s.source)
         expect(paths).toContain('packages/readme-agents/README.md')
         expect(paths).toContain('packages/readme-agents/src/AddPackageReadmeAgent.test.ts')
     })
@@ -24,7 +24,6 @@ describe('AddPackageReadmeAgent', () => {
         const prompt = await agent.generatePrompt()
         const len = prompt.length
         const tokens = count_tokens(prompt)
-        console.info({ len, tokens })
         expect(len).toBeGreaterThan(15000)
         expect(tokens).toBeGreaterThan(4000)
     })

@@ -6,12 +6,13 @@ import { ingestDirectory } from '@memento-ai/ingester'
 import { MementoDb } from '@memento-ai/memento-db'
 import { createMementoDb, dropDatabase } from '@memento-ai/postgres-db'
 import { AssistantMessage } from '@memento-ai/types'
-import { getProjectRoot } from '@memento-ai/utils'
+import { getMementoProjectRoot } from '@memento-ai/utils'
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import debug from 'debug'
 import { nanoid } from 'nanoid'
 import type { Interceptor } from 'slonik'
-import { MementoAgent, createMementoSystem, type MementoSystem } from './mementoAgent'
+import { createMementoSystem, type MementoSystem } from './factory'
+import type { MementoAgent } from './mementoAgent'
 
 const dlog = debug('mementoAgent:test')
 
@@ -115,7 +116,7 @@ describe('MementoAgent', () => {
     it(
         'can chat with the agent about ingested content',
         async () => {
-            await ingestDirectory({ db, dirPath: `${getProjectRoot()}/packages/types` })
+            await ingestDirectory({ db, dirPath: `${getMementoProjectRoot()}/packages/types` })
             const args = sendArgs('What are the various kinds of MemMetaData?')
             const message: AssistantMessage = await mementoAgent.run(args)
             expect(message.content).toBeTruthy()

@@ -1,5 +1,6 @@
 // Path: packages/function-calling/src/functionHandler.ts
 
+import type { FunctionRegistry } from '@memento-ai/function-registry'
 import type { Context } from '@memento-ai/memento-db'
 import type { AssistantMessage, Message, UserMessage } from '@memento-ai/types'
 import { constructAssistantMessage, constructUserMessage } from '@memento-ai/types'
@@ -9,7 +10,6 @@ import { Writable } from 'node:stream'
 import type { InvokeFunctionsArgs, InvokeFunctionsResults } from './functionCalling'
 import type { FunctionCallingAgent } from './functionCallingAgent'
 import type { FunctionCallResult } from './functionCallingTypes'
-import type { FunctionRegistry } from './functionRegistry'
 import { invokeSyncAndAsyncFunctions } from './invokeSyncAndAsyncFunctions'
 
 const dlog = debug('functionHandler')

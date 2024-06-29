@@ -1,4 +1,4 @@
-// Path: packages/function-calling/src/functionRegistry.ts
+// Path: packages/function-registry/src/functionRegistry.ts
 
 import debug from 'debug'
 import { z, ZodObject } from 'zod'

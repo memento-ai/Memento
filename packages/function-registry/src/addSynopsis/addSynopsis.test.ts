@@ -1,4 +1,4 @@
-// Path: packages/function-calling/src/functions/addSynopsis.test.ts
+// Path: packages/function-registry/src/addSynopsis/addSynopsis.test.ts
 
 import { MementoDb } from '@memento-ai/memento-db'
 import { createMementoDb, dropDatabase } from '@memento-ai/postgres-db'
@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import debug from 'debug'
 import { nanoid } from 'nanoid'
 import { sql } from 'slonik'
-import { registry } from './index'
+import { registry } from '../registry'
 
 const dlog = debug('addSynopsis')
 

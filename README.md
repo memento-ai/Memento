@@ -1,6 +1,6 @@
 # Memento
 
-Memento is a conversational AI system that aims to overcome the challenge of maintaining long-term coherent context during open-ended dialogue over extended time periods. While large language model chatbots can effectively use their context windows to continue short-term conversations, they inevitably lose crucial historical context once the conversation extends beyond the context window size. This makes it difficult to maintain a coherent understanding of overarching themes, goals, and discussion points when picking up a conversation thread after a long delay.
+Memento is a conversational AI system designed to maintain long-term coherent context during open-ended dialogue over extended time periods. While large language model chatbots can effectively use their context windows for short-term conversations, they inevitably lose crucial historical context once the conversation extends beyond the context window size. This makes it difficult to maintain a coherent understanding of overarching themes, goals, and discussion points when picking up a conversation thread after a long delay.
 
 Most users, realizing this limitation, choose to simply start new conversation sessions rather than attempt to continue previous long-running dialogues where nuanced context would be lost.
 
@@ -51,6 +51,7 @@ The Memento monorepo also includes the following applications:
 - `add-path-comments`: A utility application that adds or updates the "Path" comment at the top of TypeScript files in the Memento project.
 - `ingest`: A command-line utility for ingesting files into a Memento database.
 - `memento-cli`: A command-line interface (CLI) for interacting with the Memento AI system.
+- `memento-web`: A web application built with SvelteKit, providing a user interface for interacting with the Memento AI system.
 - `select-similar-mems`: A utility for selecting mementos from a Memento database based on their similarity to a given content.
 - `update-readmes`: A utility for updating the README.md files across the Memento monorepo project.
 
@@ -73,14 +74,18 @@ The Memento monorepo also includes the following applications:
 
 To get started with the Memento project, please refer to the README.md file in the individual packages for more information on their usage and examples.
 
-See [apps/memento-cli/README.md](apps/memento-cli/README.md) for how to  chat with Memento (web client UI coming soon.)
+See [apps/memento-cli/README.md](apps/memento-cli/README.md) for how to chat with Memento (web client UI coming soon).
 
 See [apps/ingest/README.md](apps/ingest/README.md) for how to ingest files.
 
 ## Contributing
 
-If you would like to contribute to the Memento project, feel free to send a pull request.
+If you would like to contribute to the Memento project, please follow the standard GitHub workflow:
 
-## License
+1. Fork the repository
+2. Create a new branch for your feature or bug fix
+3. Make your changes and commit them with descriptive commit messages
+4. Push your changes to your forked repository
+5. Open a pull request against the main Memento repository
 
-The Memento project is licensed under the [MIT License](LICENSE).
+Please ensure that your code follows the project's coding style and conventions, and that you have added appropriate tests and documentation for your changes.

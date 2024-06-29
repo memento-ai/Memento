@@ -1,4 +1,4 @@
-// Path: packages/function-calling/src/functions/addSynopsis.ts
+// Path: packages/function-registry/src/addSynopsis/addSynopsis.ts
 
 import { addMemento } from '@memento-ai/postgres-db'
 import { SYN, SynopsisMetaArgs } from '@memento-ai/types'
@@ -23,7 +23,7 @@ const fnSchema = z
     .returns(outputSchema)
     .describe('Creates one synopsis memento from the input.')
 
-async function addSynopsis(input: SynopsisInput): Promise<ID> {
+export async function addSynopsis(input: SynopsisInput): Promise<ID> {
     const { content, context } = input
     if (!context) {
         throw new Error('Context is required')

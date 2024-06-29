@@ -32,7 +32,9 @@ export abstract class SummarizerAgent extends Agent implements Summarizer {
             # Instructions
             Your task is to generate a response that is a *concise* summary of the given document.
             The document's entire content is provided in the user message.
-            Your *entire* reponse will be stored in a database as the summary of the document.
+            Your *entire* reponse will be stored in a PostgreSQL database as the summary of the document
+            and automatically indexed for both semantic and keyword search.
+            These summaries will be provided as additional context to AI agents in future conversations.
             Your response should therefore not contain any text that is not part of the intended summary.
             Be concise and factual.
         `)

@@ -1,6 +1,6 @@
-// Path: packages/function-calling/src/functions/gitListFiles.ts
+// Path: packages/function-registry/src/gitListFiles/gitListFiles.ts
 
-import { $ } from 'bun'
+import { gitListRepositoryFiles as listFiles } from '@memento-ai/utils'
 import { z } from 'zod'
 import type { FunctionConfig } from '../functionRegistry'
 import { baseInputSchema } from '../functionRegistry'
@@ -20,14 +20,9 @@ const fnSchema = z
     .describe('Returns list of file paths tracked by git for the current repository.')
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function gitListFiles(_: GitListFilesInput): Promise<string[]> {
+export async function gitListFiles(_: GitListFilesInput): Promise<string[]> {
     try {
-        const { stdout, stderr, exitCode } = await $`git ls-files`.quiet()
-        if (exitCode !== 0) {
-            throw new Error(stderr.toString())
-        }
-        const filePaths = stdout.toString().trim().split('\n')
-        return filePaths
+        return listFiles()
     } catch (error) {
         return [`Error listing file paths: ${(error as Error).message}`]
     }

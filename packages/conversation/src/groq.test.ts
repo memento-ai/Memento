@@ -27,4 +27,4 @@ test('Hello from Groq!', async () => {
 
     console.log(message.content)
     expect(message.content).toInclude('Hello!')
-})
+}, 60000)

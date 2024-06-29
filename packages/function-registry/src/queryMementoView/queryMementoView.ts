@@ -1,4 +1,4 @@
-// Path: packages/function-calling/src/functions/queryMementoView.ts
+// Path: packages/function-registry/src/queryMementoView/queryMementoView.ts
 
 import { count_tokens } from '@memento-ai/encoding'
 import { stripCommonIndent } from '@memento-ai/utils'
@@ -6,8 +6,8 @@ import debug from 'debug'
 import { sql } from 'slonik'
 import { raw } from 'slonik-sql-tag-raw'
 import { z } from 'zod'
-import type { FunctionConfig } from '../functionRegistry'
 import { baseInputSchema, ErrorMessage } from '../functionRegistry'
+import type { FunctionConfig } from './functionRegistry'
 const dlog = debug('queryMementoView')
 
 const inputSchema = baseInputSchema
@@ -33,7 +33,7 @@ const fnSchema = z
     .returns(outputSchema)
     .describe('Execute a SQL SELECT query on the memento view.')
 
-async function queryMementoView(input: queryMementoViewInput): Promise<RowsOrError> {
+export async function queryMementoView(input: queryMementoViewInput): Promise<RowsOrError> {
     dlog('queryMementoView:', input)
     const { query, context } = input
 

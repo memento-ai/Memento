@@ -2,7 +2,7 @@
 
 import { MementoDb } from '@memento-ai/memento-db'
 import { createMementoDb, dropDatabase } from '@memento-ai/postgres-db'
-import { getProjectRoot } from '@memento-ai/utils'
+import { getMementoProjectRoot } from '@memento-ai/utils'
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import { nanoid } from 'nanoid'
 import { copyIngestedMementos } from './copy-ingested-mementos'
@@ -42,7 +42,7 @@ describe('copyIngestedMementos', () => {
     it(
         'should copy ingested mementos from one database to another',
         async () => {
-            const projectRoot = getProjectRoot()
+            const projectRoot = getMementoProjectRoot()
             await ingestDirectory({ db: fromdb, dirPath: `${projectRoot}/packages/function-calling/src` })
             await copyIngestedMementos(fromdb.pool, todb.pool)
         },
