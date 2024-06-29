@@ -13,7 +13,6 @@ export interface ChatSessionArgs {
     model: string
     temperature?: number
     max_response_tokens?: number
-    outStream?: Writable
     seed?: number // Ollama only
 }
 
@@ -23,7 +22,6 @@ export interface ChatSession {
     temperature: number
     max_response_tokens: number
     seed?: number
-    outStream?: Writable
 }
 
 export function createChatSession(args: ChatSessionArgs): ChatSession {
@@ -33,7 +31,6 @@ export function createChatSession(args: ChatSessionArgs): ChatSession {
         model: model ?? 'dolphin-phi',
         temperature: temperature ?? 1.0,
         max_response_tokens: max_response_tokens ?? 1024,
-        outStream: args.outStream,
         seed: args.seed,
     }
     return session
@@ -49,7 +46,6 @@ export class OllamaConversation implements ConversationInterface {
 
         const args: ChatSessionArgs = {
             model: this.model,
-            outStream: this.stream,
             temperature: options.temperature ?? 1.0,
             max_response_tokens: options.max_response_tokens ?? 1024,
             seed: options.seed,
@@ -84,8 +80,8 @@ export class OllamaConversation implements ConversationInterface {
         // Make the API request to OpenAI
         // Use the this.apiKey and this.model
         // Include the prepared messages (which may contain a 'system' role message)
-        // If this.stream is provided, enable streaming and forward the responses to the stream
-        // If this.stream is not provided, wait for the complete response
+        // If args.stream is provided, enable streaming and forward the responses to the stream
+        // If args.stream is not provided, wait for the complete response
 
         const options: Partial<Options> = {
             seed: this.session.seed,
@@ -101,8 +97,8 @@ export class OllamaConversation implements ConversationInterface {
 
         dlog(body)
 
-        if (this.stream) {
-            const outStream = this.stream as Writable
+        if (args.stream) {
+            const outStream = args.stream
             const eventStream = await this.session.client.chat({ ...body, stream: true })
             const parts: string[] = []
             for await (const event of eventStream) {
@@ -111,7 +107,7 @@ export class OllamaConversation implements ConversationInterface {
                 outStream.write(content)
                 parts.push(content)
             }
-            outStream.write('\n')
+            outStream.end('\n')
             const content = parts.join('') + '\n'
             return { role: ASSISTANT, content }
         } else {

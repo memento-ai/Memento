@@ -3,19 +3,16 @@
 import type { AssistantMessage, Message, Role } from '@memento-ai/types'
 import OpenAI from 'openai'
 import type { Stream } from 'openai/streaming.mjs'
-import { Writable } from 'stream'
 import type { ConversationInterface, SendMessageArgs } from './conversation'
 import { type ConversationOptions } from './factory'
 
 export class OpenAIConversation implements ConversationInterface {
     private model: string
-    private stream?: Writable
     private client: OpenAI
     private temperature?: number
 
     constructor(options: ConversationOptions) {
         this.model = options.model ?? 'gpt-3.5-turbo'
-        this.stream = options.stream
         this.client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
         this.temperature = options.temperature
     }
@@ -49,7 +46,7 @@ export class OpenAIConversation implements ConversationInterface {
         // If this.stream is provided, enable streaming and forward the responses to the stream
         // If this.stream is not provided, wait for the complete response
 
-        const stream = !!this.stream
+        const stream = !!args.stream
 
         const completion = await this.client.chat.completions.create({
             model: this.model,
@@ -58,14 +55,15 @@ export class OpenAIConversation implements ConversationInterface {
             temperature: this.temperature ?? 1.0,
         })
 
-        if (stream) {
+        if (args.stream) {
             const chunks: string[] = []
             const completionStream = completion as Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
             for await (const chunk of completionStream) {
                 const data = chunk.choices[0]?.delta?.content || ''
                 chunks.push(data)
-                ;(this.stream as Writable).write(data)
+                args.stream.write(data)
             }
+            args.stream.end()
             return { role: 'assistant', content: chunks.join('') }
         } else {
             const completionResponse = completion as OpenAI.Chat.Completions.ChatCompletion

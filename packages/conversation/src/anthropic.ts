@@ -30,7 +30,6 @@ export interface ChatSessionArgs {
     model?: string
     temperature?: number
     max_response_tokens?: number
-    outStream?: Writable
 }
 
 export interface ChatSession {
@@ -38,7 +37,6 @@ export interface ChatSession {
     model: string
     temperature: number
     max_response_tokens: number
-    outStream?: Writable
 }
 
 export function createChatSession(args: ChatSessionArgs = {}): ChatSession {
@@ -50,7 +48,6 @@ export function createChatSession(args: ChatSessionArgs = {}): ChatSession {
         model,
         temperature,
         max_response_tokens,
-        outStream: args.outStream,
     }
     return session
 }
@@ -72,16 +69,13 @@ function logBadMessages(messages: Message[]) {
 
 export class AnthropicConversation implements ConversationInterface {
     private model: string
-    private stream?: Writable
     private session: ChatSession
 
     constructor(options: ConversationOptions) {
         this.model = getModel(options.model)
-        this.stream = options.stream
 
         const args: ChatSessionArgs = {
             model: this.model,
-            outStream: this.stream,
             temperature: options.temperature ?? 1.0,
             max_response_tokens: options.max_response_tokens ?? 3000,
         }
@@ -118,9 +112,9 @@ export class AnthropicConversation implements ConversationInterface {
     }
 
     private async sendRequest(args: SendMessageArgs): Promise<AssistantMessage> {
-        const { prompt, messages: messages_ } = args
+        const { prompt, messages: messages_, stream } = args
         const messages = asClaudeMessages(messages_)
-        const streaming = !!this.stream
+        const streaming = !!stream
         const body: MessageCreateParams = {
             max_tokens: this.session.max_response_tokens,
             messages,
@@ -134,7 +128,7 @@ export class AnthropicConversation implements ConversationInterface {
         if (!body.stream) {
             response = await this.session.anthropic.messages.create(body)
         } else {
-            const outStream = this.stream as Writable
+            const outStream = stream as Writable
             const eventStream: MessageStream = this.session.anthropic.messages.stream(body)
             let event: Anthropic.Messages.MessageStreamEvent
             let usage: MessageDeltaUsage = { output_tokens: 0 }
@@ -145,7 +139,7 @@ export class AnthropicConversation implements ConversationInterface {
                     usage = event.usage
                 }
             }
-            outStream.write('\n')
+            outStream.end('\n')
             response = await eventStream.finalMessage()
             const { output_tokens } = usage
             const { input_tokens } = response.usage
