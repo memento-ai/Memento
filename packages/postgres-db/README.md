@@ -12,11 +12,15 @@ The `@memento-ai/postgres-db` package provides utilities for interacting with a 
 - Clean up orphaned user messages after application crashes
 - Retrieve the last user and assistant messages
 - Support for readonly database connections
+- List existing databases
+- Check if a specific database exists
+- Wipe and recreate databases
+- Create and manage database indexes
 
 ## Usage and Examples
 ### Creating and Managing Databases
 ```typescript
-import { createNewEmptyDatabase, createMementoDb, dropDatabase, wipeDatabase } from '@memento-ai/postgres-db';
+import { createNewEmptyDatabase, createMementoDb, dropDatabase, wipeDatabase, listDatabases, databaseExists } from '@memento-ai/postgres-db';
 
 // Create a new empty database
 await createNewEmptyDatabase('my_database');
@@ -29,6 +33,14 @@ await dropDatabase('my_database');
 
 // Wipe and recreate a database
 await wipeDatabase('my_memento_database');
+
+// List all databases
+const databases = await listDatabases();
+console.log(databases);
+
+// Check if a database exists
+const exists = await databaseExists('my_database');
+console.log(exists);
 ```
 
 ### Connecting to Databases

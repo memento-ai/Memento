@@ -33,6 +33,7 @@ The Memento monorepo contains the following packages:
 - `@memento-ai/embedding`: Provides functionality for generating text embeddings using the Ollama language model.
 - `@memento-ai/encoding`: Provides utility functions for encoding and decoding text using the `cl100k_base` encoding.
 - `@memento-ai/function-calling`: Provides a framework for defining and invoking functions within the Memento application.
+- `@memento-ai/function-registry`: Provides a framework for defining, registering, and managing functions within the Memento AI system.
 - `@memento-ai/ingester`: Provides functionality for ingesting and summarizing documents into a Memento database.
 - `@memento-ai/memento-agent`: A key component of the Memento system, providing an interface for interacting with the Memento system and leveraging a database to store and retrieve information.
 - `@memento-ai/memento-db`: Provides a TypeScript interface for interacting with a PostgreSQL database to store and retrieve "mementos" - pieces of information that are part of a conversational history.
@@ -51,7 +52,6 @@ The Memento monorepo also includes the following applications:
 - `add-path-comments`: A utility application that adds or updates the "Path" comment at the top of TypeScript files in the Memento project.
 - `ingest`: A command-line utility for ingesting files into a Memento database.
 - `memento-cli`: A command-line interface (CLI) for interacting with the Memento AI system.
-- `memento-web`: A web application built with SvelteKit, providing a user interface for interacting with the Memento AI system.
 - `select-similar-mems`: A utility for selecting mementos from a Memento database based on their similarity to a given content.
 - `update-readmes`: A utility for updating the README.md files across the Memento monorepo project.
 

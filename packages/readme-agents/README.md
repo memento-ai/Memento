@@ -2,7 +2,7 @@
 
 ## Description
 
-The `@memento-ai/readme-agents` package provides agents for generating comprehensive README.md files for packages and the overall Memento project. These agents leverage the Memento AI system to analyze the source code, existing documentation, project structure, and other relevant information to generate informative and up-to-date README files.
+The `@memento-ai/readme-agents` package provides specialized agents for generating comprehensive README.md files for individual packages and the overall Memento project. These agents leverage the Memento AI system to analyze source code, existing documentation, project structure, and other relevant information to produce informative and up-to-date README files.
 
 ## Key Features
 
@@ -15,6 +15,8 @@ The `@memento-ai/readme-agents` package provides agents for generating comprehen
 - **Source Code Analysis**: Automatically retrieves and analyzes source files within packages to ensure accurate documentation.
 
 - **Token Counting**: Utilizes token counting to optimize prompt generation and ensure compatibility with model context limits.
+
+- **Git Integration**: Leverages Git commands to retrieve file listings and repository information for comprehensive documentation.
 
 ## Usage and Examples
 

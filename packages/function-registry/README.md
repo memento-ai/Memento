@@ -9,6 +9,7 @@ The Function Registry package provides a framework for defining, registering, an
 - Execute registered functions with type safety
 - Support for asynchronous functions
 - Integration with the Memento database and utility functions
+- Handlebars templates for generating function descriptions and prompts
 
 ## Usage and Examples
 
@@ -103,3 +104,37 @@ The Function Registry package includes several pre-defined functions:
 6. `writeSourceFile`: Writes content to a source file and returns a status message.
 
 Each of these functions can be accessed and executed through the registry as demonstrated in the examples above.
+
+### Using Handlebars Templates
+
+The Function Registry package includes Handlebars templates for generating function descriptions and prompts:
+
+```typescript
+import { function_description_template, function_registry_template, function_prompt_template } from './functionRegistryTemplate'
+
+// Generate a description for a single function
+const functionDescription = function_description_template({
+    name: 'exampleFunction',
+    purpose: 'This function does something useful',
+    input: 'Some input parameters',
+    output: 'The expected output'
+})
+
+// Generate a description for the entire function registry
+const registryDescription = function_registry_template({
+    function: [
+        { name: 'func1', purpose: 'Purpose 1', input: 'Input 1', output: 'Output 1' },
+        { name: 'func2', purpose: 'Purpose 2', input: 'Input 2', output: 'Output 2' }
+    ]
+})
+
+// Generate a prompt for function calling
+const functionPrompt = function_prompt_template({
+    functions: [
+        { name: 'func1', purpose: 'Purpose 1', input: 'Input 1', output: 'Output 1' },
+        { name: 'func2', purpose: 'Purpose 2', input: 'Input 2', output: 'Output 2' }
+    ]
+})
+```
+
+These templates provide a standardized way to generate function descriptions and prompts, which can be used in the Memento AI system for consistent function documentation and invocation.

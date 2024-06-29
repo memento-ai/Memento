@@ -1,21 +1,19 @@
 # @memento-ai/function-calling
 ## Description
-The `@memento-ai/function-calling` package provides a framework for invoking functions defined in `@memento-ai/function-registry`. It allows for execution of functions, as well as the extraction and validation of function calls from content.
+The `@memento-ai/function-calling` package provides a framework for defining, extracting, and invoking functions within the Memento AI system. It allows for seamless integration of function calls into conversations, handling both synchronous and asynchronous functions, and managing function execution within the context of an AI agent.
 
 ## Key Features
-- Invoke registered functions with provided input and context
 - Extract function call requests from content using a special code block syntax
 - Validate extracted function calls against registered function schemas
+- Invoke registered functions with provided input and context
 - Execute multiple function calls in sequence, handling both synchronous and asynchronous functions
-- Handle function errors and results
+- Manage function errors and results
 - Support for various types of functions including database queries, file operations, and system utilities
 - Recursive function calling with cycle count limit
 - Integration with Memento agents for seamless function execution within conversations
+- Robust error handling for various scenarios, including invalid function calls, execution errors, and exceeding function call limits
 
 ## Usage and Examples
-
-See @memento-ai/memento-agent for examples of usage.
-
 
 ### Extracting Function Calls
 The `extractFunctionCalls` function allows you to extract function calls from content:
