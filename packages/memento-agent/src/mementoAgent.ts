@@ -82,7 +82,7 @@ export class MementoAgent extends FunctionCallingAgent {
     }
 
     /// This is the main entry point for the agent. It is called by the CLI to send a message to the agent.
-    async run({ content }: SendArgs): Promise<AssistantMessage> {
+    async run({ content, stream }: SendArgs): Promise<AssistantMessage> {
         await awaitAsyncAgentActions({ asyncActionsPromise: this.asyncResponsePromise })
 
         const priorMessages: Message[] = await this.db.getConversation(this.config)
