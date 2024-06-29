@@ -4,6 +4,7 @@ import type { FunctionRegistry } from '@memento-ai/function-registry'
 import type { Context } from '@memento-ai/memento-db'
 import type { AssistantMessage, Message, UserMessage } from '@memento-ai/types'
 import { constructAssistantMessage, constructUserMessage } from '@memento-ai/types'
+import { createTemporaryWritable } from '@memento-ai/utils'
 import c from 'ansi-colors'
 import debug from 'debug'
 import type { Writable } from 'node:stream'
@@ -29,6 +30,12 @@ export type FunctionHandlerArgs = {
     agent: FunctionCallingAgent
 }
 
+export type FunctionHandlerHandleArgs = {
+    userMessage: UserMessage
+    priorMessages: Message[]
+    stream?: Writable
+}
+
 export class FunctionHandler {
     private agent: FunctionCallingAgent
     private registry: FunctionRegistry
@@ -43,18 +50,14 @@ export class FunctionHandler {
         this.cycleCount = 0
     }
 
-    async handle(userMessage: UserMessage, priorMessages: Message[], stream?: Writable): Promise<AssistantMessage> {
+    async handle(args: FunctionHandlerHandleArgs): Promise<AssistantMessage> {
         this.cycleCount = 0
-        return await this.recursiveSend(userMessage, priorMessages, stream)
+        return await this.recursiveSend(args)
     }
 
     // We want this method to have the elegant signature of sending a UserMessage and receiving an AssistantMessage
     // That means we have to construct the SendMessageArgs within this method.
-    async recursiveSend(
-        userMessage: UserMessage,
-        priorMessages: Message[],
-        stream?: Writable
-    ): Promise<AssistantMessage> {
+    async recursiveSend({ userMessage, priorMessages, stream }: FunctionHandlerHandleArgs): Promise<AssistantMessage> {
         this.cycleCount++
         this.agent.checkForFunctionResults(userMessage)
 
@@ -64,7 +67,11 @@ export class FunctionHandler {
         // --- Send the message to the assistant here ---
         const prompt = await this.agent.generatePrompt()
         const messages: Message[] = [...priorMessages, userMessage]
-        let assistantMessage: AssistantMessage = await this.agent.forward({ prompt, messages, stream })
+        let assistantMessage: AssistantMessage = await this.agent.forward({
+            prompt,
+            messages,
+            stream: !stream ? undefined : createTemporaryWritable(stream),
+        })
 
         // Check if the assistant's response contains a function call
         const context: Context = this.agent.db.context()
@@ -93,11 +100,11 @@ export class FunctionHandler {
             } else {
                 const content = functionResultContent
                 userMessage = constructUserMessage(content)
-                assistantMessage = await this.recursiveSend(userMessage, [
-                    ...priorMessages,
+                assistantMessage = await this.recursiveSend({
                     userMessage,
-                    assistantMessage,
-                ])
+                    priorMessages: [...priorMessages, userMessage, assistantMessage],
+                    stream,
+                })
             }
         }
 
