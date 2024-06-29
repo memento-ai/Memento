@@ -88,7 +88,11 @@ export class MementoAgent extends FunctionCallingAgent {
         const priorMessages: Message[] = await this.db.getConversation(this.config)
         const userMessage: UserMessage = constructUserMessage(content)
 
-        const assistantMessage: AssistantMessage = await this.functionHandler.handle(userMessage, priorMessages)
+        const assistantMessage: AssistantMessage = await this.functionHandler.handle({
+            userMessage,
+            priorMessages,
+            stream,
+        })
 
         // Use the assistant's response to update the search context for the next user message.
         const args = {
