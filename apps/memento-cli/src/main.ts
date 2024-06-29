@@ -1,12 +1,13 @@
 // Path: apps/memento-cli/src/main.ts
 
+import type { SendArgs } from '@memento-ai/agent'
 import type { Config } from '@memento-ai/config'
 import { loadAggregateConfig } from '@memento-ai/config'
 import { createMementoSystem } from '@memento-ai/memento-agent'
 import { cleanUpLastUserMem } from '@memento-ai/postgres-db'
+import { createTemporaryWritable } from '@memento-ai/utils'
 import c from 'ansi-colors'
 import { Command } from 'commander'
-import { type Writable } from 'node:stream'
 
 const program = new Command()
 
@@ -20,9 +21,7 @@ program.parse(process.argv)
 const configPath = program.args[0]
 const configData: Config = await loadAggregateConfig(configPath)
 
-const outStream: Writable = process.stdout
-
-const system = await createMementoSystem(configData, outStream)
+const system = await createMementoSystem(configData)
 
 await cleanUpLastUserMem(system.db.pool)
 
@@ -50,9 +49,11 @@ async function* collectLines() {
 }
 
 for await (const lines of collectLines()) {
-    process.stdout.write(`${c.blue('Assistant: ')}`)
-    const args = {
+    const stream = createTemporaryWritable(process.stdout)
+    stream.write(`${c.blue('Assistant: ')}`)
+    const args: SendArgs = {
         content: lines.join('\n'),
+        stream,
     }
     await system.mementoAgent.run(args)
 }
