@@ -22,6 +22,7 @@ program
 program.parse(process.argv)
 
 async function updateOnePackageReadme(projectRoot: string, pkgPath: string, provider: Provider, model: string) {
+    console.log(`Updating README.md for package: ${pkgPath}`)
     const args: AddPackageReadmeAgentArgs = { projectRoot, pkgPath, provider, model }
     const agent: AddPackageReadmeAgent = new AddPackageReadmeAgent(args)
     const readme = await agent.run()
@@ -71,6 +72,7 @@ async function main() {
 
         const addProjectReadmeAgent = new AddProjectReadmeAgent({ projectRoot, provider, model })
         const projectReadme = await addProjectReadmeAgent.run()
+        console.log(`Updating project README.md`)
         await Bun.write(`${projectRoot}/README.md`, projectReadme.trim() + '\n')
     }
 }
