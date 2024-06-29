@@ -11,6 +11,7 @@ The `@memento-ai/search` package provides functionality for searching and retrie
 - Normalize search scores using linear normalization to ensure scores are in the range [0, 1].
 - Limit search results based on a maximum token count to control the amount of information returned.
 - Avoid returning redundant mementos for documents, synopses, and conversations.
+- Trim search results to fit within a specified token limit.
 
 ## Usage and Examples
 To use the `@memento-ai/search` package, you need to have a Memento database set up with a PostgreSQL connection pool.
@@ -48,21 +49,23 @@ const semanticSearchResults = await selectMemsBySemanticSimilarity(db.pool, {
 
 The `selectMemsByKeywordSearch` function performs a keyword-based search using the extracted keywords from the given content, while the `selectMemsBySemanticSimilarity` function performs a semantic similarity-based search using vector embeddings.
 
-The package also provides utility functions for normalizing search scores, combining search results, and converting search results to a similarity map:
+The package also provides utility functions for normalizing search scores, combining search results, converting search results to a similarity map, and trimming search results:
 
 ```typescript
-import { linearNormalize, combineSearchResults, asSimilarityMap } from '@memento-ai/search';
+import { linearNormalize, combineSearchResults, asSimilarityMap, trimSearchResult } from '@memento-ai/search';
 
 const normalizedResults = linearNormalize(searchResults, (item) => item.score);
 const combinedResults = combineSearchResults({
   lhs: keywordSearchResults,
   rhs: semanticSearchResults,
-  maxTokens: 5000
+  maxTokens: 5000,
+  p: 0.5
 });
 const similarityMap = await asSimilarityMap(searchResults);
+const trimmedResults = trimSearchResult(searchResults, 5000);
 ```
 
-These functions ensure that the search scores are in the range [0, 1] and can be used to adjust the relative importance of different search results. The `combineSearchResults` function combines the results of two memento searches into a single search result list, handling cases where mementos are present in one selection but not the other. The `asSimilarityMap` function converts the search results into a map where the keys are the memento IDs and the values are the corresponding search result objects.
+These functions ensure that the search scores are in the range [0, 1] and can be used to adjust the relative importance of different search results. The `combineSearchResults` function combines the results of two memento searches into a single search result list, handling cases where mementos are present in one selection but not the other. The `asSimilarityMap` function converts the search results into a map where the keys are the memento IDs and the values are the corresponding search result objects. The `trimSearchResult` function trims the search results to fit within a specified token limit while removing redundant mementos.
 
 ### selectSimilarMemsUtil.ts
 

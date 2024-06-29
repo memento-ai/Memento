@@ -20,12 +20,11 @@ To use the Resolution Agent, create an instance with the required arguments:
 
 ```typescript
 import { ResolutionAgent, createResolutionAgent } from '@memento-ai/resolution-agent';
-import { createConversation } from '@memento-ai/conversation';
 import { MementoDb } from '@memento-ai/memento-db';
 import { Config } from '@memento-ai/config';
 
 const db = await MementoDb.connect('my_database');
-const config = new loadConfig('memento.toml'); // Load config from file
+const config = new Config('memento.toml'); // Load config from file
 
 const resolutionAgent = await createResolutionAgent(config, db);
 ```

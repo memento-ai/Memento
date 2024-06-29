@@ -18,7 +18,7 @@ export class AddProjectReadmeAgent extends Agent {
         const conversation: ConversationInterface = createConversation(provider, {
             model,
             temperature: 0.0,
-            max_response_tokens: 1500,
+            max_response_tokens: 3000,
             logging: { name: 'prj_readme' },
         })
         super({ conversation })

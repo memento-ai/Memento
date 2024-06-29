@@ -1,13 +1,15 @@
 # update-readmes
 
 ## Description
-The `update-readmes` package is a utility for updating the README.md files across the Memento monorepo project. It can update the README.md file for a specific package or the overall project README.md file.
+The `update-readmes` package is a utility for updating the README.md files across the Memento monorepo project. It can update the README.md file for a specific package, multiple packages, or the overall project README.md file.
 
 ## Key Features
 - Update a single package's README.md file
+- Update README.md files for all packages in the project
 - Update the overall project README.md file
 - Leverage the Memento AI agents to generate or update the README content
 - Specify the language model provider and model to use for summarization
+- Automatically detect and process packages in both 'apps' and 'packages' directories
 
 ## Usage and Examples
 
@@ -32,6 +34,11 @@ nx run update-readmes --provider anthropic --model haiku --package @memento-ai/m
 
 # Update the overall project README.md file
 nx run update-readmes --provider openai --model gpt-3.5-turbo --project-only
+
+# Update all package README.md files and the project README.md
+nx run update-readmes --provider anthropic --model haiku
 ```
 
-The utility will generate or update the README.md content based on the package's source files and the current README.md content (if present). It will ensure that the README.md accurately reflects the package's features and usage.
+The utility will generate or update the README.md content based on the package's source files and the current README.md content (if present). It ensures that the README.md accurately reflects the package's features and usage.
+
+Note: This utility is designed to work within the Memento monorepo structure. It automatically detects packages in both the 'apps' and 'packages' directories.

@@ -1,34 +1,42 @@
 # select-similar-mems
 
 ## Description
-The `select-similar-mems` package provides functionality for selecting mementos (pieces of information) from a Memento database based on their similarity to a given content. It supports both keyword-based and semantic similarity search methods.
+The `select-similar-mems` package is a command-line utility for selecting mementos (pieces of information) from a Memento database based on their similarity to a given content. It leverages both keyword-based and semantic similarity search methods to provide comprehensive results.
 
 ## Key Features
-- Extract keywords from a given content
-- Search for mementos based on keyword matching
-- Search for mementos based on semantic similarity to the given content
+- Extract keywords from given content
+- Search for mementos using keyword matching
+- Search for mementos using semantic similarity
 - Combine keyword and semantic similarity search results
+- Display results in a tabular format for easy comparison
 
 ## Usage and Examples
-The `select-similar-mems` package can be used as a command-line utility or imported as a module in other parts of the Memento application.
 
 ### Command-line Usage
 ```
 npx @memento-ai/select-similar-mems -d <database_name> -c <content> [-t <max_tokens>]
 ```
 
-- `-d`, `--database`: The name of the Memento database to search
-- `-c`, `--content`: The content to use for similarity search
-- `-t`, `--tokens` (optional): The maximum number of tokens to retrieve (default: 10000)
+Options:
+- `-d`, `--database`: (Required) The name of the Memento database to search
+- `-c`, `--content`: (Required) The content to use for similarity search
+- `-t`, `--tokens`: (Optional) The maximum number of tokens to retrieve (default: 10000)
 
-This command will output the following:
-- A list of extracted keywords from the given content
-- A table of mementos selected based on keyword matching
-- A table of mementos selected based on semantic similarity
-- A table of mementos selected using a combination of keyword and semantic similarity
+The command will output:
+1. A list of extracted keywords from the given content
+2. A table of mementos selected based on keyword matching
+3. A table of mementos selected based on semantic similarity
+4. A table of mementos selected using a combination of keyword and semantic similarity
+
+### Example
+```bash
+npx @memento-ai/select-similar-mems -d my_memento_db -c "Artificial intelligence and machine learning" -t 5000
+```
+
+This command will search the "my_memento_db" database for mementos similar to the content "Artificial intelligence and machine learning", limiting the results to approximately 5000 tokens.
 
 ### Module Usage
-You can import and use the individual functions from the `@memento-ai/search` package:
+While this package is primarily designed as a command-line tool, you can use the underlying functions from the `@memento-ai/search` package in your own TypeScript projects:
 
 ```typescript
 import { MementoDb } from '@memento-ai/memento-db';

@@ -10,6 +10,11 @@ The `@memento-ai/ingest` package is a command-line utility for ingesting files i
 - Ability to specify the language model provider (e.g., Anthropic, OpenAI, Ollama) and model for summarization.
 - Clean-slate option to drop the existing database and start over.
 - Utility functions for managing the Memento database, such as creating, wiping, and connecting to databases.
+- Automatically creates a template database for the specified provider and model if it doesn't exist.
+- Copies ingested mementos from the template database to the target database.
+- Removes abandoned files (files that were previously ingested but no longer exist) from the target database.
+- Deletes unreferenced mementos (mementos that are not referenced by any other memento) from the target database.
+- Displays a table of the 10 largest documents ingested into the target database.
 
 ## Usage and Examples
 
@@ -36,4 +41,4 @@ Example usage:
 nx run ingest --provider=anthropic --model=haiku --database=my-memento-db
 ```
 
-This command will ingest files from the current directory into a database named `my-memento-db`, using the Anthropic provider and the `haiku` model for summarization.
+This command will ingest files from the current directory into a database named `my-memento-db`, using the Anthropic provider and the `haiku` model for summarization. If a template database for the Anthropic provider and `haiku` model doesn't exist, it will be created. The ingested mementos will be copied from the template database to the `my-memento-db` database, and any abandoned files or unreferenced mementos will be removed from `my-memento-db`.

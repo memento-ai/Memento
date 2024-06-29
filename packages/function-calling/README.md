@@ -1,6 +1,7 @@
 # @memento-ai/function-calling
 ## Description
 The `@memento-ai/function-calling` package provides a framework for defining and invoking functions within the Memento application. It allows for the registration and execution of functions, as well as the extraction and validation of function calls from content.
+
 ## Key Features
 - Register custom functions with input/output schemas and function implementations
 - Invoke registered functions with provided input and context
@@ -8,7 +9,10 @@ The `@memento-ai/function-calling` package provides a framework for defining and
 - Validate extracted function calls against registered function schemas
 - Execute multiple function calls in sequence, handling both synchronous and asynchronous functions
 - Handle function errors and results
+- Support for various types of functions including database queries, file operations, and system utilities
+
 ## Usage and Examples
+
 ### Registering Functions
 To register a new function, import the `registerFunction` function from the `functionRegistry` module and provide a `FunctionConfig` object:
 
@@ -98,3 +102,19 @@ const { functionResultContent, newAsyncResultsP }: InvokeFunctionsResults = awai
 ```
 
 This will execute the synchronous functions immediately, while asynchronous functions will be invoked and their results will be available in the next cycle via the `newAsyncResultsP` promise.
+
+### Available Functions
+The package includes several pre-defined functions:
+
+- `addSynopsis`: Creates a synopsis memento from the input.
+- `getCurrentTime`: Returns the current UTC time.
+- `gitListFiles`: Returns a list of file paths tracked by git for the current repository.
+- `queryMementoView`: Executes a SQL SELECT query on the memento view.
+- `readSourceFile`: Reads the content of a source file and returns it as a single string.
+
+These functions can be imported and used as part of the function registry.
+
+### Error Handling
+The package includes robust error handling for various scenarios, including invalid function calls, execution errors, and exceeding function call limits. Errors are returned as part of the function call results, allowing for graceful error handling and reporting.
+
+For more detailed information on each function and its usage, refer to the source files in the `src/functions` directory.

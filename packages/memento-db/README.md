@@ -1,6 +1,6 @@
 # @memento-ai/memento-db
 ## Description
-The `@memento-ai/memento-db` package provides a TypeScript interface for interacting with a PostgreSQL database to store and retrieve "mementos" - pieces of information that are part of a conversational history. It includes functionality for adding different types of mementos (conversations, fragments, documents, summaries, resolutions, synopses, and conversation exchanges), searching for similar mementos, and retrieving conversation history.
+The `@memento-ai/memento-db` package provides a TypeScript interface for interacting with a PostgreSQL database to store and retrieve "mementos" - pieces of information that are part of a conversational history. It allows for adding different types of mementos such as conversation messages, document fragments, documents with summaries, conversation exchanges (user-assistant message pairs), resolutions, synopses, and linking conversation exchanges to synopses. Additionally, it provides functionality for retrieving the conversation history, resolutions, synopses, and the last user and assistant messages.
 
 ## Key Features
 - Add conversation mementos (user and assistant messages)
@@ -14,7 +14,6 @@ The `@memento-ai/memento-db` package provides a TypeScript interface for interac
 - Retrieve resolution mementos
 - Retrieve synopses (short summaries) from the database
 - Get the last user and assistant messages in a conversation
-- Add multiple mementos in a single transaction for a conversation exchange (user message, assistant message, and the exchange itself)
 
 ## Usage and Examples
 The main entry point is the `MementoDb` class, which provides methods for interacting with the database:

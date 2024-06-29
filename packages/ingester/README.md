@@ -14,6 +14,7 @@ The `@memento-ai/ingester` package provides functionality for ingesting and summ
   - Chat-based summarizer using a conversation interface
   - Model-based summarizer using a specified provider and model
   - Ability to create custom summarizers by extending the `SummarizerAgent` class
+- Copy ingested mementos from one database to another
 
 ## Usage and Examples
 ### Ingesting a File
@@ -106,3 +107,18 @@ const summarizer = new CustomSummarizer();
 
 const { docid, summaryid } = await ingestFile(db, 'path/to/file.ts', summarizer);
 ```
+
+### Copying Ingested Mementos
+To copy ingested mementos from one database to another:
+
+```typescript
+import { MementoDb } from '@memento-ai/memento-db';
+import { copyIngestedMementos } from '@memento-ai/ingester';
+
+const fromDb = await MementoDb.connect('source-database');
+const toDb = await MementoDb.connect('destination-database');
+
+await copyIngestedMementos(fromDb.pool, toDb.pool);
+```
+
+This function copies all ingested documents and their summaries from the source database to the destination database.
