@@ -14,21 +14,29 @@ import { synopsisPromptTemplate } from './synopsis-prompt-template'
 
 const dlog = debug('synopsis')
 
-export type SynopsisAgentArgs = AgentArgs & { db: MementoDb }
+export type SynopsisAgentArgs = AgentArgs & {
+    db: MementoDb
+    max_tokens: number
+}
 
 export class SynopsisAgent extends Agent {
     private db: MementoDb
+    private max_tokens: number
 
     constructor(args: SynopsisAgentArgs) {
         super(args)
         this.db = args.db
+        this.max_tokens = args.max_tokens
+        if (this.max_tokens < 500) {
+            throw new Error('synopsis max_tokens must be at least 500')
+        }
     }
 
     async run(): Promise<string> {
         const content = stripCommonIndent(`
             Generate the synopsis as instructed.
             Remember: Use first person plural tense, with a shared perspective.
-            Remember: Be concise. One sentence. Under 50 tokens.
+            Remember: Be concise. No helpful commentary. One sentence. Under 50 tokens.
         `)
         const response = await this.send({ content })
         const tokens = count_tokens(response.content)
@@ -36,8 +44,8 @@ export class SynopsisAgent extends Agent {
         return response.content
     }
 
-    private async getSynopses(): Promise<string[]> {
-        return await getSynopses(this.db.readonlyPool, 1000)
+    async getSynopses(): Promise<string[]> {
+        return await getSynopses(this.db.readonlyPool, this.max_tokens)
     }
 
     private async getLatestUserMessage(): Promise<Message> {
@@ -64,6 +72,7 @@ export async function createSynopsisAgent(config: Config, db: MementoDb): Promis
     const agentArgs: SynopsisAgentArgs = {
         db,
         conversation,
+        max_tokens: config.synopsis_agent.max_tokens,
     }
     return new SynopsisAgent(agentArgs)
 }
