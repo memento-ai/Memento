@@ -16,7 +16,7 @@ const synopsisPromptTemplateText = stripCommonIndent(`
     synopses are useful information to reconstruct the context of the conversation no longer visible
     in the snapshot.
     {{#each synMems}}
-    <syn>{{{content}}}</syn>
+    <syn>{{this}}</syn>
     {{/each}}
     </synopsis_mementos>
 `)

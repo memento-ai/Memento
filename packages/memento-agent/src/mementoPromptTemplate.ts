@@ -9,6 +9,7 @@ import { function_calling } from './prompt-partials/function_calling'
 import { pronouns } from './prompt-partials/pronouns'
 import { resolutions } from './prompt-partials/resolutions'
 import { sql_schema } from './prompt-partials/sql_schema'
+import { synopses } from './prompt-partials/synopses'
 import { terminology } from './prompt-partials/terminology'
 
 export type MementoPromptTemplateArgs = {
@@ -31,7 +32,7 @@ Handlebars.registerPartial('function_calling', function_calling)
 Handlebars.registerPartial('pronouns', pronouns)
 Handlebars.registerPartial('resolutions', resolutions)
 Handlebars.registerPartial('sql_schema', sql_schema)
-Handlebars.registerPartial('synopses', resolutions)
+Handlebars.registerPartial('synopses', synopses)
 Handlebars.registerPartial('terminology', terminology)
 
 const mementoPromptTemplateText = stripCommonIndent(`
