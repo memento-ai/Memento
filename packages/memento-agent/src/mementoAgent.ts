@@ -77,8 +77,10 @@ export class MementoAgent extends FunctionCallingAgent {
         results = trimSearchResult(results, maxTokens)
         this.aggregateSearchResults = results
 
+        const synMems: string[] = !this.synopsisAgent ? [] : await this.synopsisAgent.getSynopses()
+
         const context: MementoPromptTemplateArgs = await retrieveContext(this, results)
-        return mementoPromptTemplate(context)
+        return mementoPromptTemplate({ ...context, synMems })
     }
 
     /// This is the main entry point for the agent. It is called by the CLI to send a message to the agent.

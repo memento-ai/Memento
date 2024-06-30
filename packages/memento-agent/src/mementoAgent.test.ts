@@ -50,10 +50,10 @@ export async function makeTestSystem(args: MakeTestSystemArgs): Promise<MementoS
     // If the agent is wanted, we pass in undefined, which will create an agent from default configuration.
     const settings: Partial<Config> = { database }
     if (!synopsis) {
-        settings.synopsis_agent = { ...ConversationConfig.parse({ provider }), max_tokens: 100 }
+        settings.synopsis_agent = { ...ConversationConfig.parse({ role: 'synopsis', provider }), max_tokens: 100 }
     }
     if (!resolution) {
-        settings.resolution_agent = ConversationConfig.parse({ provider })
+        settings.resolution_agent = ConversationConfig.parse({ role: 'resolution', provider })
     }
     const config = Config.parse(settings)
     const system: MementoSystem = await createMementoSystem(config)

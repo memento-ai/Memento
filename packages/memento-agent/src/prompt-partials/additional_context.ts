@@ -7,7 +7,6 @@ import Handlebars from 'handlebars'
 export type AdditionalContextTemplateArgs = {
     dsumMems: MementoSearchResult[]
     docMems: MementoSearchResult[]
-    synMems: MementoSearchResult[]
     xchgMems: MementoSearchResult[]
 }
 
@@ -35,14 +34,6 @@ const additional_context_text = stripCommonIndent(`
     </dsum>
     {{/each}}
     </document_summary_mementos>
-    {{/if}}
-
-    {{#if synMems}}
-    <synopsis_mementos>
-    {{#each synMems}}
-    <syn>{{{content}}}</syn>
-    {{/each}}
-    </synopsis_mementos>
     {{/if}}
 
     {{#if xchgMems}}
