@@ -3,9 +3,19 @@
 import { sql, type DatabasePool } from 'slonik'
 import { z } from 'zod'
 
-export async function getSynopses(pool: DatabasePool, max_tokens: number): Promise<string[]> {
+export type GetSynopsesArgs = {
+    max_tokens: number
+    max_response_tokens: number
+}
+
+export async function getSynopses(pool: DatabasePool, args: GetSynopsesArgs): Promise<string[]> {
+    const { max_tokens, max_response_tokens } = args
+
+    if (max_response_tokens > 100) {
+        throw new Error(`synopsis max_response_tokens must be at most 100, got ${max_response_tokens}`)
+    }
     if (max_tokens < 500) {
-        throw new Error('synopsis max_tokens must be at least 500')
+        throw new Error(`synopsis max_tokens must be at least 500, got ${max_tokens}`)
     }
     const query = sql.type(z.object({ content: z.string() }))`
         SELECT content
