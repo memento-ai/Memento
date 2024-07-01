@@ -25,7 +25,7 @@ export function combineSearchResults(args: CombineMementoResultArgs): MementoSea
 
     const { lhs, rhs, p } = args
 
-    let combined: MementoSearchResult[] = []
+    const combined: MementoSearchResult[] = []
     const lhsMap: Record<string, MementoSearchResult> = {}
     const rhsMap: Record<string, MementoSearchResult> = {}
 
@@ -46,6 +46,5 @@ export function combineSearchResults(args: CombineMementoResultArgs): MementoSea
         combined.push({ ...entry, score })
     }
 
-    combined = linearNormalize(combined, (m) => m.score)
-    return combined
+    return linearNormalize(combined, (m) => m.score)
 }

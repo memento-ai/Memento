@@ -11,7 +11,6 @@ import type {
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { ASSISTANT, AssistantMessage, Message, USER } from '@memento-ai/types'
 import debug from 'debug'
-import { Writable } from 'node:stream'
 import type { ConversationInterface, SendMessageArgs } from './conversation'
 import type { ConversationOptions } from './factory'
 import { PolyfillTextDecoderStream } from './polyfillTextDecoderStream'
@@ -23,7 +22,6 @@ export interface ChatSessionArgs {
     model?: string
     temperature?: number
     max_response_tokens?: number
-    outStream?: Writable
 }
 
 export interface ChatSession {
@@ -31,7 +29,6 @@ export interface ChatSession {
     model: string
     temperature: number
     max_response_tokens: number
-    outStream?: Writable
 }
 
 export function createChatSession(args: ChatSessionArgs): ChatSession {
@@ -49,22 +46,18 @@ export function createChatSession(args: ChatSessionArgs): ChatSession {
         model,
         temperature: temperature ?? 1.0,
         max_response_tokens: max_response_tokens ?? 2048,
-        outStream: args.outStream,
     }
     return session
 }
 export class GoogleConversation implements ConversationInterface {
     private model: string
-    private stream?: Writable
     private session: ChatSession
 
     constructor(options: ConversationOptions) {
         this.model = options.model
-        this.stream = options.stream
 
         const args: ChatSessionArgs = {
             model: this.model,
-            outStream: this.stream,
             temperature: options.temperature ?? 0.25,
             max_response_tokens: options.max_response_tokens ?? 3000,
         }
@@ -73,7 +66,7 @@ export class GoogleConversation implements ConversationInterface {
     }
 
     async sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {
-        const { prompt, messages } = args
+        const { prompt, messages, stream } = args
 
         dlog(`Sending message to Google with prompt: ${prompt}`)
         dlog(`Messages: ${Bun.inspect(messages)}`)
@@ -111,18 +104,19 @@ export class GoogleConversation implements ConversationInterface {
             const r: GenerateContentStreamResult = await chat.sendMessageStream(content)
 
             let check = ''
-            if (this.session.outStream) {
+            if (stream) {
                 for await (const chunk of r.stream) {
                     const chunkText = chunk.text()
                     check += chunkText
-                    this.session.outStream.write(chunkText)
+                    stream.write(chunkText)
                 }
+                stream.end()
             }
 
             const response: EnhancedGenerateContentResponse = await r.response
 
             const text = response.text()
-            if (this.session.outStream && text != check) {
+            if (stream && text != check) {
                 console.error(`Mismatch between streamed and response text!`)
                 console.error(`text: ${text}`)
                 console.error(`check: ${check}`)

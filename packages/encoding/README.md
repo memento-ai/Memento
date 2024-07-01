@@ -7,6 +7,7 @@ The `@memento-ai/encoding` package provides utility functions for encoding and d
 - Encode a string to a Uint32Array
 - Decode a Uint32Array to a Uint8Array or a string
 - Count the number of tokens in a given text
+- Support for emoji characters in encoding and decoding
 
 ## Usage and Examples
 
@@ -33,10 +34,10 @@ console.log(decodedString); // Output: 'hello world'
 ```typescript
 import { count_tokens } from '@memento-ai/encoding';
 
-const text = 'hello world 😃';
+const text = 'hello world';
 const tokenCount: number = count_tokens(text);
 
-console.log(tokenCount); // Output: 3
+console.log(tokenCount); // Output: 2
 ```
 
 The package uses the `tiktoken` library for encoding and decoding operations, and the `cl100k_base` encoding is used by default.
@@ -53,4 +54,11 @@ const decoded = decode_to_string(encoded);
 console.log(decoded); // Output: 'hello world 😃'
 ```
 
-Note that emoji characters may affect token count differently than regular text characters.
+Note that emoji characters may affect token count differently than regular text characters. For example:
+
+```typescript
+const textWithEmoji = 'hello world 😃';
+const tokenCount = count_tokens(textWithEmoji);
+
+console.log(tokenCount); // Output may be higher than 3 due to emoji encoding
+```

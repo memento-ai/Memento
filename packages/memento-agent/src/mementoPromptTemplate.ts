@@ -9,15 +9,16 @@ import { function_calling } from './prompt-partials/function_calling'
 import { pronouns } from './prompt-partials/pronouns'
 import { resolutions } from './prompt-partials/resolutions'
 import { sql_schema } from './prompt-partials/sql_schema'
+import { synopses } from './prompt-partials/synopses'
 import { terminology } from './prompt-partials/terminology'
 
 export type MementoPromptTemplateArgs = {
     functions: string
     databaseSchema: string
     resolutions: string[]
+    synMems: string[]
     dsumMems: MementoSearchResult[]
     docMems: MementoSearchResult[]
-    synMems: MementoSearchResult[]
     xchgMems: MementoSearchResult[]
 }
 
@@ -25,12 +26,13 @@ Handlebars.registerHelper('obj', function (context) {
     return Bun.inspect(context)
 })
 
-Handlebars.registerPartial('core_system', core_system)
-Handlebars.registerPartial('pronouns', pronouns)
-Handlebars.registerPartial('function_calling', function_calling)
-Handlebars.registerPartial('sql_schema', sql_schema)
 Handlebars.registerPartial('additional_context', additional_context)
+Handlebars.registerPartial('core_system', core_system)
+Handlebars.registerPartial('function_calling', function_calling)
+Handlebars.registerPartial('pronouns', pronouns)
 Handlebars.registerPartial('resolutions', resolutions)
+Handlebars.registerPartial('sql_schema', sql_schema)
+Handlebars.registerPartial('synopses', synopses)
 Handlebars.registerPartial('terminology', terminology)
 
 const mementoPromptTemplateText = stripCommonIndent(`
@@ -45,19 +47,11 @@ const mementoPromptTemplateText = stripCommonIndent(`
 
     {{> sql_schema databaseSchema=databaseSchema }}
 
-    {{> additional_context docMems=docMems dsumMems=dsumMems synMems=synMems xchgMems=xchgMems}}
+    {{> additional_context docMems=docMems dsumMems=dsumMems xchgMems=xchgMems}}
+
+    {{> synopses synMems=synMems}}
 
     {{> resolutions resolutions=resolutions}}
-
-    ## Warnings
-
-    1. Please review the discussion above in the section 'Applying Daniel Kahneman's Dual Process Theory to your functioning'.
-       Do not make function calls to retrieve additional information from the database unless you are certain it is necessary.
-       Generally you should only do so after asking the user if they would like you to do so.
-
-    2. Please review the discussion above in the section '**Important** Rules for Function Invocation'.
-       If you want to invoke a function, the code fence block must be the only content in the message.
-       Save any commentary or explanation for a subsequent message.
     </system>
 `)
 

@@ -10,12 +10,10 @@ import { type ConversationOptions } from './factory'
 
 export class GroqConversation implements ConversationInterface {
     private model: string
-    private stream?: Writable
     private client: Groq
 
     constructor(options: ConversationOptions) {
         this.model = options.model ?? 'mixtral-8x7b-32768'
-        this.stream = options.stream
         this.client = new Groq({ apiKey: process.env.GROQ_API_KEY })
     }
 
@@ -48,12 +46,13 @@ export class GroqConversation implements ConversationInterface {
         // If this.stream is provided, enable streaming and forward the responses to the stream
         // If this.stream is not provided, wait for the complete response
 
-        const stream = !!this.stream
+        const { stream } = args
+        const streaming = !!stream
 
         const completion = await this.client.chat.completions.create({
             model: this.model,
             messages: args.messages,
-            stream,
+            stream: streaming,
         })
 
         if (stream) {
@@ -62,8 +61,9 @@ export class GroqConversation implements ConversationInterface {
             for await (const chunk of completionStream) {
                 const data = chunk.choices[0]?.delta?.content || ''
                 chunks.push(data)
-                ;(this.stream as Writable).write(data)
+                ;(stream as Writable).write(data)
             }
+            stream.end()
             return { role: ASSISTANT, content: chunks.join('') }
         } else {
             const completionResponse = completion as Groq.Chat.Completions.ChatCompletion

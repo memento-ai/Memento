@@ -2,9 +2,10 @@
 
 import type { AgentArgs } from '@memento-ai/agent'
 import { Agent } from '@memento-ai/agent'
+import type { SendMessageArgs } from '@memento-ai/conversation'
 import type { FunctionRegistry } from '@memento-ai/function-registry'
 import type { MementoDb } from '@memento-ai/memento-db'
-import type { UserMessage } from '@memento-ai/types'
+import type { AssistantMessage, UserMessage } from '@memento-ai/types'
 import { USER } from '@memento-ai/types'
 import { FUNCTION_RESULT_HEADER } from './functionCallingTypes'
 
@@ -23,6 +24,10 @@ export abstract class FunctionCallingAgent extends Agent {
         this.db = args.db
         this.registry = args.registry
         this.lastUserMessage = { content: '', role: USER }
+    }
+
+    async forward(args: SendMessageArgs): Promise<AssistantMessage> {
+        return super.forward(args)
     }
 
     checkForFunctionResults(userMessage: UserMessage): void {

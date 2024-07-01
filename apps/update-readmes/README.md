@@ -1,7 +1,7 @@
 # update-readmes
 
 ## Description
-The `update-readmes` package is a utility for updating the README.md files across the Memento monorepo project. It can update the README.md file for a specific package, multiple packages, or the overall project README.md file.
+The `update-readmes` package is a utility for updating the README.md files across the Memento monorepo project. It can update the README.md file for a specific package, multiple packages, or the overall project README.md file. This tool is designed to work within the Memento monorepo structure and automatically detects packages in both the 'apps' and 'packages' directories.
 
 ## Key Features
 - Update a single package's README.md file
@@ -41,4 +41,9 @@ nx run update-readmes --provider anthropic --model haiku
 
 The utility will generate or update the README.md content based on the package's source files and the current README.md content (if present). It ensures that the README.md accurately reflects the package's features and usage.
 
-Note: This utility is designed to work within the Memento monorepo structure. It automatically detects packages in both the 'apps' and 'packages' directories.
+Note: This utility requires the following peer dependencies:
+- `@memento-ai/conversation`
+- `@memento-ai/readme-agents`
+- `@memento-ai/utils`
+
+Make sure these dependencies are properly installed and configured in your project before running the utility.

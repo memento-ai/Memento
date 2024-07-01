@@ -38,6 +38,7 @@ export function startAsyncAgentActions({
             if (xchgId) {
                 await db.linkExchangeSynopsis({ xchg_id: xchgId.id, synopsis_id: id.id })
             }
+            console.info('New synopsis:', message.content)
             return message.content
         })
     }

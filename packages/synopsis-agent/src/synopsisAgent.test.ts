@@ -40,7 +40,7 @@ describe('SynopsisAgent', () => {
             max_response_tokens: 70,
             logging: { name: 'synopsis' },
         })
-        const synopsisAgent = new SynopsisAgent({ conversation, db })
+        const synopsisAgent = new SynopsisAgent({ conversation, db, max_tokens: 1000 })
         const synopsis = await synopsisAgent.run()
 
         expect(synopsis).toBeTruthy()

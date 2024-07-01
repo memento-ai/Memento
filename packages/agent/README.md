@@ -1,7 +1,7 @@
 # @memento-ai/agent
 
 ## Description
-The `@memento-ai/agent` package provides an abstract `Agent` class that represents a conversational agent or a specialized tool. Agents can be used in place of a `ConversationInterface` in a conversation, and can be layered on top of or wrapped around another agent. This package is designed to be flexible, allowing for the creation of both simple tools and more complex agents with advanced functionality.
+The `@memento-ai/agent` package provides an abstract `Agent` class that represents a conversational agent or a specialized tool. This package is designed to be flexible, allowing for the creation of both simple tools and more complex agents with advanced functionality. Agents can be used in place of a `ConversationInterface` in a conversation, and can be layered on top of or wrapped around another agent.
 
 ## Key Features
 - Provides an abstract `Agent` base class with `forward` and `send` methods for sending messages via a `ConversationInterface`.
@@ -9,6 +9,8 @@ The `@memento-ai/agent` package provides an abstract `Agent` class that represen
 - The `send` method constructs a `UserMessage` from the provided content and sends it along with the generated prompt to the `forward` method.
 - The `forward` method delegates the message sending to the underlying `ConversationInterface`.
 - Supports creation of both simple tools and complex agents with database connections and multiple functions.
+- Allows for streaming responses through an optional `stream` parameter.
+- Ensures that the `send` method cannot be overridden by subclasses to maintain consistent behavior across all agents.
 
 ## Usage and Examples
 
@@ -62,4 +64,20 @@ const response = await myAgent.forward({ prompt: customPrompt, messages });
 console.log(response);
 ```
 
-Note that the `send` method is designed for simple use cases with a single message, while `forward` provides more flexibility for complex interactions.
+### Streaming Responses
+To stream responses, you can pass a `Writable` stream to the `send` or `forward` methods:
+
+```typescript
+import { Writable } from 'stream';
+
+const outputStream = new Writable({
+  write(chunk, encoding, callback) {
+    console.log(chunk.toString());
+    callback();
+  }
+});
+
+await myAgent.send({ content: 'Stream this response', stream: outputStream });
+```
+
+Note that the `send` method is designed for simple use cases with a single message, while `forward` provides more flexibility for complex interactions. The `send` method cannot be overridden by subclasses to ensure consistent behavior across all agents.

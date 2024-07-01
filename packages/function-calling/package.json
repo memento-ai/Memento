@@ -9,6 +9,7 @@
     },
     "peerDependencies": {
         "@memento-ai/agent": "^1.0.0",
+        "@memento-ai/conversation": "^1.0.0",
         "@memento-ai/function-registry": "^1.0.0",
         "@memento-ai/memento-db": "^1.0.0",
         "@memento-ai/types": "^1.0.0",

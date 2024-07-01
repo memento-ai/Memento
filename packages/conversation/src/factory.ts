@@ -2,6 +2,7 @@
 
 import type { ConversationConfig } from '@memento-ai/config'
 import type { AssistantMessage } from '@memento-ai/types'
+import { getMementoProjectRoot } from '@memento-ai/utils'
 import dayjs from 'dayjs'
 import fs from 'fs'
 import { mkdir } from 'node:fs/promises'
@@ -42,7 +43,8 @@ export function withLogger(conversation: ConversationInterface, path: string): C
         const loggingData: string = loggingTemplate({ prompt, messages: [...messages, response] })
 
         const datestring = dayjs().format('YYYY-MM-DD')
-        const fullPath = `logs/${path}/${datestring}`
+        const root = getMementoProjectRoot()
+        const fullPath = `${root}/logs/${path}/${datestring}`
         await mkdir(fullPath, { recursive: true })
 
         const hm = dayjs().format('HH:mm')

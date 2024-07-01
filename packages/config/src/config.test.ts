@@ -12,12 +12,14 @@ const defaultConfig: Config = {
         model: 'haiku',
         temperature: 0,
         role: 'memento',
+        max_response_tokens: 2000,
     },
     resolution_agent: {
         provider: 'anthropic',
         model: 'haiku',
         temperature: 0,
         role: 'resolution',
+        max_response_tokens: 200,
     },
     synopsis_agent: {
         provider: 'anthropic',
@@ -25,6 +27,7 @@ const defaultConfig: Config = {
         temperature: 0,
         max_tokens: 2000,
         role: 'synopsis',
+        max_response_tokens: 100,
     },
     conversation: {
         max_exchanges: 5,

@@ -8,6 +8,7 @@ The `@memento-ai/conversation` package provides an abstraction for interacting w
 - Ability to send messages and receive responses
 - Support for streaming responses
 - Configurable options for temperature, max response tokens, model selection, and logging
+- Seed option for reproducible results (Ollama only)
 
 ## Usage and Examples
 ### Creating a Conversation
@@ -44,7 +45,7 @@ console.log(response.content); // Output: '5'
 ```
 
 ### Streaming Responses
-The package also supports streaming responses, which can be enabled by providing a `Writable` stream when creating the `ConversationInterface` instance:
+The package supports streaming responses, which can be enabled by providing a `Writable` stream when creating the `ConversationInterface` instance:
 
 ```typescript
 import { Writable } from 'stream';
@@ -84,3 +85,34 @@ logs/
         ...
 ```
 Each log file contains the prompt, messages, and response for each conversation, separated by a delimiter.
+
+### Using Different Providers
+The package supports multiple providers. Here's an example of using the Google provider:
+
+```typescript
+const googleConversation = createConversation('google', {
+  model: 'gemini-1.5-flash-latest',
+  temperature: 0.0,
+  max_response_tokens: 64
+});
+
+const response = await googleConversation.sendMessage(args);
+console.log(response.content);
+```
+
+### Setting a Seed (Ollama only)
+For reproducible results with Ollama, you can set a seed:
+
+```typescript
+const ollamaConversation = createConversation('ollama', {
+  model: 'dolphin-phi',
+  temperature: 0.0,
+  max_response_tokens: 64,
+  seed: 987
+});
+
+const response = await ollamaConversation.sendMessage(args);
+console.log(response.content);
+```
+
+Note that the seed option is only available for the Ollama provider.

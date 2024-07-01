@@ -2,6 +2,7 @@
 
 import type { ConversationInterface, SendMessageArgs } from '@memento-ai/conversation'
 import { AssistantMessage, constructUserMessage } from '@memento-ai/types'
+import type { Writable } from 'stream'
 
 // An Agent is a class that may represent:
 // 1. a conversational agent/chatbot that interacts with the user, or
@@ -22,6 +23,7 @@ export type AgentArgs = {
 
 export interface SendArgs {
     content: string
+    stream?: Writable
 }
 
 export abstract class Agent {
@@ -43,8 +45,8 @@ export abstract class Agent {
     // Instead, we just delegate to ConversationInterface through this method.
     // All subclasses of Agent will have to call this method either directly
     // or indirectly via the send method.
-    async forward({ prompt, messages }: SendMessageArgs): Promise<AssistantMessage> {
-        return this.conversation.sendMessage({ prompt, messages })
+    async forward(args: SendMessageArgs): Promise<AssistantMessage> {
+        return this.conversation.sendMessage(args)
     }
 
     // Every agent will need a prompt that is specific to the agent
@@ -54,9 +56,9 @@ export abstract class Agent {
     // This is a convenience method what will be used for simple tools with a fixed prompt and a single message (no coversation history)
     // But note that this method cannot be overridden by subclasses, as it becomes difficult to reason about behavior
     // if both send and sendMessage can be overridden.
-    public async send({ content }: SendArgs): Promise<AssistantMessage> {
+    public async send({ content, stream }: SendArgs): Promise<AssistantMessage> {
         const prompt = await this.generatePrompt()
         const message = constructUserMessage(content)
-        return this.forward({ prompt, messages: [message] })
+        return this.forward({ prompt, messages: [message], stream })
     }
 }

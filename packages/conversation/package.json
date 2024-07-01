@@ -12,7 +12,8 @@
     },
     "peerDependencies": {
         "@memento-ai/config": "^1.0.0",
-        "@memento-ai/types": "^1.0.0"
+        "@memento-ai/types": "^1.0.0",
+        "@memento-ai/utils": "^1.0.0"
     },
     "dependencies": {
         "@anthropic-ai/sdk": "^0.17.1",

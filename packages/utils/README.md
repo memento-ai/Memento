@@ -1,7 +1,7 @@
 # @memento-ai/utils
 
 ## Description
-The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for finding the root directory of a Git repository or the Memento project, parsing input using Zod schemas with error handling and stack trace support, removing common indentation from text blocks, and listing files in a Git repository.
+The `@memento-ai/utils` package provides a set of utility functions and tools for the Memento project. It includes functionality for working with Git repositories, managing project structure, parsing input using Zod schemas, handling common tasks, and more.
 
 ## Key Features
 - Git repository utilities:
@@ -11,6 +11,7 @@ The `@memento-ai/utils` package provides a set of utility functions and tools fo
 - `zodParse` function to parse input using Zod schemas with error handling and stack trace support.
 - `stripCommonIndent` function to remove common indentation from a block of text.
 - `spawnCommand` and `spawnCommandLine` functions for reliable command execution.
+- `createTemporaryWritable` function to create a temporary writable stream.
 
 ## Usage and Examples
 
@@ -89,6 +90,20 @@ console.log(output1);
 
 const output2 = spawnCommandLine('git status');
 console.log(output2);
+```
+
+### Creating a Temporary Writable Stream
+```typescript
+import { createTemporaryWritable } from '@memento-ai/utils';
+import { Writable } from 'node:stream';
+
+const originalStream = new Writable(/* ... */);
+const tempStream = createTemporaryWritable(originalStream);
+
+// Use tempStream...
+
+// Closing tempStream won't close the originalStream
+tempStream.end();
 ```
 
 These utility functions provide essential tools for working with Git repositories, managing project structure, and handling common tasks within the Memento project ecosystem.

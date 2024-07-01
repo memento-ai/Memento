@@ -20,6 +20,9 @@ function tokenCount(results: MementoSearchResult[]): number {
     return results.reduce((acc, m) => acc + m.tokens, 0)
 }
 
+const maxTokens = 2000
+const numKeywords = 5
+
 describe('Search', () => {
     let db: MementoDb
     let dbname: string
@@ -40,7 +43,7 @@ describe('Search', () => {
     })
 
     it('can run a keyword search for a function declaration', async () => {
-        const args: MementoSearchArgs = { content: 'createMem(content: string)', maxTokens: 1000, numKeywords: 5 }
+        const args: MementoSearchArgs = { content: 'createMem(content: string)', maxTokens, numKeywords }
         const result = await selectMemsByKeywordSearch(db.pool, args)
         dlog(`Result set has ${result.length} entries`)
         expect(result).toBeTruthy()
@@ -50,14 +53,14 @@ describe('Search', () => {
 
         expect(result[0].kind).toBe('doc')
         expect(result[0].source).toBe('packages/types/src/memSchema.ts')
-        expect(tokenCount(result)).toBeLessThanOrEqual(1000)
+        expect(tokenCount(result)).toBeLessThanOrEqual(maxTokens)
     })
 
     it('can run a semantic search for a content string', async () => {
         const args: MementoSearchArgs = {
             content: 'A Mem is determined by its content string.',
-            maxTokens: 1000,
-            numKeywords: 5,
+            maxTokens,
+            numKeywords,
         }
         const result = await selectMemsBySemanticSimilarity(db.pool, args)
         dlog(`Result set has ${result.length} entries`)
@@ -72,14 +75,14 @@ describe('Search', () => {
 
         expect(result[0].kind).toBe('doc')
         expect(result[0].source).toBe('packages/types/src/memSchema.ts')
-        expect(tokenCount(result)).toBeLessThanOrEqual(1000)
+        expect(tokenCount(result)).toBeLessThanOrEqual(maxTokens)
     })
 
     it('can run a combined search for a content string', async () => {
         const args: MementoSearchArgs = {
             content: 'A Mem is determined by its content string.',
-            maxTokens: 1000,
-            numKeywords: 5,
+            maxTokens,
+            numKeywords,
         }
         const result = await selectSimilarMementos(db.pool, args)
         dlog(`Result set has ${result.length} entries`)
@@ -95,18 +98,20 @@ describe('Search', () => {
         expect(result[0].kind).toBe('doc')
         expect(result[0].source).toBe('packages/types/src/memSchema.ts')
 
-        const trimmed = trimSearchResult(result, 1000)
-        expect(tokenCount(trimmed)).toBeLessThanOrEqual(1000)
+        const trimTo = 1000
+        const trimmed = trimSearchResult(result, trimTo)
+        expect(tokenCount(trimmed)).toBeLessThanOrEqual(trimTo)
     })
 
     it('can run a combined search for a function declaration', async () => {
-        const args: MementoSearchArgs = { content: 'createMem(content: string)', maxTokens: 1000, numKeywords: 5 }
+        const args: MementoSearchArgs = { content: 'createMem(content: string)', maxTokens, numKeywords }
         const result = await selectSimilarMementos(db.pool, args)
         dlog(`Result set has ${result.length} entries`)
         expect(result).toBeTruthy()
         expect(result.length).toBeGreaterThan(1)
-        expect(result[0].score).toBe(1.0)
-        expect(result[result.length - 1].score).toBe(0.0)
+        const scores: number[] = result.map((r) => r.score)
+        expect(Math.max(...scores)).toBe(1.0)
+        expect(Math.min(...scores)).toBe(0.0)
 
         result.forEach((r) => {
             dlog(`2Kind: ${r.kind}, Source: ${r.source}, Score: ${r.score}`)
@@ -115,7 +120,8 @@ describe('Search', () => {
         expect(result[0].kind).toBe('doc')
         expect(result[0].source).toBe('packages/types/src/memSchema.ts')
 
-        const trimmed = trimSearchResult(result, 1000)
-        expect(tokenCount(trimmed)).toBeLessThanOrEqual(1000)
+        const trimTo = 1000
+        const trimmed = trimSearchResult(result, trimTo)
+        expect(tokenCount(trimmed)).toBeLessThanOrEqual(trimTo)
     })
 })

@@ -10,6 +10,8 @@ The `@memento-ai/memento-cli` package provides a command-line interface (CLI) fo
 - Provides visual cues and prompts for a seamless conversational experience.
 - Configurable through command-line arguments.
 - Color-coded output for better readability.
+- Cleans up the last user memory before starting a new conversation.
+- Implements a streaming interface for real-time display of the assistant's responses.
 
 ## Usage and Examples
 
@@ -54,3 +56,11 @@ nx run memento-cli:serve path/to/your/config.toml
 ```
 
 For more details on the TOML configuration format, refer to the `@memento-ai/config` package documentation.
+
+### Implementation Details
+- The CLI uses the `@memento-ai/memento-agent` package to create and interact with the Memento system.
+- It leverages the `@memento-ai/config` package to load and manage configuration settings.
+- The `@memento-ai/postgres-db` package is used to clean up the last user memory before starting a new conversation.
+- The application uses the `commander` package for parsing command-line arguments.
+- `ansi-colors` is used for color-coded output in the terminal.
+- The CLI implements a generator-based approach for handling user input, supporting both single-line and multi-line inputs.

@@ -14,7 +14,7 @@ import debug from 'debug'
 import type { DatabasePool, Interceptor } from 'slonik'
 import { sql } from 'slonik'
 import { z } from 'zod'
-import { getSynopses } from './getSynopses'
+import { getSynopses, type GetSynopsesArgs } from './getSynopses'
 import { addConvExchangeMementos } from './mementoDb-addConvXchg'
 import {
     addConversationMem,
@@ -146,8 +146,8 @@ export class MementoDb {
         return await getConversation(this.pool, config)
     }
 
-    async getSynopses(tokenLimit: number): Promise<string[]> {
-        return getSynopses(this.pool, tokenLimit)
+    async getSynopses(args: GetSynopsesArgs): Promise<string[]> {
+        return getSynopses(this.pool, args)
     }
 
     async get_last_user_message(): Promise<Message> {

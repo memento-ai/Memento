@@ -14,12 +14,14 @@ The `@memento-ai/memento-db` package provides a TypeScript interface for interac
 - Retrieve resolution mementos
 - Retrieve synopses (short summaries) from the database
 - Get the last user and assistant messages in a conversation
+- Generate and retrieve text embeddings for semantic search
 
 ## Usage and Examples
 The main entry point is the `MementoDb` class, which provides methods for interacting with the database:
 
 ```typescript
 import { MementoDb } from '@memento-ai/memento-db';
+import { USER, ASSISTANT } from '@memento-ai/types';
 
 // Create a new MementoDb instance
 const db = await MementoDb.connect('my-memento-db');
@@ -61,12 +63,21 @@ const synId = await db.addSynopsisMem({
 });
 
 // Get the conversation history
-const conversation = await db.getConversation();
+const config = loadDefaultConfig(); // Assuming you have a config loader
+const conversation = await db.getConversation(config);
 
 // Get resolution mementos
 const resolutions = await db.getResolutions();
 
+// Get synopses
+const synopses = await db.getSynopses(1000); // Get synopses with a token limit of 1000
+
 // Get the last user and assistant messages
 const lastUserMessage = await db.get_last_user_message();
 const lastAssistantMessage = await db.get_last_assistant_message();
+
+// Close the database connection when done
+await db.close();
 ```
+
+This package is designed to work seamlessly with other components of the Memento AI system, providing a robust storage and retrieval mechanism for maintaining conversational context and related information.

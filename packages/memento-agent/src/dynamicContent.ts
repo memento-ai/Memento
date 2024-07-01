@@ -5,7 +5,7 @@ import type { MementoDb } from '@memento-ai/memento-db'
 import type { MementoSearchResult, MementoSimilarityMap } from '@memento-ai/search'
 import { asSimilarityMap } from '@memento-ai/search'
 import type { MemKind, Message } from '@memento-ai/types'
-import { CONV, MemKindValues, Role, SYN, XCHG } from '@memento-ai/types'
+import { CONV, MemKindValues, Role, XCHG } from '@memento-ai/types'
 import { sql } from 'slonik'
 import { z } from 'zod'
 
@@ -15,7 +15,6 @@ export type AdditionalContextIndex = Record<MemKind, MementoSearchResultMap>
 export type DynamicContent = {
     additionalContext: AdditionalContextIndex
     messages: Message[]
-    synopses: string[]
 }
 
 function makeAdditionalContextIndex(): AdditionalContextIndex {
@@ -42,10 +41,6 @@ function removeConv(id: string, index: AdditionalContextIndex): void {
 
 function removeXchg(id: string, index: AdditionalContextIndex): void {
     delete index[XCHG][id]
-}
-
-function removeSyn(id: string, index: AdditionalContextIndex): void {
-    delete index[SYN][id]
 }
 
 const MessageIdPair = z.object({
@@ -80,36 +75,6 @@ export async function getRecentConversation(db: MementoDb, max_exchanges: number
     return result.rows.map((row) => MessageIdPair.parse(row))
 }
 
-const SynopsesIdPair = z.object({
-    id: z.string(),
-    content: z.string(),
-})
-type SynopsesIdPair = z.infer<typeof SynopsesIdPair>
-
-export async function getRecentSynopses(db: MementoDb, maxSynopses = 30): Promise<SynopsesIdPair[]> {
-    const query = sql.type(SynopsesIdPair)`
-        WITH recent_synopses AS (
-            SELECT
-                id, content, created_at
-            FROM memento
-            WHERE
-                kind = 'syn'
-            ORDER BY
-                created_at DESC
-            LIMIT ${maxSynopses}
-        )
-        SELECT
-            id, content
-        FROM
-            recent_synopses
-        ORDER BY
-            created_at ASC;
-    `
-
-    const result = await db.pool.query(query)
-    return result.rows.map((row) => SynopsesIdPair.parse(row))
-}
-
 export async function gatherContent(
     db: MementoDb,
     results: MementoSearchResult[],
@@ -127,17 +92,9 @@ export async function gatherContent(
         removeXchg(message.docid, mementosByKind)
     }
 
-    const synopses: SynopsesIdPair[] = await getRecentSynopses(db)
-
-    // If the recent synopses are contained in the additional context, remove them.
-    for (const synopsis of synopses) {
-        removeSyn(synopsis.id, mementosByKind)
-    }
-
     return {
         additionalContext: mementosByKind,
         messages: messages.map((m) => ({ role: m.role, content: m.content })),
-        synopses: synopses.map((s) => s.content),
     }
 }
 
