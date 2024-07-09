@@ -1,34 +1,40 @@
-import { Command } from 'commander';
+import { program } from 'commander';
+import fs from 'fs/promises';
+import path from 'path';
 import { queryMementos } from './queryMementos';
 import { processConversation } from './processConversation';
-import { formatTranscript } from './formatTranscript';
-import { TranscriptOptions } from './types';
-
-const program = new Command();
+import { formatTranscript, FormatType } from './formatTranscript';
 
 program
-  .option('-d, --database <name>', 'Database name to connect to')
-  .option('-s, --start <date>', 'Start date for the transcript (ISO 8601 format)')
-  .option('-e, --end <date>', 'End date for the transcript (ISO 8601 format)')
-  .option('-f, --format <type>', 'Output format (markdown or html)', 'markdown')
-  .option('-o, --output <file>', 'Output file path')
+  .requiredOption('-d, --database <name>', 'database name')
+  .requiredOption('-s, --start <date>', 'start date (YYYY-MM-DD)')
+  .requiredOption('-e, --end <date>', 'end date (YYYY-MM-DD)')
+  .requiredOption('-f, --format <type>', 'output format (markdown or html)')
+  .requiredOption('-o, --output <file>', 'output file path')
   .parse(process.argv);
 
 const options = program.opts();
 
-async function generateTranscript(options: TranscriptOptions & { database: string }) {
-  const startDate = new Date(options.start);
-  const endDate = new Date(options.end);
-  
-  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-    throw new Error('Invalid date format. Please use ISO 8601 format (e.g., "2023-01-01T00:00:00Z").');
-  }
+async function generateTranscript() {
+  try {
+    const startDate = new Date(options.start);
+    const endDate = new Date(options.end);
+    const format = options.format as FormatType;
 
-  const mementos = await queryMementos(options.database, startDate, endDate);
-  const conversation = processConversation(mementos);
-  const transcript = formatTranscript(conversation, options.format);
-  // TODO: Write transcript to file
-  console.log('Transcript generated successfully');
+    if (format !== 'markdown' && format !== 'html') {
+      throw new Error('Invalid format. Use "markdown" or "html".');
+    }
+
+    const mementos = await queryMementos(options.database, startDate, endDate);
+    const processedConversation = processConversation(mementos);
+    const formattedTranscript = formatTranscript(processedConversation, format);
+
+    await fs.writeFile(options.output, formattedTranscript);
+    console.log(`Transcript written to ${options.output}`);
+  } catch (error) {
+    console.error('Error generating transcript:', error);
+    process.exit(1);
+  }
 }
 
-generateTranscript(options as TranscriptOptions & { database: string }).catch(console.error);
+generateTranscript();
