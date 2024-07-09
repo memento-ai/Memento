@@ -29,7 +29,7 @@ const content = `
 }
 \`\`\``;
 
-const functionCalls = Array.from(extractFunctionCalls(content));
+const { syncCalls, asyncCalls, badCalls, thinking } = extractFunctionCalls(content);
 ```
 
 ### Invoking Functions
@@ -79,7 +79,7 @@ const handler = new FunctionHandler({ agent: myAgent });
 
 const userMessage = { content: 'What time is it?', role: 'user' };
 const priorMessages = [];
-const assistantMessage = await handler.handle(userMessage, priorMessages);
+const result = await handler.sendUserMessageAndExecuteFunctions({ userMessage, priorMessages });
 ```
 
 ### Invoking Synchronous and Asynchronous Functions
@@ -89,14 +89,12 @@ The `invokeSyncAndAsyncFunctions` function allows executing both synchronous and
 import { invokeSyncAndAsyncFunctions } from '@memento-ai/function-calling';
 
 const args = {
-  assistantMessage,
+  extracted,
   context,
   registry,
-  asyncResultsP: Promise.resolve([]),
-  cycleCount: 1
 };
 
-const { functionResultContent, newAsyncResultsP } = await invokeSyncAndAsyncFunctions(args);
+const { newAsyncResultsP, funcMementoIds } = await invokeSyncAndAsyncFunctions(args);
 ```
 
 ### Error Handling

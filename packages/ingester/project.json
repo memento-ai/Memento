@@ -6,25 +6,24 @@
     "tags": [],
     "targets": {
         "build": {
-            "executor": "@nx-bun/nx:build",
+            "executor": "nx:run-commands",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "entrypoints": ["packages/ingester/src/index.ts"],
-                "outputPath": "dist/ingester",
-                "tsConfig": "packages/ingester/tsconfig.lib.json",
-                "smol": false,
-                "bun": true
+                "command": "bun build packages/ingester/index.ts --outdir dist/ingester --target node"
             }
         },
         "lint": {
             "executor": "@nx/eslint:lint"
         },
-        "test": {
-            "executor": "@nx-bun/nx:test",
+        "test": { "executor": "@nx-bun/nx:test", "options": { "smol": false, "bail": true, "bun": false } },
+        "type-check": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
             "options": {
-                "smol": false,
-                "bail": true,
-                "bun": false
+                "outputPath": "dist/out-tsc/packages/ingester",
+                "main": "packages/ingester/index.ts",
+                "tsConfig": "packages/ingester/tsconfig.json",
+                "noEmit": true
             }
         }
     }

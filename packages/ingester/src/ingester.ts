@@ -85,7 +85,7 @@ export async function ingestDirectory({ db, dirPath, summarizer, log }: IngestDi
     log = log ?? false
     if (log) debug.enable('ingester')
 
-    const root = await gitRepoRootForDir(dirPath)
+    const root = gitRepoRootForDir(dirPath)
     dlog(`Ingesting directory: ${dirPath}`)
     await dropAbandonedFiles(db)
 

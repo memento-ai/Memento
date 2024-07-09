@@ -1,7 +1,6 @@
 // Path: packages/function-calling/src/functionCallingTypes.ts
 
 import type { BaseInput } from '@memento-ai/function-registry'
-import type { Context } from '@memento-ai/memento-db'
 
 export const FUNCTION_RESULT_HEADER = 'SYSTEM: Function call result for'
 
@@ -9,20 +8,19 @@ export type SyncFunctionCall = {
     name: string
     async?: false | undefined
     input: BaseInput
-    context?: Context
 }
 
 export type AsyncFunctionCall = {
     name: string
     async: true
     input: BaseInput
-    context?: Context
 }
 
 export type FunctionCall = SyncFunctionCall | AsyncFunctionCall
 
 export interface FunctionError {
     name: string // The name of the function that was called
+    input: BaseInput
     error: string
 }
 
@@ -57,7 +55,7 @@ export function isFunctionCall(value: unknown): value is FunctionCall {
         'name' in value &&
         'input' in value &&
         typeof value.name === 'string' &&
-        typeof value.input === 'object'
+        (typeof value.input === 'object' || typeof value.input === 'string')
     )
 }
 

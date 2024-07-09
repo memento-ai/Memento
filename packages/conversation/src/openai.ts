@@ -13,7 +13,7 @@ export class OpenAIConversation implements ConversationInterface {
 
     constructor(options: ConversationOptions) {
         this.model = options.model ?? 'gpt-3.5-turbo'
-        this.client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+        this.client = new OpenAI({ apiKey: process.env['OPENAI_API_KEY'] })
         this.temperature = options.temperature
     }
 

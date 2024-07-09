@@ -7,7 +7,7 @@ import { createMementoDb, dropDatabase, type ID } from '@memento-ai/postgres-db'
 import { CONV, Memento, USER, XCHG } from '@memento-ai/types'
 import { nanoid } from 'nanoid'
 import { sql } from 'slonik'
-import type { AddConvExchangeArgs } from '../mementoDb-types'
+import type { AddConvExchangeFuncArgs } from '../mementoDb-types'
 
 describe('MementoDb', () => {
     let db: MementoDb
@@ -46,11 +46,12 @@ describe('MementoDb', () => {
     })
 
     it('can add a user/assistant exchange', async () => {
-        const args: AddConvExchangeArgs = {
+        const args: AddConvExchangeFuncArgs = {
             userContent: 'test user exchange',
             asstContent: 'test assistant',
+            funcMementoIds: [],
         }
-        const id: ID = await db.addConvExchangeMementos(args)
+        const id: ID = await db.addConvExchangeFuncMementos(args)
 
         const mementos = await db.pool.connect(async (conn) => {
             return await conn.query(sql.type(Memento)`

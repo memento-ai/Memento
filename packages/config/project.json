@@ -6,25 +6,24 @@
     "tags": [],
     "targets": {
         "build": {
-            "executor": "@nx-bun/nx:build",
+            "executor": "nx:run-commands",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "entrypoints": ["packages/config/src/index.ts"],
-                "outputPath": "dist/config",
-                "tsConfig": "packages/config/tsconfig.lib.json",
-                "smol": false,
-                "bun": true
+                "command": "bun build packages/config/index.ts --outdir dist/config --target node"
             }
         },
         "lint": {
             "executor": "@nx/eslint:lint"
         },
-        "test": {
-            "executor": "@nx-bun/nx:test",
+        "test": { "executor": "@nx-bun/nx:test", "options": { "smol": false, "bail": true, "bun": false } },
+        "type-check": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
             "options": {
-                "smol": false,
-                "bail": true,
-                "bun": false
+                "outputPath": "dist/out-tsc/packages/config",
+                "main": "packages/config/index.ts",
+                "tsConfig": "packages/config/tsconfig.json",
+                "noEmit": true
             }
         }
     }

@@ -49,12 +49,12 @@ import {
 
 const db = await MementoDb.connect('my_database');
 const content = 'Some content to search for';
-const maxTokens = 10000;
+const max_tokens = 10000;
 
 const keywords = await extractKeywordsFromContent(db.pool, { content });
-const keywordSearchMems = await selectMemsByKeywordSearch(db.pool, { content, maxTokens });
-const semanticSearchMems = await selectMemsBySemanticSimilarity(db.pool, { content, maxTokens });
-const fullSearchMems = await selectSimilarMementos(db.pool, { content, maxTokens });
+const keywordSearchMems = await selectMemsByKeywordSearch(db.pool, { content, max_tokens });
+const semanticSearchMems = await selectMemsBySemanticSimilarity(db.pool, { content, max_tokens });
+const fullSearchMems = await selectSimilarMementos(db.pool, { content, max_tokens });
 ```
 
 For more details on the individual functions, refer to the `@memento-ai/search` package documentation.

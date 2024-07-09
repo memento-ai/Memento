@@ -7,6 +7,7 @@ import {
     getConversation,
     get_last_assistant_message,
     get_last_user_message,
+    type GetConversationSnapshotResult,
     type ID,
 } from '@memento-ai/postgres-db'
 import type { Message } from '@memento-ai/types'
@@ -15,20 +16,22 @@ import type { DatabasePool, Interceptor } from 'slonik'
 import { sql } from 'slonik'
 import { z } from 'zod'
 import { getSynopses, type GetSynopsesArgs } from './getSynopses'
-import { addConvExchangeMementos } from './mementoDb-addConvXchg'
+import { addConvExchangeFuncMementos } from './mementoDb-addConvXchg'
 import {
     addConversationMem,
     addDocAndSummary,
     addFragmentMem,
+    addFuncMemento,
     addResolutionMem,
     addSynopsisMem,
     linkExchangeSynopsis,
 } from './mementoDb-mems'
 import type {
     AddConvArgs,
-    AddConvExchangeArgs,
+    AddConvExchangeFuncArgs,
     AddDocAndSummaryArgs,
     AddFragArgs,
+    AddFunctionCallArgs,
     AddSynopsisArgs,
     Context,
     DocAndSummaryResult,
@@ -122,8 +125,8 @@ export class MementoDb {
     // - a conversation exchange memento
     // - a conv memento for the user message
     // - a conv memento for the assistant message
-    async addConvExchangeMementos(args_: AddConvExchangeArgs): Promise<ID> {
-        return addConvExchangeMementos(this.pool, args_)
+    async addConvExchangeFuncMementos(args_: AddConvExchangeFuncArgs): Promise<ID> {
+        return addConvExchangeFuncMementos(this.pool, args_)
     }
 
     async linkExchangeSynopsis(args_: LinkExchangeArgs): Promise<void> {
@@ -142,7 +145,11 @@ export class MementoDb {
         return addSynopsisMem(this.pool, args_)
     }
 
-    async getConversation(config: Config): Promise<Message[]> {
+    async addFuncMemento(args_: AddFunctionCallArgs): Promise<ID> {
+        return addFuncMemento(this.pool, args_)
+    }
+
+    async getConversation(config: Config): Promise<GetConversationSnapshotResult> {
         return await getConversation(this.pool, config)
     }
 
@@ -169,8 +176,15 @@ export class MementoDb {
             ORDER BY
                 created_at ASC
             `
-        const result = await this.pool.query(query)
-        return result.rows.map((row) => Resolution.parse(row).content)
+        const result = await this.pool
+            .query(query)
+            .then((result) => result.rows.map((row) => row.content))
+            .catch((err) => {
+                Error.captureStackTrace(err)
+                console.error(err.stack)
+                throw err
+            })
+        return result
     }
 }
 

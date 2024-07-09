@@ -1,11 +1,10 @@
 // Path: packages/memento-agent/src/prompt-partials/synopses.ts
 
-import type { MementoSearchResult } from '@memento-ai/search'
 import { stripCommonIndent } from '@memento-ai/utils'
 import Handlebars from 'handlebars'
 
 export type SynopsesPromptTempateArgs = {
-    synMems: MementoSearchResult[]
+    synMems: string[]
 }
 
 const synopsisPromptTemplateText = stripCommonIndent(`

@@ -2,4 +2,5 @@
 
 export * from './src/getSynopses'
 export * from './src/mementoDb'
+export * from './src/mementoDb-mems'
 export * from './src/mementoDb-types'

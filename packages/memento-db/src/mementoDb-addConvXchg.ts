@@ -15,13 +15,13 @@ import {
 import { zodParse } from '@memento-ai/utils'
 import debug from 'debug'
 import { nanoid } from 'nanoid'
-import type { DatabasePool } from 'slonik'
-import type { AddConvExchangeArgs } from './mementoDb-types'
+import { sql, type DatabasePool } from 'slonik'
+import type { AddConvExchangeFuncArgs } from './mementoDb-types'
 
 const dlog = debug('mementoDb:mems')
 
-export async function addConvExchangeMementos(pool: DatabasePool, args_: AddConvExchangeArgs): Promise<ID> {
-    const { userContent, asstContent } = args_
+export async function addConvExchangeFuncMementos(pool: DatabasePool, args_: AddConvExchangeFuncArgs): Promise<ID> {
+    const { userContent, asstContent, funcMementoIds } = args_
 
     const result = await pool.connect(async (conn) => {
         const userMem: Mem = await createMem(userContent)
@@ -57,6 +57,21 @@ export async function addConvExchangeMementos(pool: DatabasePool, args_: AddConv
         const xchgID = await addMementoWithConn({ conn, mem: xchgMem, metaId: xchgMetaId, metaArgs: xchgMetaArgs })
 
         dlog('Added conversation exchange mementos:', { userID, asstID, xchgID })
+        dlog('Updating func mementos to point to xchg memento:', funcMementoIds)
+
+        // Update the func mementos to point to the xchg memento
+        if (funcMementoIds.length > 0) {
+            const updateQuery = sql.unsafe`
+                UPDATE meta
+                SET docid = ${xchgMetaId}
+                WHERE id in (${sql.join(funcMementoIds, sql.fragment`, `)})
+            `
+            await conn.query(updateQuery).catch((err) => {
+                Error.captureStackTrace(err)
+                console.error(err.stack)
+                throw err
+            })
+        }
 
         return xchgID
     })

@@ -6,25 +6,24 @@
     "tags": [],
     "targets": {
         "build": {
-            "executor": "@nx-bun/nx:build",
+            "executor": "nx:run-commands",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "entrypoints": ["packages/function-registry/src/index.ts"],
-                "outputPath": "dist/function-registry",
-                "tsConfig": "packages/function-registry/tsconfig.lib.json",
-                "smol": false,
-                "bun": true
+                "command": "bun build packages/function-registry/index.ts --outdir dist/function-registry --target node"
             }
         },
         "lint": {
             "executor": "@nx/eslint:lint"
         },
-        "test": {
-            "executor": "@nx-bun/nx:test",
+        "test": { "executor": "@nx-bun/nx:test", "options": { "smol": false, "bail": true, "bun": false } },
+        "type-check": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
             "options": {
-                "smol": false,
-                "bail": true,
-                "bun": false
+                "outputPath": "dist/out-tsc/packages/function-registry",
+                "main": "packages/function-registry/index.ts",
+                "tsConfig": "packages/function-registry/tsconfig.json",
+                "noEmit": true
             }
         }
     }

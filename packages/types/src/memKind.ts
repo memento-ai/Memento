@@ -9,6 +9,7 @@ export const DSUM = 'dsum' as const
 export const RES = 'res' as const
 export const SYN = 'syn' as const
 export const XCHG = 'xchg' as const
+export const FUNC = 'func' as const
 
 export const MemKindMap = {
     conv: CONV, // Conversation mem: content of one message from user or assistant
@@ -18,6 +19,7 @@ export const MemKindMap = {
     res: RES, // Resolution mem: a resolution made by the assistant
     syn: SYN, // Message exchange synopsis (assistant's inner monologue)
     xchg: XCHG, // Exchange mem: a message pair between user and assistant
+    func: FUNC, // Function call mem: details of a function call including input and output
 } as const
 
 export type MemKind = (typeof MemKindMap)[keyof typeof MemKindMap]

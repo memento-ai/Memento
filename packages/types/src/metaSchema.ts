@@ -1,7 +1,7 @@
 // Path: packages/types/src/metaSchema.ts
 
 import { z } from 'zod'
-import { CONV, DOC, DSUM, FRAG, MemKind, RES, SYN, XCHG } from './memKind'
+import { CONV, DOC, DSUM, FRAG, FUNC, MemKind, RES, SYN, XCHG } from './memKind'
 import { Role } from './role'
 
 // The various *MetaData types are the logical database schema for each of the mem kinds.
@@ -73,11 +73,19 @@ export const ConvExchangeMetaData = RequiredMetaBase.extend({
 })
 export type ConvExchangeMetaData = z.TypeOf<typeof ConvExchangeMetaData>
 
+export const FunctionCallMetaData = RequiredMetaBase.extend({
+    kind: z.literal(FUNC),
+    docid: z.string(), // This will store the id of the associated xchg memento
+    source: z.string().optional(), // We can use this to store the function_name
+})
+export type FunctionCallMetaData = z.TypeOf<typeof FunctionCallMetaData>
+
 export const MemMetaData = z.discriminatedUnion('kind', [
     ConversationMetaData,
     DocSummaryMetaData,
     DocumentMetaData,
     FragmentMetaData,
+    FunctionCallMetaData,
     ResolutionMetaData,
     SynopsisMetaData,
     ConvExchangeMetaData,

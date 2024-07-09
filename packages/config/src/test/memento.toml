@@ -8,29 +8,37 @@
 database = "memento-test.db"
 
 [memento_agent]
+role = "memento-x"
 provider = "anthropic"
 model = "opus"
 temperature = 1.5
-
-[synopsis_agent]
-provider = "anthropic"
-model = "haiku"
-temperature = 0.25
-max_tokens = 1000
+max_response_tokens = 4001
 
 [resolution_agent]
+role = 'resolution-x'
 provider = "anthropic"
 model = "sonnet"
 temperature = 1.25
+max_response_tokens = 199
 
-[conversation]
-max_exchanges = 13
-max_tokens = 3333
+[synopsis_agent]
+role = "synopsis-x"
+provider = "anthropic"
+model = "haiku"
+temperature = 0.25
+max_response_tokens = 99
 
-[search]
-max_tokens = 7777
+[search_context]
+tokens = 7777
 keywords = 7
 
-    [search.decay]
-    user = 0.4
-    asst = 0.6
+[search_context.weight]
+user = 0.4
+asst = 0.6
+
+[synopses]
+max_tokens = 222
+
+[conversation_snapshot]
+max_exchanges = 13
+max_tokens = 3333

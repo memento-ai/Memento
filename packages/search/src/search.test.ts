@@ -13,15 +13,15 @@ import { selectMemsByKeywordSearch } from './selectMemsByKeywordSearch'
 import { selectMemsBySemanticSimilarity } from './selectMemsBySemanticSimilarity'
 import { selectSimilarMementos } from './selectSimilarMementos'
 
-console.log('DEBUG', process.env.DEBUG)
+console.log('DEBUG', process.env['DEBUG'])
 const dlog = debug('search')
 
 function tokenCount(results: MementoSearchResult[]): number {
     return results.reduce((acc, m) => acc + m.tokens, 0)
 }
 
-const maxTokens = 2000
-const numKeywords = 5
+const max_tokens = 2000
+const keywords = 5
 
 describe('Search', () => {
     let db: MementoDb
@@ -43,7 +43,7 @@ describe('Search', () => {
     })
 
     it('can run a keyword search for a function declaration', async () => {
-        const args: MementoSearchArgs = { content: 'createMem(content: string)', maxTokens, numKeywords }
+        const args: MementoSearchArgs = { content: 'createMem(content: string)', max_tokens, keywords }
         const result = await selectMemsByKeywordSearch(db.pool, args)
         dlog(`Result set has ${result.length} entries`)
         expect(result).toBeTruthy()
@@ -53,14 +53,14 @@ describe('Search', () => {
 
         expect(result[0].kind).toBe('doc')
         expect(result[0].source).toBe('packages/types/src/memSchema.ts')
-        expect(tokenCount(result)).toBeLessThanOrEqual(maxTokens)
+        expect(tokenCount(result)).toBeLessThanOrEqual(max_tokens)
     })
 
     it('can run a semantic search for a content string', async () => {
         const args: MementoSearchArgs = {
             content: 'A Mem is determined by its content string.',
-            maxTokens,
-            numKeywords,
+            max_tokens,
+            keywords,
         }
         const result = await selectMemsBySemanticSimilarity(db.pool, args)
         dlog(`Result set has ${result.length} entries`)
@@ -75,14 +75,14 @@ describe('Search', () => {
 
         expect(result[0].kind).toBe('doc')
         expect(result[0].source).toBe('packages/types/src/memSchema.ts')
-        expect(tokenCount(result)).toBeLessThanOrEqual(maxTokens)
+        expect(tokenCount(result)).toBeLessThanOrEqual(max_tokens)
     })
 
     it('can run a combined search for a content string', async () => {
         const args: MementoSearchArgs = {
             content: 'A Mem is determined by its content string.',
-            maxTokens,
-            numKeywords,
+            max_tokens,
+            keywords,
         }
         const result = await selectSimilarMementos(db.pool, args)
         dlog(`Result set has ${result.length} entries`)
@@ -104,7 +104,7 @@ describe('Search', () => {
     })
 
     it('can run a combined search for a function declaration', async () => {
-        const args: MementoSearchArgs = { content: 'createMem(content: string)', maxTokens, numKeywords }
+        const args: MementoSearchArgs = { content: 'createMem(content: string)', max_tokens, keywords }
         const result = await selectSimilarMementos(db.pool, args)
         dlog(`Result set has ${result.length} entries`)
         expect(result).toBeTruthy()

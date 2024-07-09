@@ -2,9 +2,8 @@ node_modules
 out/
 src/notes
 logs
-sonnet.toml
-sonnet35.toml
-opus.toml
+/*.toml
 
 .nx/cache
 .nx/workspace-data
+dist

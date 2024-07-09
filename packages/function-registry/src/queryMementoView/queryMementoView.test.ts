@@ -46,10 +46,8 @@ describe('queryMementoView', () => {
             const queryMementoView = registry['queryMementoView']
             expect(queryMementoView).toBeDefined()
             dlog(`Executing read-only query on ${dbname}`)
-            const result = await queryMementoView.fn({
-                query: 'SELECT kind FROM memento',
-                context: { readonlyPool: db.readonlyPool },
-            })
+            const query = 'SELECT kind FROM memento'
+            const result = await queryMementoView.fn({ query }, { readonlyPool: db.readonlyPool })
             expect(typeof result).toBe('object')
             expect(result.length).toBe(2)
         },
@@ -62,10 +60,8 @@ describe('queryMementoView', () => {
             const queryMementoView = registry['queryMementoView']
             expect(queryMementoView).toBeDefined()
             dlog(`Executing read-only query on ${dbname}`)
-            const result = await queryMementoView.fn({
-                query: 'SELECT distinct kind FROM memento',
-                context: { readonlyPool: db.readonlyPool },
-            })
+            const query = 'SELECT distinct kind FROM memento'
+            const result = await queryMementoView.fn({ query }, { readonlyPool: db.readonlyPool })
             expect(typeof result).toBe('object')
             expect(result.length).toBe(1)
         },
@@ -85,11 +81,7 @@ describe('queryMementoView', () => {
             await db.addConversationMem({ content: 'test mem 3', role: ASSISTANT, priority: 10 })
 
             const query = `SELECT content FROM memento WHERE role = '${USER}' AND priority >= 10 AND priority <= 20 LIMIT 5`
-
-            const result = await queryMementoView.fn({
-                query,
-                context: { readonlyPool: db.readonlyPool },
-            })
+            const result = await queryMementoView.fn({ query }, { readonlyPool: db.readonlyPool })
 
             expect(typeof result).toBe('object')
             expect(result.length).toBe(2)
@@ -112,11 +104,7 @@ describe('queryMementoView', () => {
             await db.addConversationMem({ content: 'test mem cherry', role: ASSISTANT, priority: 10 })
 
             const query = `SELECT content FROM memento WHERE content ILIKE '%apple%' LIMIT 5`
-
-            const result = await queryMementoView.fn({
-                query,
-                context: { readonlyPool: db.readonlyPool },
-            })
+            const result = await queryMementoView.fn({ query }, { readonlyPool: db.readonlyPool })
 
             expect(typeof result).toBe('object')
             expect(result.length).toBe(1)
@@ -138,11 +126,7 @@ describe('queryMementoView', () => {
             await db.addConversationMem({ content: 'test mem cherry', role: ASSISTANT, priority: 10 })
 
             const query = `SELECT content FROM memento WHERE tssearch @@ to_tsquery('apple | cherry') LIMIT 5`
-
-            const result = await queryMementoView.fn({
-                query,
-                context: { readonlyPool: db.readonlyPool },
-            })
+            const result = await queryMementoView.fn({ query }, { readonlyPool: db.readonlyPool })
 
             expect(typeof result).toBe('object')
             expect(result.length).toBe(2)

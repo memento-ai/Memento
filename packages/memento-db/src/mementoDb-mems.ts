@@ -9,7 +9,9 @@ import {
     DocSummaryMetaArgs,
     DocumentMetaArgs,
     FRAG,
+    FUNC,
     FragmentMetaArgs,
+    FunctionCallMetaArgs,
     Mem,
     MemId,
     RES,
@@ -28,6 +30,7 @@ import type {
     AddConvArgs,
     AddDocAndSummaryArgs,
     AddFragArgs,
+    AddFunctionCallArgs,
     AddResolutionArgs,
     AddSynopsisArgs,
     DocAndSummaryResult,
@@ -98,6 +101,17 @@ export async function addSynopsisMem(pool: DatabasePool, args_: AddSynopsisArgs)
     const { content } = args_
     const metaArgs = zodParse(SynopsisMetaArgs, {
         kind: SYN,
+    })
+    const metaId = nanoid()
+    return await addMemento({ pool, metaId, content, metaArgs })
+}
+
+export async function addFuncMemento(pool: DatabasePool, args_: AddFunctionCallArgs): Promise<ID> {
+    const { content, docid, source } = args_
+    const metaArgs = zodParse(FunctionCallMetaArgs, {
+        kind: FUNC,
+        docid,
+        source,
     })
     const metaId = nanoid()
     return await addMemento({ pool, metaId, content, metaArgs })

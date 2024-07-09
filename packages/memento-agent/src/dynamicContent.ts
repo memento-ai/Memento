@@ -71,8 +71,16 @@ export async function getRecentConversation(db: MementoDb, max_exchanges: number
             created_at ASC;
     `
 
-    const result = await db.pool.query(query)
-    return result.rows.map((row) => MessageIdPair.parse(row))
+    const result = await db.pool
+        .query(query)
+        .then((result) => result.rows.map((row) => row))
+        .catch((err) => {
+            Error.captureStackTrace(err)
+            console.error(err.stack)
+            throw err
+        })
+
+    return result
 }
 
 export async function gatherContent(
@@ -83,7 +91,7 @@ export async function gatherContent(
     const similarMementos: MementoSimilarityMap = await asSimilarityMap(results)
     const mementosByKind = indexMementosByKind(similarMementos)
 
-    const max_exchanges = config.conversation.max_exchanges
+    const max_exchanges = config.conversation_snapshot.max_exchanges
     const messages: MessageIdPair[] = await getRecentConversation(db, max_exchanges)
 
     // If the recent conversation message are contained in the additional context, remove them.

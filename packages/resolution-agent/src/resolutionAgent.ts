@@ -3,16 +3,11 @@
 import { Agent, type AgentArgs } from '@memento-ai/agent'
 import type { Config } from '@memento-ai/config'
 import { createConversationFromConfig } from '@memento-ai/conversation'
-import { count_tokens } from '@memento-ai/encoding'
 import type { MementoDb } from '@memento-ai/memento-db'
 import { get_last_assistant_message, get_last_user_message } from '@memento-ai/postgres-db'
 import { Message } from '@memento-ai/types'
-import c from 'ansi-colors'
-import debug from 'debug'
 import { lastUserMessageTemplate } from './resolutionLastUserMessage'
 import { resolutionPromptTemplate } from './resolutionPromptTemplate'
-
-const dlog = debug('synopsis')
 
 export type ResolutionAgentArgs = AgentArgs & { db: MementoDb }
 
@@ -30,8 +25,6 @@ export class ResolutionAgent extends Agent {
         const content = lastUserMessageTemplate({ user, asst })
 
         const response = await this.send({ content })
-        const tokens = count_tokens(response.content)
-        dlog(c.green(`tokens:${tokens}, synopsis:${response.content}`))
         return response.content
     }
 
@@ -50,7 +43,7 @@ export class ResolutionAgent extends Agent {
 }
 
 export async function createResolutionAgent(config: Config, db: MementoDb): Promise<ResolutionAgent | undefined> {
-    const conversation = createConversationFromConfig(config.synopsis_agent)
+    const conversation = createConversationFromConfig(config.resolution_agent)
     if (conversation == undefined) {
         return undefined
     }

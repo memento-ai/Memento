@@ -5,13 +5,22 @@ import { Agent } from '@memento-ai/agent'
 import type { SendMessageArgs } from '@memento-ai/conversation'
 import type { FunctionRegistry } from '@memento-ai/function-registry'
 import type { MementoDb } from '@memento-ai/memento-db'
-import type { AssistantMessage, UserMessage } from '@memento-ai/types'
+import type { AssistantMessage, Message, MetaId, UserMessage } from '@memento-ai/types'
 import { USER } from '@memento-ai/types'
-import { FUNCTION_RESULT_HEADER } from './functionCallingTypes'
+import { createTemporaryWritable } from '@memento-ai/utils'
+import { extractFunctionCalls, type ExtractFunctionCallsResult } from './extractFunctionCalls'
+import type { FunctionCallResult } from './functionCallingTypes'
+import type { SendUserMessageArgs } from './functionHandler'
 
 export type FunctionCallingAgentArgs = AgentArgs & {
     db: MementoDb
     registry: FunctionRegistry
+}
+
+export type SendUserAndExecuteFunctionsResult = {
+    funcIds: MetaId[]
+    thoughts: string[]
+    asyncResultsP: Promise<FunctionCallResult[]>
 }
 
 export abstract class FunctionCallingAgent extends Agent {
@@ -30,10 +39,23 @@ export abstract class FunctionCallingAgent extends Agent {
         return super.forward(args)
     }
 
-    checkForFunctionResults(userMessage: UserMessage): void {
-        if (!userMessage.content.startsWith(FUNCTION_RESULT_HEADER)) {
-            this.lastUserMessage = userMessage
+    // Send a user message and extract (but do not execute) any function calls.
+    async sendUserMessageAndExtractFunctionCalls({
+        userMessage,
+        priorMessages,
+        stream,
+    }: SendUserMessageArgs): Promise<ExtractFunctionCallsResult> {
+        const prompt = await this.generatePrompt()
+        const messages: Message[] = [...priorMessages, userMessage]
+        const forwardArgs: SendMessageArgs = {
+            prompt,
+            messages,
+            stream: !stream ? undefined : createTemporaryWritable(stream),
         }
+
+        const assistantMessage: AssistantMessage = await this.forward(forwardArgs)
+        const extracted: ExtractFunctionCallsResult = extractFunctionCalls(assistantMessage.content)
+        return extracted
     }
 
     get Registry(): FunctionRegistry {

@@ -5,6 +5,7 @@ import { stripCommonIndent } from '@memento-ai/utils'
 import Handlebars from 'handlebars'
 import { additional_context } from './prompt-partials/additional_context'
 import { core_system } from './prompt-partials/core_system'
+import { PartialFuncMemento, func_mementos } from './prompt-partials/func_mementos'
 import { function_calling } from './prompt-partials/function_calling'
 import { pronouns } from './prompt-partials/pronouns'
 import { resolutions } from './prompt-partials/resolutions'
@@ -17,6 +18,7 @@ export type MementoPromptTemplateArgs = {
     databaseSchema: string
     resolutions: string[]
     synMems: string[]
+    funcMems: PartialFuncMemento[]
     dsumMems: MementoSearchResult[]
     docMems: MementoSearchResult[]
     xchgMems: MementoSearchResult[]
@@ -29,6 +31,7 @@ Handlebars.registerHelper('obj', function (context) {
 Handlebars.registerPartial('additional_context', additional_context)
 Handlebars.registerPartial('core_system', core_system)
 Handlebars.registerPartial('function_calling', function_calling)
+Handlebars.registerPartial('func_mementos', func_mementos)
 Handlebars.registerPartial('pronouns', pronouns)
 Handlebars.registerPartial('resolutions', resolutions)
 Handlebars.registerPartial('sql_schema', sql_schema)
@@ -47,7 +50,9 @@ const mementoPromptTemplateText = stripCommonIndent(`
 
     {{> sql_schema databaseSchema=databaseSchema }}
 
-    {{> additional_context docMems=docMems dsumMems=dsumMems xchgMems=xchgMems}}
+    {{> additional_context docMems=docMems dsumMems=dsumMems xchgMems=xchgMems }}
+
+    {{> func_mementos funcMems=funcMems }}
 
     {{> synopses synMems=synMems}}
 

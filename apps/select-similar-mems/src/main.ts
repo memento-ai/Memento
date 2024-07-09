@@ -27,7 +27,7 @@ async function main() {
     const options = program.opts()
 
     const { database, tokens, content } = options
-    const maxTokens = parseInt(tokens)
+    const max_tokens = parseInt(tokens)
 
     if (!database) {
         console.error('You must provide a database name')
@@ -40,7 +40,7 @@ async function main() {
     console.info(c.bold('Keywords:'))
     console.table(keywords)
 
-    const keywordSearchMems = await selectMemsByKeywordSearch(db.pool, { content, maxTokens })
+    const keywordSearchMems = await selectMemsByKeywordSearch(db.pool, { content, max_tokens })
 
     console.info(c.bold('Keyword similar mementos:'))
     console.table(
@@ -51,7 +51,7 @@ async function main() {
         })
     )
 
-    const semanticSearchMems = await selectMemsBySemanticSimilarity(db.pool, { content, maxTokens })
+    const semanticSearchMems = await selectMemsBySemanticSimilarity(db.pool, { content, max_tokens })
 
     console.info(c.bold('Semantically similar mementos:'))
     console.table(
@@ -62,7 +62,7 @@ async function main() {
         })
     )
 
-    const fullSearchMems = await selectSimilarMementos(db.pool, { content, maxTokens })
+    const fullSearchMems = await selectSimilarMementos(db.pool, { content, max_tokens })
 
     console.info(c.bold('Full search similar mementos:'))
     console.table(

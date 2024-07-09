@@ -1,11 +1,15 @@
 // Path: packages/function-calling/src/functionCalling.ts
 
 import type { FunctionRegistry } from '@memento-ai/function-registry'
-import type { Context } from '@memento-ai/memento-db'
-import type { AssistantMessage } from '@memento-ai/types'
+import type { AddFunctionCallArgs, Context } from '@memento-ai/memento-db'
+import { addFuncMemento } from '@memento-ai/memento-db'
+import type { MetaId } from '@memento-ai/types'
+import { stripCommonIndent } from '@memento-ai/utils'
 import debug from 'debug'
-import type { FunctionCall, FunctionCallRequest, FunctionCallResult } from './functionCallingTypes'
-import { isFunctionCall, isFunctionError } from './functionCallingTypes'
+import Handlebars from 'handlebars'
+import type { DatabasePool } from 'slonik'
+import type { ExtractFunctionCallsResult, FunctionCallRequest } from '..'
+import { isFunctionError, type FunctionCall, type FunctionCallResult } from './functionCallingTypes'
 
 const dlog = debug('functionCalling')
 
@@ -15,25 +19,99 @@ export interface InvokeOneFunctionArgs {
     context: Context
 }
 
-export async function invokeOneFunction({
-    registry,
-    context,
-    call,
-}: InvokeOneFunctionArgs): Promise<FunctionCallResult> {
+export interface FuncMemTemplateArgs {
+    name: string
+    input: string
+    output?: string
+    error?: string
+}
+
+const funcMemTemplateText = stripCommonIndent(`
+    <function name="{{name}}">
+    <input>
+    {{{input}}}
+    </input>
+    {{#if output}}
+    <output>
+    {{{output}}}
+    </output>
+    {{/if}}
+    {{#if error}}
+    <error>
+    {{{error}}}
+    </error>
+    {{/if}}
+    </function>
+    `)
+const funcMemTemplate = Handlebars.compile<FuncMemTemplateArgs>(funcMemTemplateText)
+
+export type ProcessOneCallArgs = {
+    registry: FunctionRegistry
+    call: FunctionCallRequest // FunctionCall | FunctionError
+    context: Context
+}
+
+export async function processOneCall({ registry, call, context }: ProcessOneCallArgs): Promise<MetaId> {
+    if (isFunctionError(call)) {
+        const { name, error, input } = call
+        const content = funcMemTemplate({ name, error, input: JSON.stringify(input) })
+        const args: AddFunctionCallArgs = {
+            source: name,
+            content,
+            docid: '',
+        }
+        return (await addFuncMemento(context.pool, args)).id
+    } else {
+        return invokeOneFunction({ registry, context, call })
+    }
+}
+
+export async function invokeOneFunction({ registry, context, call }: InvokeOneFunctionArgs): Promise<MetaId> {
     const { name, input } = call
     const functionDef = registry[name]
 
+    if (!context || (!context.pool && !!context.readonlyPool)) {
+        throw new Error('Context is required')
+    }
+
+    let result: FunctionCallResult
     if (functionDef) {
         // Execute the function with the provided input and additional context
-        input.context = context
-        dlog(`Calling function(${name}) with input:`, { input })
-        const result = { name, output: await functionDef.fn(input) }
+        dlog(`Calling function(${name}) with input:`, input)
+        result = { name, output: await functionDef.fn(input, context) }
         dlog('Got function result:', result)
-        return result
     } else {
         const error = `Function "${name}" not found in the function registry.`
-        return { name, error }
+        result = { input, name, error }
+        dlog('Got function error:', result)
     }
+
+    const funcTemplateArgs: FuncMemTemplateArgs = {
+        name,
+        input: JSON.stringify(input),
+    }
+
+    if (isFunctionError(result)) {
+        funcTemplateArgs.error = `Function "${name}" returned an error: ${result.error}`
+    } else {
+        funcTemplateArgs.output = JSON.stringify(result.output)
+    }
+
+    let funcMementoId = ''
+    if (context.pool) {
+        const content: string = funcMemTemplate(funcTemplateArgs)
+        dlog('Adding func memento:', content.slice(0, 100))
+        const args: AddFunctionCallArgs = {
+            source: name,
+            content,
+            docid: '',
+        }
+        const pool = context.pool as DatabasePool
+        funcMementoId = (await addFuncMemento(pool, args)).id
+    }
+
+    dlog('Created func memento id:', funcMementoId)
+    return funcMementoId
 }
 
 export interface InvokeMultFunctionsArgs {
@@ -42,35 +120,21 @@ export interface InvokeMultFunctionsArgs {
     calls: FunctionCallRequest[]
 }
 
-export async function invokeMultFunctions({
-    registry,
-    calls,
-    context,
-}: InvokeMultFunctionsArgs): Promise<FunctionCallResult[]> {
+export async function invokeMultFunctions({ registry, calls, context }: InvokeMultFunctionsArgs): Promise<MetaId[]> {
     return Promise.all(
-        calls.map(async (call): Promise<FunctionCallResult> => {
-            const { name } = call
-            if (isFunctionError(call)) {
-                return call
-            } else if (isFunctionCall(call)) {
-                return await invokeOneFunction({ registry, context, call })
-            } else {
-                const error = `Invalid function call request: ${JSON.stringify(call)}`
-                return { name, error }
-            }
+        calls.map(async (call): Promise<MetaId> => {
+            return await processOneCall({ registry, context, call })
         })
     )
 }
 
 export type InvokeFunctionsArgs = {
-    assistantMessage: AssistantMessage
+    extracted: ExtractFunctionCallsResult
     context: Context
     registry: FunctionRegistry
-    asyncResultsP: Promise<FunctionCallResult[]>
-    cycleCount: number
 }
 
 export type InvokeFunctionsResults = {
-    functionResultContent: string
-    newAsyncResultsP: Promise<FunctionCallResult[]>
+    newAsyncResultsP: Promise<MetaId[]>
+    funcMementoIds: MetaId[]
 }

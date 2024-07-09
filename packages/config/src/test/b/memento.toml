@@ -14,14 +14,6 @@ temperature = 1.5
 role = "memento"
 max_response_tokens = 500
 
-[synopsis_agent]
-provider = "anthropic"
-model = "haiku"
-temperature = 0.25
-max_tokens = 1000
-role = "synopsis"
-max_response_tokens = 500
-
 [resolution_agent]
 provider = "anthropic"
 model = "sonnet"
@@ -29,14 +21,24 @@ temperature = 1.25
 role = "resolution"
 max_response_tokens = 500
 
-[conversation]
-max_exchanges = 13
-max_tokens = 3333
+[synopsis_agent]
+provider = "anthropic"
+model = "haiku"
+temperature = 0.25
+role = "synopsis"
+max_response_tokens = 500
 
-[search]
-max_tokens = 7777
+[search_context]
+tokens = 7777
 keywords = 7
 
-    [search.decay]
-    user = 0.25
-    asst = 0.6
+[search_context.weight]
+user = 0.25
+asst = 0.6
+
+[synopses]
+max_tokens = 31415
+
+[conversation_snapshot]
+max_exchanges = 13
+max_tokens = 3333

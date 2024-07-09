@@ -6,9 +6,9 @@ import type { MementoSearchResult } from './mementoSearchTypes'
 
 const dlog = debug('search')
 
-export function trimSearchResult(result: MementoSearchResult[], maxTokens: number): MementoSearchResult[] {
+export function trimSearchResult(result: MementoSearchResult[], max_tokens: number): MementoSearchResult[] {
     let tokens = result.reduce((acc, m) => acc + m.tokens, 0)
-    if (tokens <= maxTokens) {
+    if (tokens <= max_tokens) {
         return result
     }
 
@@ -34,7 +34,7 @@ export function trimSearchResult(result: MementoSearchResult[], maxTokens: numbe
     const afterTokens = result.reduce((acc, m) => acc + m.tokens, 0)
     dlog(`Redundant mementos: removed ${tokens - afterTokens} tokens`)
     tokens = afterTokens
-    if (tokens <= maxTokens) {
+    if (tokens <= max_tokens) {
         return result
     }
 
@@ -42,7 +42,7 @@ export function trimSearchResult(result: MementoSearchResult[], maxTokens: numbe
 
     tokens = 0
     for (let i = 0; i < result.length; i++) {
-        if (tokens + result[i].tokens > maxTokens) {
+        if (tokens + result[i].tokens > max_tokens) {
             result = result.slice(0, i)
             break
         }

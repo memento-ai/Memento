@@ -18,7 +18,7 @@ describe('writeSourceFile', () => {
         const result: string = await writeSourceFile.fn({
             filePath: testFilePath,
             content: testContent,
-        })
+        }, { pool: null })
 
         expect(result).toContain('File successfully written')
 
@@ -31,6 +31,33 @@ describe('writeSourceFile', () => {
         await fs.unlink(fullPath)
     })
 
+    it('should write json object content to a file and return a success message', async () => {
+        const projectRoot = getMementoProjectRoot()
+        const writeSourceFile = registry['writeSourceFile']
+        expect(writeSourceFile).toBeDefined()
+
+        const testFilePath = 'test-write-file.txt'
+        const testContent = {
+            foo: 'bar',
+            baz: 123,
+        }
+
+        const result: string = await writeSourceFile.fn({
+            filePath: testFilePath,
+            content: testContent,
+        }, { pool: null })
+
+        expect(result).toContain('File successfully written')
+
+        // Verify the file was actually written
+        const fullPath = path.join(projectRoot, testFilePath)
+        const writtenContent = await fs.readFile(fullPath, 'utf-8')
+        expect(writtenContent).toBe(JSON.stringify(testContent))
+
+        // Clean up: remove the test file
+        await fs.unlink(fullPath)
+    })
+
     it('should return an error message for invalid file paths', async () => {
         const writeSourceFile = registry['writeSourceFile']
         expect(writeSourceFile).toBeDefined()
@@ -38,7 +65,7 @@ describe('writeSourceFile', () => {
         const result: string = await writeSourceFile.fn({
             filePath: '../outside-project.txt',
             content: 'This should not be written.',
-        })
+        }, { pool: null })
 
         expect(result).toContain('Error writing to source file')
         expect(result).toContain('Invalid file path')

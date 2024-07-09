@@ -3,6 +3,6 @@
 # The rest is inherited from the test/memento.toml and test/b/memento.toml
 database = "memento-foo.db"
 
-[search]
-max_tokens = 1234
+[search_context]
+tokens = 1234
 keywords = 23

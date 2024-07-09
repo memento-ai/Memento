@@ -1,13 +1,15 @@
 // Path: packages/conversation/src/mock.ts
 
 import { ASSISTANT, type AssistantMessage } from '@memento-ai/types'
+import debug from 'debug'
 import type { ConversationInterface, SendMessageArgs } from './conversation'
 import { type ConversationOptions } from './factory'
 
+const dlog = debug('conversation')
+
 export class MockConversation implements ConversationInterface {
-    private opts: ConversationOptions
     constructor(opts: ConversationOptions) {
-        this.opts = opts
+        dlog('MockConversation', opts) // mainly to silence linting errors
     }
 
     async sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {

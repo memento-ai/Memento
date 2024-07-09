@@ -3,11 +3,12 @@
 import { count_tokens } from '@memento-ai/encoding'
 import { stripCommonIndent } from '@memento-ai/utils'
 import debug from 'debug'
+import { Context } from '@memento-ai/memento-db'
 import { sql } from 'slonik'
 import { raw } from 'slonik-sql-tag-raw'
 import { z } from 'zod'
+import type { FunctionConfig } from '../functionRegistry'
 import { baseInputSchema, ErrorMessage } from '../functionRegistry'
-import type { FunctionConfig } from './functionRegistry'
 const dlog = debug('queryMementoView')
 
 const inputSchema = baseInputSchema
@@ -29,13 +30,13 @@ export type RowsOrError = z.infer<typeof RowsOrError>
 const outputSchema = z.promise(RowsOrError).describe('The result as a array of rows, or an error message.')
 const fnSchema = z
     .function()
-    .args(inputSchema)
+    .args(inputSchema, Context)
     .returns(outputSchema)
     .describe('Execute a SQL SELECT query on the memento view.')
 
-export async function queryMementoView(input: queryMementoViewInput): Promise<RowsOrError> {
+export async function queryMementoView(input: queryMementoViewInput, context: Context): Promise<RowsOrError> {
     dlog('queryMementoView:', input)
-    const { query, context } = input
+    const { query } = input
 
     // If either of these errors happen, we should throw, as these are not errors that the LLM can attempt to correct.
     if (!context) {

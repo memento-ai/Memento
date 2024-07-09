@@ -1,10 +1,10 @@
 // Path: packages/conversation/src/factory.ts
 
-import type { ConversationConfig } from '@memento-ai/config'
+import type { AgentConversationConfig } from '@memento-ai/config'
 import type { AssistantMessage } from '@memento-ai/types'
 import { getMementoProjectRoot } from '@memento-ai/utils'
-import dayjs from 'dayjs'
-import fs from 'fs'
+import { format } from 'date-fns'
+import { createWriteStream } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import { Writable } from 'stream'
 import { AnthropicConversation } from './anthropic'
@@ -42,13 +42,14 @@ export function withLogger(conversation: ConversationInterface, path: string): C
         const response: AssistantMessage = await conversation.sendMessage(args)
         const loggingData: string = loggingTemplate({ prompt, messages: [...messages, response] })
 
-        const datestring = dayjs().format('YYYY-MM-DD')
+        const d = new Date()
+        const datestring = format(d, 'yyyy-MM-dd')
         const root = getMementoProjectRoot()
         const fullPath = `${root}/logs/${path}/${datestring}`
         await mkdir(fullPath, { recursive: true })
 
-        const hm = dayjs().format('HH:mm')
-        const file = fs.createWriteStream(`${fullPath}/${hm}.md`, { flags: 'a' })
+        const hms = format(d, 'HH:mm:ss')
+        const file = createWriteStream(`${fullPath}/${hms}.md`, { flags: 'a' })
         file.write(loggingData)
         file.close()
 
@@ -85,7 +86,7 @@ export function createConversation(provider: Provider, options: ConversationOpti
 }
 
 export function createConversationFromConfig(
-    config: ConversationConfig,
+    config: AgentConversationConfig,
     stream?: Writable
 ): ConversationInterface | undefined {
     const { provider, model, temperature, role } = config

@@ -3,30 +3,42 @@
 import { getMementoProjectRoot } from '@memento-ai/utils'
 import debug from 'debug'
 import fs from 'fs/promises'
+import { Context } from '@memento-ai/memento-db'
 import path from 'path'
 import { z } from 'zod'
 import { baseInputSchema, type FunctionConfig } from '../functionRegistry'
 
 const dlog = debug('writeSourceFile')
 
+export const StringifyableContent = z
+    .union([z.string(), z.object({})])
+    .describe('The content to write to the file. Can be a string or an object that will be stringified.')
+export type StringifyableContent = z.input<typeof StringifyableContent>
+
 const inputSchema = baseInputSchema
     .extend({
         filePath: z.string().describe('The path to the source file to write.'),
-        content: z.string().describe('The content to write to the file.'),
+        content: StringifyableContent,
     })
     .describe('The file path and content to write')
-export type WriteSourceFileInput = z.infer<typeof inputSchema>
+export type WriteSourceFileInput = z.input<typeof inputSchema>
 
 const outputSchema = z.promise(z.string()).describe('A message indicating success or failure of the write operation.')
 const fnSchema = z
     .function()
-    .args(inputSchema)
+    .args(inputSchema, Context)
     .returns(outputSchema)
     .describe('Write content to a source file and return a status message.')
 
-export async function writeSourceFile(input: WriteSourceFileInput): Promise<string> {
-    const { filePath, content } = input
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function writeSourceFile(input: WriteSourceFileInput, _context: Context): Promise<string> {
+    const { filePath } = input
+    let { content } = input
     dlog(`Writing to source file: ${filePath}`)
+
+    if (typeof content === 'object') {
+        content = JSON.stringify(content)
+    }
 
     try {
         const projectRoot = getMementoProjectRoot()
@@ -38,7 +50,7 @@ export async function writeSourceFile(input: WriteSourceFileInput): Promise<stri
         }
 
         await fs.mkdir(path.dirname(fullPath), { recursive: true })
-        await fs.writeFile(fullPath, content, 'utf-8')
+        await fs.writeFile(fullPath, content as string, 'utf-8')
         dlog(`File written successfully: ${fullPath}`)
         return `File successfully written to ${filePath}`
     } catch (error) {

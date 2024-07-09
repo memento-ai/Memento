@@ -1,18 +1,14 @@
 {
-    "name": "ingest",
+    "name": "@memento-ai/ingest",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
     "sourceRoot": "apps/ingest/src",
     "targets": {
         "build": {
-            "executor": "@nx-bun/nx:build",
+            "executor": "nx:run-commands",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "entrypoints": ["apps/ingest/src/ingest.ts"],
-                "outputPath": "dist/ingest",
-                "tsConfig": "apps/ingest/tsconfig.app.json",
-                "smol": false,
-                "bun": true
+                "command": "bun build apps/ingest/src/ingest.ts --outdir dist/ingest --target node"
             }
         },
         "lint": {
@@ -35,6 +31,16 @@
                 "bail": true,
                 "tsConfig": "apps/ingest/tsconfig.json",
                 "bun": true
+            }
+        },
+        "type-check": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "outputPath": "dist/out-tsc/apps/ingest",
+                "main": "apps/ingest/src/ingest.ts",
+                "tsConfig": "apps/ingest/tsconfig.json",
+                "noEmit": true
             }
         }
     }

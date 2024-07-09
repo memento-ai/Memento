@@ -31,6 +31,12 @@ export type Mem = z.output<typeof Mem>
 // All columns of the mem table are determined by the `content` column.
 // We can create a Mem in memory using this function:
 export async function createMem(content: string): Promise<Mem> {
+    if (content.length === 0) {
+        const error = new Error('Content must be non-empty')
+        Error.captureStackTrace(error)
+        console.error(error.stack)
+        throw error
+    }
     const hasher = new Bun.CryptoHasher('md4')
     hasher.update(content)
     const id: MemId = hasher.digest('base64')

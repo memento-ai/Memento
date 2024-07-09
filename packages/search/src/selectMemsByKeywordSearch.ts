@@ -4,8 +4,7 @@ import debug from 'debug'
 import type { DatabasePool } from 'slonik'
 import { sql } from 'slonik'
 import { extractKeywordsFromContent } from './extractKeywordsFromContent'
-import type { MementoSearchArgs } from './mementoSearchTypes'
-import { MementoSearchResult } from './mementoSearchTypes'
+import { MementoSearchArgs, MementoSearchResult } from './mementoSearchTypes'
 import { linearNormalize } from './normalize'
 
 const dlog = debug('selectMemsByKeywordSearch')
@@ -19,8 +18,8 @@ export async function queryMemsByKeywordSearch(
     dbPool: DatabasePool,
     args: MementoSearchArgs
 ): Promise<MementoSearchResult[]> {
-    const { content, numKeywords = 5 } = args
-    const keywords = await extractKeywordsFromContent(dbPool, { content, numKeywords })
+    const { content } = MementoSearchArgs.parse(args)
+    const keywords = await extractKeywordsFromContent(dbPool, args)
 
     if (keywords.length === 0) {
         dlog('No keywords extracted from content:', content)
@@ -75,15 +74,20 @@ export async function selectMemsByKeywordSearch(
     dbPool: DatabasePool,
     args: MementoSearchArgs
 ): Promise<MementoSearchResult[]> {
-    const { content, maxTokens = 5000, numKeywords = 5 } = args
-    const keywords = await extractKeywordsFromContent(dbPool, { content, numKeywords })
+    const { content, max_tokens, keywords } = MementoSearchArgs.parse(args)
+    dlog(`selectMemsByKeywordSearch: max_tokens:${max_tokens} keywords:${keywords} content: ${content.slice(0, 50)}...`)
 
-    if (keywords.length === 0) {
+    if (content.length === 0) {
+        return []
+    }
+
+    const extract = await extractKeywordsFromContent(dbPool, { content, keywords, max_tokens })
+    if (extract.length === 0) {
         dlog('No keywords extracted from content:', content)
         return []
     }
 
-    const keywordQuery = keywords.map((keyword) => keyword.lexeme).join(' | ')
+    const keywordQuery = extract.map((keyword) => keyword.lexeme).join(' | ')
 
     const query = sql.type(MementoSearchResult)`
         WITH query AS (
@@ -129,12 +133,19 @@ export async function selectMemsByKeywordSearch(
             created_at,
             score
         FROM mementos_with_running_sum
-        WHERE total_tokens <= ${maxTokens}
+        WHERE total_tokens <= ${max_tokens}
         ORDER BY score DESC;`
 
     const result = await dbPool.connect(async (connection) => {
-        const result = await connection.query(query)
-        return result.rows.map((row) => row)
+        const result = await connection
+            .query(query)
+            .then((result) => result.rows.map((row) => row))
+            .catch((err) => {
+                Error.captureStackTrace(err)
+                console.error(err.stack)
+                throw err
+            })
+        return result
     })
 
     return linearNormalize(result, (m) => m.score)

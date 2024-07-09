@@ -2,6 +2,7 @@
 
 import debug from 'debug'
 import fs from 'fs/promises'
+import { Context } from '@memento-ai/memento-db'
 import { z } from 'zod'
 import { baseInputSchema, type FunctionConfig } from '../functionRegistry'
 const dlog = debug('readSourceFile')
@@ -16,11 +17,12 @@ export type ReadSourceFileInput = z.infer<typeof inputSchema>
 const outputSchema = z.promise(z.string()).describe('The content of the source file as a single string.')
 const fnSchema = z
     .function()
-    .args(inputSchema)
+    .args(inputSchema, Context)
     .returns(outputSchema)
     .describe('Read the content of a source file and return it as a single string.')
 
-export async function readSourceFile(input: ReadSourceFileInput): Promise<string> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function readSourceFile(input: ReadSourceFileInput, _context: Context): Promise<string> {
     const { filePath } = input
     dlog(`Reading source file: ${filePath}`)
 

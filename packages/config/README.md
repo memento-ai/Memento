@@ -10,6 +10,7 @@ The `@memento-ai/config` package provides functionality for loading and managing
 - Load an aggregate configuration by merging configurations from multiple TOML files in parent directories
 - Merge partial configurations into a full configuration
 - Load the nearest configuration file in parent directories
+- Write configuration to a TOML file
 
 ## Usage and Examples
 
@@ -68,6 +69,16 @@ This finds and loads the nearest `memento.toml` file in parent directories:
 import { loadNearestConfig } from '@memento-ai/config';
 
 const nearestConfig = await loadNearestConfig();
+```
+
+### Writing a configuration to a file
+
+```typescript
+import { writeConfig } from '@memento-ai/config';
+
+const config = { /* ... */ };
+const configPath = 'path/to/output/config.toml';
+writeConfig(config, configPath);
 ```
 
 The `@memento-ai/config` package provides a flexible and powerful way to manage configuration settings for the Memento AI application, allowing for hierarchical configuration structures and easy merging of partial configurations.
