@@ -3,11 +3,12 @@
 import { Mem, MemBaseMetaData } from '@memento-ai/types'
 import { z } from 'zod'
 
-export type MementoSearchArgs = {
-    content: string
-    numKeywords?: number
-    maxTokens?: number
-}
+export const MementoSearchArgs = z.object({
+    content: z.string(),
+    keywords: z.number().min(3),
+    max_tokens: z.number().min(2000),
+})
+export type MementoSearchArgs = z.infer<typeof MementoSearchArgs>
 
 export const MementoSearchResult = MemBaseMetaData.pick({
     id: true,
@@ -16,11 +17,6 @@ export const MementoSearchResult = MemBaseMetaData.pick({
     summaryid: true,
     source: true,
     created_at: true,
-
-    // metaid: false,
-    // role: false,
-    // priority: false,
-    // pinned: false,
 })
     .merge(
         Mem.pick({

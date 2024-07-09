@@ -6,7 +6,7 @@ import { linearNormalize } from './normalize'
 export type CombineMementoResultArgs = {
     lhs: MementoSearchResult[]
     rhs: MementoSearchResult[]
-    maxTokens: number
+    max_tokens: number
     p: number
 }
 

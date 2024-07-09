@@ -3,7 +3,7 @@
 import type { DatabasePool } from 'slonik'
 import { sql } from 'slonik'
 import { z } from 'zod'
-import type { MementoSearchArgs } from '..'
+import { MementoSearchArgs } from '..'
 
 export const ExtractKeywordsFromContentResult = z.object({
     lexeme: z.string(),
@@ -17,7 +17,7 @@ export async function extractKeywordsFromContent(
     dbPool: DatabasePool,
     args: MementoSearchArgs
 ): Promise<ExtractKeywordsFromContentResult[]> {
-    const { content, numKeywords = 5 } = args
+    const { content, keywords } = MementoSearchArgs.parse(args)
     const query = sql.type(ExtractKeywordsFromContentResult)`
         WITH msg_stats AS (
             SELECT
@@ -40,11 +40,18 @@ export async function extractKeywordsFromContent(
         FROM msg_stats
         JOIN corpus_stats ON msg_stats.lexeme = corpus_stats.lexeme
         ORDER BY tf_idf DESC
-        LIMIT ${numKeywords};
+        LIMIT ${keywords};
         `
 
     return dbPool.connect(async (connection) => {
-        const result = await connection.query(query)
-        return result.rows.map((row) => row)
+        const result = await connection
+            .query(query)
+            .then((result) => result.rows.map((row) => row))
+            .catch((err) => {
+                Error.captureStackTrace(err)
+                console.error(err.stack)
+                throw err
+            })
+        return result
     })
 }

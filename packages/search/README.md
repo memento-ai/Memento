@@ -23,12 +23,12 @@ import { selectSimilarMementos } from '@memento-ai/search';
 
 const similarMementos = await selectSimilarMementos(db.pool, {
   content: 'Your search content here',
-  maxTokens: 5000,
-  numKeywords: 5
+  max_tokens: 5000,
+  keywords: 5
 });
 ```
 
-The `selectSimilarMementos` function combines the results from keyword-based and semantic similarity-based searches, normalizes the scores, and returns the most relevant mementos limited by the specified `maxTokens`. It also avoids returning redundant mementos for documents, synopses, and conversations.
+The `selectSimilarMementos` function combines the results from keyword-based and semantic similarity-based searches, normalizes the scores, and returns the most relevant mementos limited by the specified `max_tokens`. It also avoids returning redundant mementos for documents, synopses, and conversations.
 
 You can also perform keyword-based and semantic similarity-based searches separately:
 
@@ -37,13 +37,14 @@ import { selectMemsByKeywordSearch, selectMemsBySemanticSimilarity } from '@meme
 
 const keywordSearchResults = await selectMemsByKeywordSearch(db.pool, {
   content: 'Your search content here',
-  maxTokens: 5000,
-  numKeywords: 5
+  max_tokens: 5000,
+  keywords: 5
 });
 
 const semanticSearchResults = await selectMemsBySemanticSimilarity(db.pool, {
   content: 'Your search content here',
-  maxTokens: 5000
+  max_tokens: 5000,
+  keywords: 5
 });
 ```
 
@@ -58,7 +59,7 @@ const normalizedResults = linearNormalize(searchResults, (item) => item.score);
 const combinedResults = combineSearchResults({
   lhs: keywordSearchResults,
   rhs: semanticSearchResults,
-  maxTokens: 5000,
+  max_tokens: 5000,
   p: 0.5
 });
 const similarityMap = await asSimilarityMap(searchResults);
