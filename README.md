@@ -56,32 +56,21 @@ The Memento monorepo also includes the following applications:
 - `transcript-generator`: A command-line utility designed to generate formatted transcripts from Memento conversation data stored in a PostgreSQL database.
 - `update-readmes`: A utility for updating the README.md files across the Memento monorepo project.
 
-## Requirements
-- Memento requires ollama for generating embeddings, using the model 'nomic-embed-text'.
-- Memento requires PostgreSQL, configured such that a connection to the url `postgres://localhost` is able to create databases.
-- Memento is able to use models from these providers:
-1. ollama (local)
-2. OpenAI
-3. Anthropic
-4. Google
-5. Groq
-- Memento is currently configured such that any model used must have a context window of at least 16K tokens.
-- Memento only functions well with the leading models provided by OpenAI, Anthropic, and Google.
-- The best bang-for-the-buck models are:
-1. Google's gemini-1.5-flash
-2. Anthropic's haiku
-
 ## Getting Started
 
-### Requirements
-
-1. A running PostgreSQL server. I use (Postgres.app)[https://postgresapp.com] on MacOS which works beautifully. We also require the (pgvector)[https://github.com/pgvector/pgvector] extension to be installed on the PostgreSQL server.
-
-2. Ollama is currently required for generating embeddings, the 'nomic-embed-text' model. You can find more information about Ollama at https://www.ollama.com.
+### Recommendations
+- Memento requires ollama for generating embeddings, using the model 'nomic-embed-text'.
+- Memento requires PostgreSQL, configured such that a connection to the url `postgres://localhost` is able to create databases. We use (Postgres.app)[https://postgresapp.com] on MacOS which works beautifully. We also require the (pgvector)[https://github.com/pgvector/pgvector] extension to be installed on the PostgreSQL server.
+- Memento is able to use models from from a varient of providers, including:
+    1. ollama (local)
+    2. OpenAI
+    3. Anthropic
+    4. Google
+    5. Groq
+- However, we highly recommend Sonnet 3.5. The user experience and performance of Sonnet 3.5 is superior to the other models we have tested.
 
 ### Setting up
-At this time you *must* clone the repo and you *must* use `bun`.
-No effort has yet been made to publish NPM packages or test
+At this time you *must* clone the repo and you *must* use `bun`. No effort has yet been made to publish NPM packages or test
 with `node`/`npm`. To get started, please follow these steps:
 
 ```bash
