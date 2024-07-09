@@ -5,7 +5,7 @@ import Handlebars from 'handlebars'
 
 export const lastUserMessageText = stripCommonIndent(`
     <exchange>
-    <instruction>Please evaluate the following exchange for any resolutions made by the assistant:</instruction>
+    <instruction>Please evaluate the following exchange for any resolutions worth recording for future reference:</instruction>
     <user>{{{user}}}</user>
     <assistant>{{{asst}}}</assistant>
     </exchange>

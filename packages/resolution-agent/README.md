@@ -1,18 +1,20 @@
 # @memento-ai/resolution-agent
 
 ## Description
-The `@memento-ai/resolution-agent` package provides a Resolution Agent that monitors conversations between a user and an AI assistant. Its role is to identify and extract any explicit resolutions made by the assistant to change its future behavior based on user feedback.
+The `@memento-ai/resolution-agent` package provides a Resolution Agent that monitors conversations between a user and an AI assistant. Its role is to identify and extract explicit resolutions made by the assistant to change its future behavior based on user feedback, as well as important user facts and negotiated commitments.
 
 ## Key Features
 - Analyzes the most recent exchange between the user and assistant
-- Identifies explicit resolutions made by the assistant to change its future behavior, looking for:
-  1. User feedback about assistant behavior
-  2. Acknowledgement of the feedback by the assistant
-  3. A statement from the assistant on how its behavior will be modified going forward
-- Extracts the resolution text, rephrasing for clarity and concision as needed
-- Encloses the extracted resolution in `<resolution>` tags
-- Handles cases where the assistant makes multiple resolutions in a single response
+- Identifies three types of resolutions:
+  1. Explicit commitments: Assistant's acknowledgments of mistakes and commitments to change behavior
+  2. Negotiated commitments: Resolutions agreed upon by both user and assistant
+  3. User facts: Important information about the user relevant for future discussions
+- Extracts resolution text, rephrasing for clarity and concision as needed
+- Encloses extracted resolutions in `<resolution>` tags
+- Handles cases where multiple resolutions are made in a single response
 - Avoids extracting duplicate resolutions by considering the current list of resolutions
+- Focuses on long-term, user-centric information to guide future interactions
+- Prioritizes user preferences, interaction styles, and high-level project directions
 
 ## Usage and Examples
 
@@ -38,8 +40,18 @@ console.log(resolutionText);
 
 The `resolutionText` will contain the extracted resolution(s) enclosed in `<resolution>` tags, or an empty `<resolution></resolution>` tag if no explicit resolutions were identified.
 
-Example output:
+Example outputs:
 
 ```
-<resolution>Going forward, I will provide more detailed explanations when asked.</resolution>
+<resolution>The assistant commits to providing more detailed explanations for technical concepts, as requested by the user.</resolution>
 ```
+
+```
+<resolution>Note: The user's name is Jim. He prefers the conversation to be collegial, informal, and relaxed.</resolution>
+```
+
+```
+<resolution>Note: The user has decided to focus on developing Memento as an Enhanced Local Single-User System with a web user interface.</resolution>
+```
+
+The Resolution Agent is designed to capture important, long-term information that will guide future interactions, avoiding temporary or technical details that are better suited for synopses or other parts of the system.
