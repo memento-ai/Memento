@@ -1,48 +1,27 @@
-import { ConversationTurn } from './types';
+import { ProcessedConversation } from './processConversation';
 
-export function formatTranscript(conversation: ConversationTurn[], format: 'markdown' | 'html'): string {
+export type FormatType = 'markdown' | 'html';
+
+export function formatTranscript(conversation: ProcessedConversation, format: FormatType): string {
+  const { messages, startTime, endTime } = conversation;
+  
+  const header = `Conversation from ${startTime.toLocaleString()} to ${endTime.toLocaleString()}`;
+  
+  const formattedMessages = messages.map(message => {
+    const timestamp = message.timestamp.toLocaleString();
+    const role = message.role.charAt(0).toUpperCase() + message.role.slice(1);
+    const content = message.content;
+    
+    if (format === 'markdown') {
+      return `**${role}** (${timestamp}):\n${content}\n`;
+    } else {
+      return `<p><strong>${role}</strong> (${timestamp}):<br>${content.replace(/\n/g, '<br>')}</p>`;
+    }
+  });
+  
   if (format === 'markdown') {
-    return formatMarkdown(conversation);
+    return `# ${header}\n\n${formattedMessages.join('\n')}`;
   } else {
-    return formatHtml(conversation);
+    return `<h1>${header}</h1>${formattedMessages.join('')}`;
   }
-}
-
-function formatMarkdown(conversation: ConversationTurn[]): string {
-  return conversation.map(turn => {
-    const timestamp = new Date(turn.timestamp).toISOString();
-    return `## ${turn.role.toUpperCase()} (${timestamp})\n\n${turn.content}\n`;
-  }).join('\n');
-}
-
-function formatHtml(conversation: ConversationTurn[]): string {
-  const turns = conversation.map(turn => {
-    const timestamp = new Date(turn.timestamp).toISOString();
-    return `
-      <div class="turn ${turn.role}">
-        <h2>${turn.role.toUpperCase()} <span class="timestamp">${timestamp}</span></h2>
-        <p>${turn.content}</p>
-      </div>
-    `;
-  }).join('');
-
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Conversation Transcript</title>
-      <style>
-        .turn { margin-bottom: 20px; }
-        .user { background-color: #f0f0f0; }
-        .assistant { background-color: #e0e0ff; }
-        .system { background-color: #ffe0e0; }
-        .timestamp { font-size: 0.8em; color: #666; }
-      </style>
-    </head>
-    <body>
-      <h1>Conversation Transcript</h1>
-      ${turns}
-    </body>
-    </html>
-  `;
 }
