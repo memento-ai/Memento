@@ -33,7 +33,7 @@ export interface ChatSession {
 
 export function createChatSession(args: ChatSessionArgs): ChatSession {
     const { temperature, max_response_tokens } = args
-    const key: string | undefined = process.env.GOOGLE_API_KEY
+    const key: string | undefined = process.env['GOOGLE_API_KEY']
     if (key === undefined) {
         throw new Error('GOOGLE_API_KEY is not set')
     }

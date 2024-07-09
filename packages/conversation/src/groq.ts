@@ -14,7 +14,7 @@ export class GroqConversation implements ConversationInterface {
 
     constructor(options: ConversationOptions) {
         this.model = options.model ?? 'mixtral-8x7b-32768'
-        this.client = new Groq({ apiKey: process.env.GROQ_API_KEY })
+        this.client = new Groq({ apiKey: process.env['GROQ_API_KEY'] })
     }
 
     async sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {

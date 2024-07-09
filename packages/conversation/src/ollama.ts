@@ -3,7 +3,6 @@
 import { ASSISTANT, AssistantMessage, type Message, type Role } from '@memento-ai/types'
 import debug from 'debug'
 import { Ollama, type ChatResponse, type Options } from 'ollama'
-import { Writable } from 'stream'
 import type { ConversationInterface, SendMessageArgs } from './conversation'
 import { type ConversationOptions } from './factory'
 
@@ -37,12 +36,10 @@ export function createChatSession(args: ChatSessionArgs): ChatSession {
 }
 export class OllamaConversation implements ConversationInterface {
     private model: string
-    private stream?: Writable
     private session: ChatSession
 
     constructor(options: ConversationOptions) {
         this.model = options.model
-        this.stream = options.stream
 
         const args: ChatSessionArgs = {
             model: this.model,
