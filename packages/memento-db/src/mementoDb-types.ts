@@ -1,11 +1,12 @@
 // Path: packages/memento-db/src/mementoDb-types.ts
 
 import type { Role } from '@memento-ai/types'
+import { MetaId } from '@memento-ai/types'
 import { z } from 'zod'
 
 export const Context = z.object({
-    readonlyPool: z.any(),
-    pool: z.any(),
+    readonlyPool: z.any(), // DatabasePool
+    pool: z.any(), // DatabasePool
 })
 export type Context = z.infer<typeof Context>
 
@@ -22,9 +23,10 @@ export type AddConvArgs = {
     priority?: number
 }
 
-export type AddConvExchangeArgs = {
+export type AddConvExchangeFuncArgs = {
     userContent: string
     asstContent: string
+    funcMementoIds: MetaId[]
 }
 
 export type AddSysArgs = {
@@ -34,13 +36,13 @@ export type AddSysArgs = {
 
 export type AddFragArgs = {
     content: string
-    docid: string
+    docid: MetaId
 }
 
 export type AddDocAndSummaryArgs = {
     source: string
     content: string
-    summary: string
+    summary: MetaId
 }
 
 export type AddResolutionArgs = {
@@ -51,11 +53,17 @@ export type AddSynopsisArgs = {
     content: string
 }
 
+export type AddFunctionCallArgs = {
+    docid: MetaId // The id of the XCHG
+    source: string // The function name
+    content: string
+}
+
 export const SimilarityResult = z.object({
-    id: z.string(),
+    id: MetaId,
     kind: z.string(),
     content: z.string(),
-    source: z.string(),
+    source: MetaId,
     created_at: z.number(),
     tokens: z.number(),
     similarity: z.number(),
@@ -63,6 +71,6 @@ export const SimilarityResult = z.object({
 export type SimilarityResult = z.TypeOf<typeof SimilarityResult>
 
 export interface DocAndSummaryResult {
-    docid: string
-    summaryid: string
+    docid: MetaId
+    summaryid: MetaId
 }

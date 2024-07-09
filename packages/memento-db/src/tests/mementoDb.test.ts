@@ -1,8 +1,7 @@
 // Path: packages/memento-db/src/tests/mementoDb.test.ts
 
 import { loadDefaultConfig } from '@memento-ai/config'
-import { createMementoDb, dropDatabase } from '@memento-ai/postgres-db'
-import type { Message } from '@memento-ai/types'
+import { createMementoDb, dropDatabase, type GetConversationSnapshotResult } from '@memento-ai/postgres-db'
 import { ASSISTANT, USER } from '@memento-ai/types'
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import { nanoid } from 'nanoid'
@@ -50,12 +49,12 @@ describe('MementoCollection independent db required', () => {
             await db.addConversationMem({ content: 'testMem4', role: ASSISTANT })
             const config = loadDefaultConfig()
             expect(config).toBeTruthy()
-            expect(config.conversation).toBeTruthy()
-            expect(config.conversation.max_exchanges).toBeGreaterThanOrEqual(3)
-            expect(config.conversation.max_tokens).toBeGreaterThanOrEqual(1000)
-            console.log(config.conversation)
-            const conversation: Message[] = await db.getConversation(config)
-            expect(conversation.length).toBe(4)
+            expect(config.conversation_snapshot).toBeTruthy()
+            expect(config.conversation_snapshot.max_exchanges).toBeGreaterThanOrEqual(3)
+            expect(config.conversation_snapshot.max_tokens).toBeGreaterThanOrEqual(1000)
+            console.log(config.conversation_snapshot)
+            const conversation: GetConversationSnapshotResult = await db.getConversation(config)
+            expect(conversation.messages.length).toBe(4)
         },
         timeout
     )

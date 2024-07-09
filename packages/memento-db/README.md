@@ -15,6 +15,7 @@ The `@memento-ai/memento-db` package provides a TypeScript interface for interac
 - Retrieve synopses (short summaries) from the database
 - Get the last user and assistant messages in a conversation
 - Generate and retrieve text embeddings for semantic search
+- Add function call mementos
 
 ## Usage and Examples
 The main entry point is the `MementoDb` class, which provides methods for interacting with the database:
@@ -22,6 +23,7 @@ The main entry point is the `MementoDb` class, which provides methods for intera
 ```typescript
 import { MementoDb } from '@memento-ai/memento-db';
 import { USER, ASSISTANT } from '@memento-ai/types';
+import { loadDefaultConfig } from '@memento-ai/config';
 
 // Create a new MementoDb instance
 const db = await MementoDb.connect('my-memento-db');
@@ -41,9 +43,10 @@ const { docid, summaryid } = await db.addDocAndSummary({
 });
 
 // Add a conversation exchange memento
-const xchgId = await db.addConvExchangeMementos({
+const xchgId = await db.addConvExchangeFuncMementos({
   userContent: 'This is a user message',
-  asstContent: 'This is an assistant response'
+  asstContent: 'This is an assistant response',
+  funcMementoIds: [] // Array of function call memento IDs, if any
 });
 
 // Link a conversation exchange to a synopsis
@@ -63,18 +66,25 @@ const synId = await db.addSynopsisMem({
 });
 
 // Get the conversation history
-const config = loadDefaultConfig(); // Assuming you have a config loader
+const config = loadDefaultConfig();
 const conversation = await db.getConversation(config);
 
 // Get resolution mementos
 const resolutions = await db.getResolutions();
 
 // Get synopses
-const synopses = await db.getSynopses(1000); // Get synopses with a token limit of 1000
+const synopses = await db.getSynopses({ max_tokens: 1000 }); // Get synopses with a token limit of 1000
 
 // Get the last user and assistant messages
 const lastUserMessage = await db.get_last_user_message();
 const lastAssistantMessage = await db.get_last_assistant_message();
+
+// Add a function call memento
+const funcId = await db.addFuncMemento({
+  docid: 'exchange-id',
+  source: 'functionName',
+  content: 'Function call details'
+});
 
 // Close the database connection when done
 await db.close();
