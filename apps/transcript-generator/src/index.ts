@@ -1,3 +1,5 @@
+// Path: apps/transcript-generator/src/index.ts
+
 import { program } from 'commander';
 import fs from 'fs/promises';
 import path from 'path';

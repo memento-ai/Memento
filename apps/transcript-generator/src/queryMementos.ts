@@ -1,3 +1,5 @@
+// Path: apps/transcript-generator/src/queryMementos.ts
+
 import { sql, DatabasePool } from 'slonik';
 import { ConversationMemento } from '@memento-ai/types';
 import { connectReadonlyDatabase } from '@memento-ai/postgres-db';

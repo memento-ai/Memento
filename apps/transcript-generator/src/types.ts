@@ -1,3 +1,5 @@
+// Path: apps/transcript-generator/src/types.ts
+
 export interface TranscriptOptions {
   start: Date;
   end: Date;

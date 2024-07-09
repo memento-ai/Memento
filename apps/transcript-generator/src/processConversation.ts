@@ -1,3 +1,5 @@
+// Path: apps/transcript-generator/src/processConversation.ts
+
 import { ConversationMemento } from '@memento-ai/types';
 
 export interface ProcessedMessage {
