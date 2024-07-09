@@ -1,6 +1,7 @@
 // Path: packages/function-registry/src/functionRegistry.ts
 
 import debug from 'debug'
+import type { Context } from '@memento-ai/memento-db'
 import { z, ZodObject } from 'zod'
 
 const dlog = debug('functionRegistry')
@@ -8,23 +9,14 @@ const dlog = debug('functionRegistry')
 export const ID = z.object({ id: z.string() }).describe('The id of the created meta record.')
 export type ID = z.infer<typeof ID>
 
-export const baseInputSchema = z.object({
-    context: z
-        .optional(
-            z.object({
-                readonlyPool: z.any().optional(),
-                pool: z.any().optional(),
-            })
-        )
-        .describe('An optional context object. Leave unspecified -- Memento will provide.'),
-})
+export const baseInputSchema = z.object({})
 export type BaseInput = z.infer<typeof baseInputSchema>
 
 export const ErrorMessage = z.object({ error: z.string() })
 export type ErrorMessage = z.infer<typeof ErrorMessage>
 
 export interface IFunction<Input, Output> {
-    (input: Input): Promise<Output>
+    (input: Input, context: Context): Promise<Output>
 }
 
 export interface FunctionConfig<Input, Output> {

@@ -7,7 +7,7 @@ describe('gitListFiles', () => {
     it('should list tracked git files', async () => {
         const gitListFiles = registry['gitListFiles']
         expect(gitListFiles).toBeDefined()
-        const content: string[] = await gitListFiles.fn({})
+        const content: string[] = await gitListFiles.fn({}, { pool: null })
         expect(content).toContain('packages/function-registry/src/getCurrentTime/getCurrentTime.ts')
         expect(content).toContain('packages/types/src/mementoSchema.ts')
     })

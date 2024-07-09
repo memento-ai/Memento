@@ -14,14 +14,12 @@ import { registerFunction, type FunctionRegistry } from './functionRegistry'
 
 export const registry: FunctionRegistry = {}
 
-import addSynopsis, { AddSynopsis } from './addSynopsis'
 import getCurrentTime, { GetCurrentTime } from './getCurrentTime'
 import gitListFiles, { GitListFiles } from './gitListFiles'
 import queryMementoView, { QueryMementoView } from './queryMementoView'
 import readSourceFile, { ReadSourceFile } from './readSourceFile'
 import writeSourceFile, { WriteSourceFile } from './writeSourceFile'
 
-registerFunction(registry, addSynopsis)
 registerFunction(registry, getCurrentTime)
 registerFunction(registry, gitListFiles)
 registerFunction(registry, queryMementoView)
@@ -29,7 +27,6 @@ registerFunction(registry, readSourceFile)
 registerFunction(registry, writeSourceFile)
 
 export const RegisteredFunctions = z.discriminatedUnion('name', [
-    AddSynopsis,
     GetCurrentTime,
     GitListFiles,
     QueryMementoView,

@@ -87,8 +87,7 @@ import { registry } from './registry'
 
 const result = await registry['queryMementoView'].fn({
     query: 'SELECT * FROM memento LIMIT 5',
-    context: { readonlyPool: db.readonlyPool },
-})
+}, { readonlyPool: db.readonlyPool })
 console.log(result)
 ```
 
@@ -96,12 +95,11 @@ console.log(result)
 
 The Function Registry package includes several pre-defined functions:
 
-1. `addSynopsis`: Creates a synopsis memento from the input.
-2. `getCurrentTime`: Returns the current UTC time.
-3. `gitListFiles`: Returns a list of file paths tracked by git for the current repository.
-4. `queryMementoView`: Executes a SQL SELECT query on the memento view.
-5. `readSourceFile`: Reads the content of a source file and returns it as a single string.
-6. `writeSourceFile`: Writes content to a source file and returns a status message.
+1. `getCurrentTime`: Returns the current UTC time.
+2. `gitListFiles`: Returns a list of file paths tracked by git for the current repository.
+3. `queryMementoView`: Executes a SQL SELECT query on the memento view.
+4. `readSourceFile`: Reads the content of a source file and returns it as a single string.
+5. `writeSourceFile`: Writes content to a source file and returns a status message.
 
 Each of these functions can be accessed and executed through the registry as demonstrated in the examples above.
 

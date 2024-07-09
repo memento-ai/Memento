@@ -1,6 +1,7 @@
 // Path: packages/function-registry/src/gitListFiles/gitListFiles.ts
 
 import { gitListRepositoryFiles as listFiles } from '@memento-ai/utils'
+import { Context } from '@memento-ai/memento-db'
 import { z } from 'zod'
 import type { FunctionConfig } from '../functionRegistry'
 import { baseInputSchema } from '../functionRegistry'
@@ -15,12 +16,12 @@ export type GitListFilesOutput = z.infer<typeof outputSchema>
 
 const fnSchema = z
     .function()
-    .args(inputSchema)
+    .args(inputSchema, Context)
     .returns(outputSchema)
     .describe('Returns list of file paths tracked by git for the current repository.')
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function gitListFiles(_: GitListFilesInput): Promise<string[]> {
+export async function gitListFiles(_: GitListFilesInput, _context: Context): Promise<string[]> {
     try {
         return listFiles()
     } catch (error) {
