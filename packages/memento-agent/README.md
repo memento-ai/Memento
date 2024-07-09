@@ -18,6 +18,7 @@ This agent performs the crucial function of constructing the system prompt with 
 - Supports multiple language model providers, including OpenAI, Anthropic, Google, Groq, and Ollama.
 - Implements a sophisticated prompt system with core instructions, metaphors, pronoun usage guidelines, and terminology explanations.
 - Uses Handlebars templating for generating dynamic prompts.
+- Aggregates search results over time to maintain relevant context across multiple exchanges.
 
 ## Usage and Examples
 The Memento Agent is designed to be used as part of the Memento system and is initialized with a conversation object, a database connection, and optional configuration parameters.

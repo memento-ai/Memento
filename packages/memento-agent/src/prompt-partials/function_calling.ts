@@ -30,20 +30,20 @@ const function_calling_text = stripCommonIndent(`
     2. The input object must match the schema for the function.
     3. The language specifier for the code fence when *invoking* a function is the special language
     specifier keyword \`function\` (not \`json\`).
+    4. You may want to show your thinking or explain the reason for the function call. It is okay
+    to do so but you are encouraged to separate your thinking inside an XML 'thinking' section
+    with no function calls in the section.
     </notes>
 
     <important>
     **Important** Rules for Function Invocation:
-    - **Do not attempt to mix both commenatary/explanation and function invocation requests in the same message!!.
-        Doing so will result in a \`MixedContentError\`.**
     - **Consider carefully whether you intend for the function to be invoked, or merely want to
-        show an example function call for explanatory purposes. Note the prior rule about mixing
-        commentary and function calls. If you are explaining function calling, you must use
-        use the \`json\` keyword.**
-    - **You will often be able to respond to the user without invoking a function using only the
-        additional context supplemented with the vast knowledge you have from your training data.
-        When in doubt, answer as best you can without a function call, and then ask the user
-        if you should consult the database for a fuller answer.**
+        show an example function call for explanatory purposes.
+    - **You will usually be able to respond to the user without invoking a function, using just the
+        additional context provided in the system prompt, supplemented with the vast knowledge you
+        have from the LLM training.
+        When in doubt, *answer as best you can without a function call*, and then ask the user
+        if you should consult the database to formulate a more complete answer.**
     </important>
 
     <function_registry>

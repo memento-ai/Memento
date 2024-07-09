@@ -11,10 +11,11 @@ export type AdditionalContextTemplateArgs = {
 }
 
 const additional_context_text = stripCommonIndent(`
-    <additional_context>
-    # Additional Context
-    The Memento system automatically retieves information it believes may be relevant to the current conversation.
-    This additional context information is dynamically generated each time the user sends a new message.
+    <search_context>
+    # Search Context
+    The Memento system automatically retrieves information it believes may be relevant to the current conversation
+    using semantic and keyword search. This additional context is dynamically generated each time the user sends
+    a new message.
 
     {{#if docMems}}
     <document_mementos>
@@ -46,7 +47,7 @@ const additional_context_text = stripCommonIndent(`
     </exchange_mementos>
     {{/if}}
 
-    </additional_context>
+    </search_context>
 `)
 
 export const additional_context = Handlebars.compile<AdditionalContextTemplateArgs>(additional_context_text)

@@ -5,42 +5,42 @@ import Handlebars from 'handlebars'
 
 const terminologyText = stripCommonIndent(`
     <structure_and_terminology>
-    The Interaction Context delivered to the LLM has the following hierarchical structure.
+    The Interaction Context delivered to the LLM has the following hierarchical structure:
 
     Interaction Context
     │
-    ├── System Prompt
-    │   ├── Overview
-    │   ├── Metaphors
-    │   ├── Pronouns
-    │   ├── Structure & Terminology
-    │   ├── Function Calling
-    │   │   ├── Example
-    │   │   ├── Notes
-    │   │   ├── Important Rules
-    │   │   └── Function Registry
-    │   ├── SQL Schema
-    │   ├── Additional Context
-    │   │   ├── Document Mementos
-    │   │   ├── Document Summary Mementos
-    │   │   ├── Synopses Mementos
-    │   │   └── Exchange Mementos
-    |   ├── Resolutions
-    │
-    └── Conversation Snapshot
-        ├── User Message 1
-        ├── Assistant Message 1
-        ├── User Message 2
-        ├── Assistant Message 2
-        │   ...
-        ├── User Message N
-        ├── Assistant Message N
-        ├── User Message N+1 (user's current message)
-
-    The *Conversation Snapshot* is a subset of recent conversation from the full *Conversation History*
-    stored in the PostgreSQL database.
-
+    └── System
+        ├── Instructions
+        │   ├── Overview
+        │   ├── Metaphors
+        │   │   ├── Theme
+        │   │   └── DPT (Dual Process Theory)
+        │   ├── Pronouns
+        │   ├── Structure & Terminology
+        │   ├── Function Calling
+        │   │   ├── Example
+        │   │   ├── Notes
+        │   │   ├── Important Rules
+        │   │   └── Function Registry
+        │   └── SQL Schema
+        │
+        ├── Search Context
+        │   ├── Document Mementos
+        │   ├── Document Summary Mementos
+        │   └── Exchange Mementos
+        │
+        ├── Function Mementos
+        │   ├── Instructions
+        |   └── Recent Function Mementos
+        │
+        ├── Synopsis Mementos
+        │   ├── Instructions
+        │   └── Multiple Synopses
+        │
+        └── Resolutions
+            ├── Instructions
+            └── Multiple Resolutions
     </structure_and_terminology>
-    `)
+`)
 
 export const terminology = Handlebars.compile(terminologyText)
