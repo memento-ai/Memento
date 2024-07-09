@@ -6,8 +6,16 @@ import { sql } from 'slonik'
 
 export async function insertMem(pool: CommonQueryMethods, mem: Mem): Promise<void> {
     const embed_vector = JSON.stringify(mem.embed_vector)
-    await pool.query(sql.unsafe`
+    await pool
+        .query(
+            sql.unsafe`
         INSERT INTO mem (id, content, embed_vector, tokens)
         VALUES (${mem.id}, ${mem.content}, ${embed_vector}, ${mem.tokens})
-        ON CONFLICT (id) DO NOTHING;`)
+        ON CONFLICT (id) DO NOTHING;`
+        )
+        .catch((err) => {
+            Error.captureStackTrace(err)
+            console.error(err.stack)
+            throw err
+        })
 }

@@ -9,7 +9,9 @@ import {
     DocSummaryMetaArgs,
     DocumentMetaArgs,
     FRAG,
+    FUNC,
     FragmentMetaArgs,
+    FunctionCallMetaArgs,
     MetaArgs,
     MetaId,
     RES,
@@ -51,6 +53,14 @@ export async function insertMeta(
             results = await conn.query(sql.unsafe`
                 INSERT INTO meta (id, memid, kind, docid)
                 VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${docid})
+                RETURNING id`)
+            break
+        }
+        case FUNC: {
+            const { docid, source } = zodParse(FunctionCallMetaArgs, metaArgs)
+            results = await conn.query(sql.unsafe`
+                INSERT INTO meta (id, memid, kind, docid, source)
+                VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${docid}, ${source})
                 RETURNING id`)
             break
         }
