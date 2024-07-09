@@ -1,0 +1,18 @@
+{
+  "name": "@memento-ai/transcript-generator",
+  "version": "0.1.0",
+  "description": "Utility to generate conversation transcripts from Memento database",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@memento-ai/memento-db": "^1.0.0",
+    "@memento-ai/types": "^1.0.0",
+    "commander": "^8.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.4"
+  }
+}
