@@ -1,7 +1,7 @@
 // Path: packages/types/src/metaArgs.ts
 
 import { z } from 'zod'
-import { CONV, DOC, DSUM, FRAG, RES, SYN, XCHG } from './memKind'
+import { CONV, DOC, DSUM, FRAG, FUNC, RES, SYN, XCHG } from './memKind'
 import { Role } from './role'
 
 /// ==== Args objects are used to specify the required arguments to create the `meta` record.
@@ -51,10 +51,18 @@ export const ConvExchangeMetaArgs = z.object({
 })
 export type ConvExchangeMetaArgs = z.input<typeof ConvExchangeMetaArgs>
 
+export const FunctionCallMetaArgs = z.object({
+    kind: z.literal(FUNC),
+    docid: z.string(), // the id of the xchg containing the function call
+    source: z.string(), // the name of the function
+})
+export type FunctionCallMetaArgs = z.input<typeof FunctionCallMetaArgs>
+
 export const MetaArgs = z.discriminatedUnion('kind', [
     ConversationMetaArgs,
     DocumentMetaArgs,
     FragmentMetaArgs,
+    FunctionCallMetaArgs,
     DocSummaryMetaArgs,
     ResolutionMetaArgs,
     SynopsisMetaArgs,

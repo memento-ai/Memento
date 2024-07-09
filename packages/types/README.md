@@ -11,6 +11,7 @@ The `@memento-ai/types` package provides the core data types, schemas, and utili
 - Defines the `Memento` schema, which combines a metadata record with the linked `Mem` content record.
 - Provides argument schemas for creating different types of metadata records.
 - Utilizes Zod for runtime type checking and validation.
+- Includes schemas for function call metadata and mementos.
 
 ## Usage and Examples
 
@@ -21,8 +22,8 @@ import { Mem, createMem } from '@memento-ai/types/memSchema';
 import { ConversationMetaData } from '@memento-ai/types/metaSchema';
 import { USER, ASSISTANT } from '@memento-ai/types/role';
 import { constructUserMessage, constructAssistantMessage } from '@memento-ai/types/message';
-import { CONV, DOC, FRAG } from '@memento-ai/types/memKind';
-import { Memento } from '@memento-ai/types/mementoSchema';
+import { CONV, DOC, FRAG, FUNC } from '@memento-ai/types/memKind';
+import { Memento, FunctionCallMemento } from '@memento-ai/types/mementoSchema';
 
 // Create a new Mem
 const mem = await createMem('Hello, world!');
@@ -54,8 +55,20 @@ const memento: Memento = {
     tokens: 7,
 };
 
+// Create a FunctionCallMemento
+const functionCallMemento: FunctionCallMemento = {
+    kind: FUNC,
+    id: '234',
+    memId: '567',
+    created_at: new Date(),
+    docid: '890', // ID of the associated exchange memento
+    source: 'exampleFunction', // Name of the function
+    content: 'Function call details',
+    tokens: 3,
+};
+
 // Use MemKind values
-console.log(CONV, DOC, FRAG);
+console.log(CONV, DOC, FRAG, FUNC);
 ```
 
 The `@memento-ai/types` package provides a centralized location for defining and managing the core data structures used throughout the Memento application. By ensuring consistency and type safety, it helps maintain a cohesive and well-structured codebase.
