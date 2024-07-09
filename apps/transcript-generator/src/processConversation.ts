@@ -1,10 +1,30 @@
-import { Memento } from '@memento-ai/types';
-import { ConversationTurn } from './types';
+import { ConversationMemento } from '@memento-ai/types';
 
-export function processConversation(mementos: Memento[]): ConversationTurn[] {
-  return mementos.map(memento => ({
-    role: memento.kind === 'conv' ? memento.role : 'system',
+export interface ProcessedMessage {
+  role: string;
+  content: string;
+  timestamp: Date;
+}
+
+export interface ProcessedConversation {
+  messages: ProcessedMessage[];
+  startTime: Date;
+  endTime: Date;
+}
+
+export function processConversation(mementos: ConversationMemento[]): ProcessedConversation {
+  const messages: ProcessedMessage[] = mementos.map(memento => ({
+    role: memento.role || 'unknown',
     content: memento.content,
-    timestamp: memento.created_at
+    timestamp: new Date(memento.created_at)
   }));
+
+  const startTime = messages.length > 0 ? messages[0].timestamp : new Date();
+  const endTime = messages.length > 0 ? messages[messages.length - 1].timestamp : new Date();
+
+  return {
+    messages,
+    startTime,
+    endTime
+  };
 }
