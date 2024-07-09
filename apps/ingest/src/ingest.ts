@@ -144,9 +144,15 @@ async function main() {
 
     await delete_unreferenced_mems(target.pool)
 
-    const result = await target.pool.query(
-        sql.type(Documents)`SELECT id, source, tokens FROM memento WHERE kind = 'doc' ORDER BY tokens DESC LIMIT 10`
-    )
+    const result = await target.pool
+        .query(
+            sql.type(Documents)`SELECT id, source, tokens FROM memento WHERE kind = 'doc' ORDER BY tokens DESC LIMIT 10`
+        )
+        .catch((err) => {
+            Error.captureStackTrace(err)
+            console.error(err.stack)
+            throw err
+        })
     console.table(result.rows)
 
     await target.close()
