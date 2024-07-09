@@ -1,9 +1,6 @@
 {
     "name": "@memento-ai/ingest",
     "version": "1.0.0",
-    "scripts": {
-        "check": "tsc --skipLibCheck --noEmit"
-    },
     "peerDependencies": {
         "@memento-ai/conversation": "^1.0.0",
         "@memento-ai/ingester": "^1.0.0",

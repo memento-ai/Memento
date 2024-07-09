@@ -6,25 +6,24 @@
     "tags": [],
     "targets": {
         "build": {
-            "executor": "@nx-bun/nx:build",
+            "executor": "nx:run-commands",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "entrypoints": ["packages/postgres-db/src/index.ts"],
-                "outputPath": "dist/postgres-db",
-                "tsConfig": "packages/postgres-db/tsconfig.lib.json",
-                "smol": false,
-                "bun": true
+                "command": "bun build packages/postgres-db/index.ts --outdir dist/postgres-db --target node"
             }
         },
         "lint": {
             "executor": "@nx/eslint:lint"
         },
-        "test": {
-            "executor": "@nx-bun/nx:test",
+        "test": { "executor": "@nx-bun/nx:test", "options": { "smol": false, "bail": true, "bun": false } },
+        "type-check": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
             "options": {
-                "smol": false,
-                "bail": true,
-                "bun": false
+                "outputPath": "dist/out-tsc/packages/postgres-db",
+                "main": "packages/postgres-db/index.ts",
+                "tsConfig": "packages/postgres-db/tsconfig.json",
+                "noEmit": true
             }
         }
     }

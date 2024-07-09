@@ -1,18 +1,14 @@
 {
-    "name": "select-similar-mems",
+    "name": "@memento-ai/select-similar-mems",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
     "sourceRoot": "apps/select-similar-mems/src",
     "targets": {
         "build": {
-            "executor": "@nx-bun/nx:build",
+            "executor": "nx:run-commands",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "entrypoints": ["apps/select-similar-mems/src/main.ts"],
-                "outputPath": "dist/select-similar-mems",
-                "tsConfig": "apps/select-similar-mems/tsconfig.app.json",
-                "smol": false,
-                "bun": true
+                "command": "bun build apps/select-similar-mems/src/main.ts --outdir dist/select-similar-mems --target node"
             }
         },
         "lint": {
@@ -35,6 +31,16 @@
                 "bail": true,
                 "tsConfig": "apps/select-similar-mems/tsconfig.json",
                 "bun": true
+            }
+        },
+        "type-check": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "outputPath": "dist/out-tsc/apps/select-similar-mems",
+                "main": "apps/select-similar-mems/src/main.ts",
+                "tsConfig": "apps/select-similar-mems/tsconfig.json",
+                "noEmit": true
             }
         }
     }

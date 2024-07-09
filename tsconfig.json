@@ -1,19 +1,6 @@
 {
-    "compilerOptions": {
-        "lib": ["ESNext"],
-        "target": "ESNext",
-        "module": "ESNext",
-        "esModuleInterop": true,
-        "moduleDetection": "force",
-        "moduleResolution": "bundler",
-        "allowImportingTsExtensions": true,
-        "verbatimModuleSyntax": true,
-        "noEmit": true,
-        "skipLibCheck": true,
-        "strict": true,
-        "noFallthroughCasesInSwitch": true,
-        "forceConsistentCasingInFileNames": true,
-        "paths": {},
-        "types": ["bun-types"]
-    }
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": { "noEmit": true },
+    "include": ["**/*.ts", "**/*.tsx"],
+    "exclude": ["node_modules", "tmp"]
 }

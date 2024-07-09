@@ -1,18 +1,14 @@
 {
-    "name": "memento-cli",
+    "name": "@memento-ai/memento-cli",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
     "sourceRoot": "apps/memento-cli/src",
     "targets": {
         "build": {
-            "executor": "@nx-bun/nx:build",
+            "executor": "nx:run-commands",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "entrypoints": ["apps/memento-cli/src/main.ts"],
-                "outputPath": "dist/memento-cli",
-                "tsConfig": "apps/memento-cli/tsconfig.app.json",
-                "smol": false,
-                "bun": true
+                "command": "bun build apps/memento-cli/src/main.ts --outdir dist/memento-cli --target node"
             }
         },
         "lint": {
@@ -37,6 +33,16 @@
                 "bail": true,
                 "tsConfig": "apps/memento-cli/tsconfig.json",
                 "bun": true
+            }
+        },
+        "type-check": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "outputPath": "dist/out-tsc/apps/memento-cli",
+                "main": "apps/memento-cli/src/main.ts",
+                "tsConfig": "apps/memento-cli/tsconfig.json",
+                "noEmit": true
             }
         }
     }

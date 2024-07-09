@@ -1,9 +1,6 @@
 {
     "name": "@memento-ai/select-similar-mems",
     "version": "1.0.0",
-    "scripts": {
-        "check": "tsc --skipLibCheck --noEmit"
-    },
     "peerDependencies": {
         "@memento-ai/memento-db": "^1.0.0",
         "@memento-ai/search": "^1.0.0"

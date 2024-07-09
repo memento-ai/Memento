@@ -1,18 +1,14 @@
 {
-    "name": "add-path-comments",
+    "name": "@memento-ai/add-path-comments",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
     "sourceRoot": "apps/add-path-comments/src",
     "targets": {
         "build": {
-            "executor": "@nx-bun/nx:build",
+            "executor": "nx:run-commands",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "entrypoints": ["apps/add-path-comments/src/main.ts"],
-                "outputPath": "dist/add-path-comments",
-                "tsConfig": "apps/add-path-comments/tsconfig.app.json",
-                "smol": false,
-                "bun": true
+                "command": "bun build apps/add-path-comments/src/main.ts --outdir dist/add-path-comments --target node"
             }
         },
         "lint": {
@@ -37,6 +33,16 @@
                 "bail": true,
                 "tsConfig": "apps/add-path-comments/tsconfig.json",
                 "bun": true
+            }
+        },
+        "type-check": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "outputPath": "dist/out-tsc/apps/add-path-comments",
+                "main": "apps/add-path-comments/src/main.ts",
+                "tsConfig": "apps/add-path-comments/tsconfig.json",
+                "noEmit": true
             }
         }
     }

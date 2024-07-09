@@ -1,18 +1,14 @@
 {
-    "name": "update-readmes",
+    "name": "@memento-ai/update-readmes",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
     "sourceRoot": "apps/update-readmes/src",
     "targets": {
         "build": {
-            "executor": "@nx-bun/nx:build",
+            "executor": "nx:run-commands",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "entrypoints": ["apps/update-readmes/src/main.ts"],
-                "outputPath": "dist/update-readmes",
-                "tsConfig": "apps/update-readmes/tsconfig.app.json",
-                "smol": false,
-                "bun": true
+                "command": "bun build apps/update-readmes/src/main.ts --outdir dist/update-readmes --target node"
             }
         },
         "lint": {
@@ -37,6 +33,16 @@
                 "bail": true,
                 "tsConfig": "apps/update-readmes/tsconfig.json",
                 "bun": true
+            }
+        },
+        "type-check": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "outputPath": "dist/out-tsc/apps/update-readmes",
+                "main": "apps/update-readmes/src/main.ts",
+                "tsConfig": "apps/update-readmes/tsconfig.json",
+                "noEmit": true
             }
         }
     }
