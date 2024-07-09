@@ -4,6 +4,6 @@
 
 database = "memento-a.db"
 
-[conversation]
+[conversation_snapshot]
 max_exchanges = 3
 max_tokens = 1111
