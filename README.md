@@ -53,6 +53,7 @@ The Memento monorepo also includes the following applications:
 - `ingest`: A command-line utility for ingesting files into a Memento database.
 - `memento-cli`: A command-line interface (CLI) for interacting with the Memento AI system.
 - `select-similar-mems`: A utility for selecting mementos from a Memento database based on their similarity to a given content.
+- `transcript-generator`: A command-line utility designed to generate formatted transcripts from Memento conversation data stored in a PostgreSQL database.
 - `update-readmes`: A utility for updating the README.md files across the Memento monorepo project.
 
 ## Requirements
@@ -72,11 +73,44 @@ The Memento monorepo also includes the following applications:
 
 ## Getting Started
 
-To get started with the Memento project, please refer to the README.md file in the individual packages for more information on their usage and examples.
+### Requirements
 
-See [apps/memento-cli/README.md](apps/memento-cli/README.md) for how to chat with Memento (web client UI coming soon).
+1. A running PostgreSQL server. I use (Postgres.app)[https://postgresapp.com] on MacOS which works beautifully. We also require the (pgvector)[https://github.com/pgvector/pgvector] extension to be installed on the PostgreSQL server.
+
+2. Ollama is currently required for generating embeddings, the 'nomic-embed-text' model. You can find more information about Ollama at https://www.ollama.com.
+
+### Setting up
+At this time you *must* clone the repo and you *must* use `bun`.
+No effort has yet been made to publish NPM packages or test
+with `node`/`npm`. To get started, please follow these steps:
+
+```bash
+git clone https://github.com/memento-ai/Memento.git
+cd Memento
+bun install
+```
+
+### Create a memento.toml configuration file
+
+1. Start with the example.memento.toml in the root of the project.
+You will likely want to experiment with different LLM models (we *highly* recommend Sonnet 3.5 for best results) and possibly with some of the settings such as `search_context.tokens`.
+
+2. Choose a database name. You can start with the name 'memento' but if you spend more than a few days with Memento you will possibly end up creating multiple database instances. I use names like `db_sonnet35_jul_8`. Specify that name in your memento.toml
+file.
+
+### Create a database by running the ingest application
+
+The `apps/ingest` application is currently setup to ingest
+the Memento project itself (yes, it will eventually be able to
+ingest other git repos and documents).
 
 See [apps/ingest/README.md](apps/ingest/README.md) for how to ingest files.
+
+### Run the memento-cli
+
+See [apps/memento-cli/README.md](apps/memento-cli/README.md) for how to chat with Memento.
+Yes, the memento-cli is pretty lame. I hope to create a web-ui soon which will not only be a more pleasant experience but
+have features that take advantage of and enhance Memento's capabilities.
 
 ## Contributing
 
