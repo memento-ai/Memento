@@ -17,22 +17,16 @@ const dlog = debug('synopsis')
 export type SynopsisAgentArgs = AgentArgs & {
     db: MementoDb
     max_tokens: number
-    max_response_tokens: number
 }
 
 export class SynopsisAgent extends Agent {
     private db: MementoDb
     private max_tokens: number
-    private max_response_tokens: number
 
     constructor(args: SynopsisAgentArgs) {
         super(args)
         this.db = args.db
         this.max_tokens = args.max_tokens
-        this.max_response_tokens = args.max_response_tokens
-        if (this.max_tokens < 500) {
-            throw new Error('synopsis max_tokens must be at least 500')
-        }
     }
 
     async run(): Promise<string> {
@@ -49,7 +43,6 @@ export class SynopsisAgent extends Agent {
 
     async getSynopses(): Promise<string[]> {
         const args: GetSynopsesArgs = {
-            max_response_tokens: this.max_response_tokens,
             max_tokens: this.max_tokens,
         }
         return await getSynopses(this.db.readonlyPool, args)
@@ -79,8 +72,7 @@ export async function createSynopsisAgent(config: Config, db: MementoDb): Promis
     const agentArgs: SynopsisAgentArgs = {
         db,
         conversation,
-        max_tokens: config.synopsis_agent.max_tokens,
-        max_response_tokens: config.synopsis_agent.max_response_tokens,
+        max_tokens: config.synopses.max_tokens,
     }
     return new SynopsisAgent(agentArgs)
 }

@@ -10,6 +10,7 @@ The Synopsis Agent is a component within the Memento application that generates 
 - Utilizes the conversation history (up to the last 1000 tokens of previous synopses) to provide context for the current exchange
 - Integrates with MementoDb for accessing conversation history
 - Uses a customizable conversation interface for generating the synopsis
+- Employs a template-based approach with Handlebars for consistent prompt generation
 
 ## Usage and Examples
 The Synopsis Agent is typically used as part of the larger Memento application to provide a high-level summary of the conversation history. Here's an example of how to use the Synopsis Agent:
@@ -39,12 +40,13 @@ if (synopsisAgent) {
 }
 ```
 
-In this example, the `createSynopsisAgent` function is used to create a `SynopsisAgent` instance with the provided configuration and database connection. The `run` method generates a synopsis of the latest exchange.
-
 The `SynopsisAgent` class has the following key methods:
 
-- `run()`: Retrieves the latest user and assistant messages, along with up to 1000 tokens of the most recent synopses, generates a prompt, and sends it to the conversation instance to generate the synopsis.
+- `run()`: Generates a synopsis of the latest exchange based on the provided instructions.
 - `generatePrompt()`: Prepares the prompt for synopsis generation by fetching recent synopses and the latest user and assistant messages.
+- `getSynopses()`: Retrieves the recent synopses from the database.
+- `getLatestUserMessage()`: Fetches the most recent user message from the database.
+- `getLatestAssistantMessage()`: Fetches the most recent assistant message from the database.
 
 The `SynopsisAgent` uses a template-based approach with Handlebars to generate the prompt, ensuring consistent formatting and instructions for the synopsis generation.
 
