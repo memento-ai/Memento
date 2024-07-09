@@ -3,49 +3,52 @@
 import { getMementoProjectRoot } from '@memento-ai/utils'
 import { describe, expect, test } from 'bun:test'
 import type { PartialConfig } from '..'
-import { Config, loadAggregateConfig, loadConfig, loadDefaultConfig, loadPartialConfig, merge } from '..'
+import { Config, loadAggregateConfig, loadConfig, loadDefaultConfig, loadPartialConfig, merge, writeConfig } from '..'
 
+// This is exactly what we expect a the default configuration to be (result of loadDefaultConfig())
 const defaultConfig: Config = {
-    database: 'memento-foo.db',
+    database: 'memento',
     memento_agent: {
+        role: 'memento',
         provider: 'anthropic',
         model: 'haiku',
         temperature: 0,
-        role: 'memento',
         max_response_tokens: 2000,
     },
     resolution_agent: {
+        role: 'resolution',
         provider: 'anthropic',
         model: 'haiku',
         temperature: 0,
-        role: 'resolution',
         max_response_tokens: 200,
     },
     synopsis_agent: {
+        role: 'synopsis',
         provider: 'anthropic',
         model: 'haiku',
         temperature: 0,
-        max_tokens: 2000,
-        role: 'synopsis',
         max_response_tokens: 100,
     },
-    conversation: {
-        max_exchanges: 5,
-        max_tokens: 3000,
-    },
-    search: {
-        max_tokens: 1234,
-        keywords: 23,
-        decay: {
+    search_context: {
+        keywords: 5,
+        weight: {
             user: 0.5,
             asst: 0.5,
         },
+        tokens: 8000,
+    },
+    synopses: {
+        max_tokens: 3000,
+    },
+    conversation_snapshot: {
+        max_exchanges: 5,
+        max_tokens: 3000,
     },
 }
-
 const foo: PartialConfig = {
-    search: {
-        max_tokens: 1234,
+    database: 'memento-foo.db',
+    search_context: {
+        tokens: 1234,
         keywords: 23,
     },
 }
@@ -53,32 +56,59 @@ const foo: PartialConfig = {
 const fullFoo: Config = merge(defaultConfig, foo)
 
 describe('Config', () => {
-    test('Can load the default config', async () => {
+    test('Round trip with default config', async () => {
         const config = loadDefaultConfig()
         expect(config).toBeDefined()
-        const { memento_agent, resolution_agent, synopsis_agent, conversation, search } = config
+        expect(config).toStrictEqual(defaultConfig)
+        const projectRoot = getMementoProjectRoot()
+        const configPath = `${projectRoot}/example.memento.toml`
+        writeConfig(config, configPath)
+        const config2 = await loadConfig(configPath)
+        expect(config2).toStrictEqual(config)
+    })
+
+    test('the default config has all sections', async () => {
+        const config = loadDefaultConfig()
+        expect(config).toBeDefined()
+        expect(config).toStrictEqual(defaultConfig)
+
+        const {
+            database,
+            memento_agent,
+            resolution_agent,
+            synopsis_agent,
+            search_context,
+            synopses,
+            conversation_snapshot,
+        } = config
+        expect(database).toBeDefined()
         expect(memento_agent).toBeDefined()
         expect(resolution_agent).toBeDefined()
         expect(synopsis_agent).toBeDefined()
-        expect(conversation).toBeDefined()
-        expect(search).toBeDefined()
+        expect(search_context).toBeDefined()
+        expect(synopses).toBeDefined()
+        expect(conversation_snapshot).toBeDefined()
 
         for (const agent of [memento_agent, resolution_agent, synopsis_agent]) {
+            expect(agent.role).toBeDefined()
             expect(agent.provider).toBeDefined()
             expect(agent.model).toBeDefined()
             expect(agent.temperature).toBeDefined()
+            expect(agent.max_response_tokens).toBeDefined()
         }
 
-        const { max_exchanges, max_tokens } = conversation
+        const { keywords, weight, tokens } = search_context
+        expect(keywords).toBeDefined()
+        expect(weight).toBeDefined()
+        expect(weight.user).toBeDefined()
+        expect(weight.asst).toBeDefined()
+        expect(tokens).toBeDefined()
+
+        expect(synopses.max_tokens).toBeDefined()
+
+        const { max_exchanges, max_tokens } = conversation_snapshot
         expect(max_exchanges).toBeDefined()
         expect(max_tokens).toBeDefined()
-
-        const { max_tokens: max_search_tokens, keywords, decay } = search
-        expect(max_search_tokens).toBeDefined()
-        expect(keywords).toBeDefined()
-        expect(decay).toBeDefined()
-        expect(decay.user).toBeDefined()
-        expect(decay.asst).toBeDefined()
     })
 
     test('Can load a specific config', async () => {
@@ -159,31 +189,36 @@ describe('Config', () => {
                 model: 'opus',
                 temperature: 1.5,
                 role: 'memento',
+                max_response_tokens: 500,
             },
             resolution_agent: {
                 provider: 'anthropic',
                 model: 'sonnet',
                 temperature: 1.25,
                 role: 'resolution',
+                max_response_tokens: 500,
             },
             synopsis_agent: {
                 provider: 'anthropic',
                 model: 'haiku',
                 temperature: 0.25,
-                max_tokens: 1000,
+                max_response_tokens: 500,
                 role: 'synopsis',
             },
-            conversation: {
-                max_exchanges: 3, // from a/memento.toml
-                max_tokens: 1111, // from a/memento.toml
-            },
-            search: {
-                max_tokens: 1234,
+            search_context: {
+                tokens: 1234,
                 keywords: 23,
-                decay: {
+                weight: {
                     user: 0.25,
                     asst: 0.6,
                 },
+            },
+            synopses: {
+                max_tokens: 31415, // from b/memento.toml
+            },
+            conversation_snapshot: {
+                max_exchanges: 3, // from a/memento.toml
+                max_tokens: 1111, // from a/memento.toml
             },
         })
         expect(config).toStrictEqual(expected)

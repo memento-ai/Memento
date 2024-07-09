@@ -2,10 +2,10 @@
 
 import debug from 'debug'
 import type { Stats } from 'node:fs'
-import { existsSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, normalize, parse, resolve } from 'node:path'
 import { cwd } from 'node:process'
-import * as toml from 'toml'
+import toml from 'smol-toml'
 import { Config } from './configSchema'
 import type { PartialConfig } from './merge'
 import { merge } from './merge'
@@ -22,7 +22,7 @@ export async function loadConfig(configPath: string): Promise<Config> {
         dlog(`Error reading config file ${configPath}`)
         return Promise.reject(`Error reading config file ${configPath}: ${e}`)
     }
-    const config = await toml.parse(content)
+    const config = toml.parse(content)
     return Config.parse(config)
 }
 
@@ -115,4 +115,9 @@ export async function loadAggregateConfig(leafPath: string): Promise<Config> {
         config = merge(config, await loadPartialConfig(leafPath))
     }
     return config
+}
+
+export function writeConfig(config: Config, path: string): void {
+    const content = toml.stringify(config)
+    writeFileSync(path, content + '\n')
 }
