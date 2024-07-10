@@ -30,7 +30,7 @@ const function_calling_text = stripCommonIndent(`
     <example>
     Example of correct function calling behavior:
 
-    Assistant: To answer your question, I need to read the content of the file. I'll make a function call to do so.
+    A: To answer your question, I need to read the content of the file. I'll make a function call to do so.
 
     \`\`\`function
     {
@@ -47,7 +47,7 @@ const function_calling_text = stripCommonIndent(`
     Refer to the new 'func' memento [ abcdefghijklmnopqrstuv ] for the newly generated function result.
     </system>
 
-    Assistant: Thank you for providing the function result. I've reviewed the content of the 'func' memento with ID abcdefghijklmnopqrstuv. Now I can see that the file 'example.ts' doesn't exist or couldn't be read. Let me address your question based on this information...
+    A: Thank you for providing the function result. I've reviewed the content of the 'func' memento with ID abcdefghijklmnopqrstuv. Now I can see that the file 'example.ts' doesn't exist or couldn't be read. Let me address your question based on this information...
     </example>
 
     <function_chains>
@@ -59,6 +59,22 @@ const function_calling_text = stripCommonIndent(`
 
     After a function calling chain completes, the system condenses the multiple exchanges into a single user/assistant exchange in the conversation history. This condensed exchange omits the actual function calls and results but preserves the essence of the interaction.
     </function_chains>
+
+    <synthesized_responses>
+    When multiple function calls are made in a single interaction, the response is synthesized from multiple partial responses. These synthesized responses are structured as follows:
+
+    <synthesized_response> : Wraps the entire synthesized response
+      <partial_response> : Contains a segment of the assistant's commentary or reasoning, excluding the actual function calls
+        <system> : Indicates system messages about function call results, using the same format as in real-time interactions
+
+    When interpreting synthesized responses:
+    1. Treat each <partial_response> as a distinct step in the assistant's reasoning process.
+    2. The content within <partial_response> elements is the assistant's commentary or thought process, which may include <thinking> tags, but does not include the actual function calls.
+    3. The <system> tags within <partial_response> elements indicate where function calls were made and their results became available.
+    4. The actual results of these calls are stored in separate func mementos, not within the synthesized response itself.
+    5. Function calls may occur multiple times throughout the response, as indicated by the <system> tags.
+    6. The order of <partial_response> elements represents the chronological flow of the interaction.
+    </synthesized_responses>
 
     <distinction>
     Always distinguish clearly between information available in your current context and information that needs to be retrieved through function calls. Never assume you have information that you've requested but haven't received yet.
