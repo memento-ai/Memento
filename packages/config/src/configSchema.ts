@@ -21,6 +21,11 @@ export const AgentConversationConfig = z.object({
 })
 export type AgentConversationConfig = z.infer<typeof AgentConversationConfig>
 
+export const MementoAgentConfig = AgentConversationConfig.extend({
+    max_func_cycles: z.number().default(3)
+})
+export type MementoAgentConfig = z.infer<typeof MementoAgentConfig>
+
 export const SearchConfig = z.object({
     // The number of keywords to extract from the message content
     // to use for keyword search.
@@ -51,7 +56,7 @@ export const Config = z.object({
     // The name of the database to use
     database: z.string().default('memento'),
 
-    memento_agent: AgentConversationConfig.default({
+    memento_agent: MementoAgentConfig.default({
         role: 'memento',
         max_response_tokens: 2000,
     }),
