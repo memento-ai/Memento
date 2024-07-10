@@ -89,12 +89,14 @@ export class FunctionHandler {
 
         let newFuncIds: MetaId[] = []
         let cycles = 0
+        const max_cycles = 5
         while (extracted.hasCalls) {
-            ++cycles
-            if (cycles >= 4) {
-                throw new Error(`FunctionHandler: Too many cycles (${cycles}) in sendUserMessageAndExecuteFunctions.`)
-            }
             thoughts.push(extracted.thinking)
+            ++cycles
+            if (cycles >= max_cycles) {
+                thoughts.push('ERROR: Reached maximum number of cycles in sendUserMessageAndExecuteFunctions.')
+                return { thoughts, funcMementoIds }
+            }
             const invokeArgs: InvokeFunctionsArgs = {
                 extracted,
                 context,

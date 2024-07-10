@@ -3,33 +3,33 @@
 import debug from 'debug'
 import { parse } from 'dirty-json'
 import type { FunctionCall, FunctionCallRequest, FunctionError } from './functionCallingTypes'
-import { isFunctionCall } from './functionCallingTypes'
+import { isFunctionCall, isFunctionError } from './functionCallingTypes'
 
 const dlog = debug('extractFunctionCalls')
 
 function validateFunctionCall(functionCallJson: string): FunctionCallRequest {
-    const parsed = parse<FunctionCallRequest>(functionCallJson)
-
-    const name: string = parsed.name ?? 'unknown'
-    const input: object = parsed.input ?? parsed
     try {
+        const parsed = parse<FunctionCallRequest>(functionCallJson, { fallback: true })
         if (isFunctionCall(parsed)) {
             return parsed
+        } else if (isFunctionError(parsed)) {
+            return parsed
         } else {
-            console.warn(parsed)
+            dlog('Provided object is not a valid function call:', parsed)
             return {
-                name,
-                input,
-                error: 'The provided object is not a valid function call. It must have a "name" (string) and an "input" (object) property.',
+                name: 'unknown',
+                input: { parsed },
+                error: 'The provided object is not a valid function call. It must have a "name" (string) and an "input" (object) property.'
             }
         }
     } catch (error) {
+        dlog('Error parsing function call request:', error)
         return {
-            name,
-            input,
-            error: `Failed to parse the function call as JSON: ${
-                (error as Error).message
-            }\n\nFunction call:\n\`\`\`\n${functionCallJson}\n\`\`\``,
+            name: 'unknown',
+            input: {
+                badInput: functionCallJson
+            },
+            error: 'Error parsing function call request. Likely malformed JSON: ' + (error as Error).message
         }
     }
 }
