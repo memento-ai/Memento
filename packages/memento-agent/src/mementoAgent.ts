@@ -142,9 +142,8 @@ export class MementoAgent extends FunctionCallingAgent {
             throw error
         }
 
-        const assistantMessage: AssistantMessage = constructAssistantMessage(
-            thoughts.map((t) => `<thinking>${t}<\\thinking>`).join('\n')
-        )
+        const assistant_synthesized = thoughts.map((t) => `<partial_response>${t}<\\partial_response>`).join('\n')
+        const assistantMessage: AssistantMessage = constructAssistantMessage(`<synthesized_response>\n${assistant_synthesized}\n<\\synthesized_response>`)
         dlog(`assistantMessage: ${assistantMessage.content}, funcMementoIds: ${funcMementoIds}`)
 
         // Use the assistant's response to update the search context for the next user message.
