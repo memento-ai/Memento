@@ -13,13 +13,14 @@ import { invokeSyncAndAsyncFunctions } from './invokeSyncAndAsyncFunctions'
 
 export type FunctionHandlerArgs = {
     agent: FunctionCallingAgent
+    max_func_cycles: number
 }
 
 export type FunctionHandlerHandleArgs = {
     userMessage: UserMessage
     priorMessages: Message[]
     extracted: ExtractFunctionCallsResult
-    stream?: Writable
+    stream?: Writable,
 }
 
 export type RecursiveSendArgs = FunctionHandlerHandleArgs & {
@@ -61,6 +62,7 @@ type SummarizedAssistantMessageArgs = {
 export class FunctionHandler {
     private agent: FunctionCallingAgent
     private registry: FunctionRegistry
+    private max_func_cycles: number
     asyncResults: Promise<MetaId[]>
 
     constructor(args: FunctionHandlerArgs) {
@@ -68,6 +70,7 @@ export class FunctionHandler {
         this.agent = agent
         this.registry = agent.Registry
         this.asyncResults = Promise.resolve([])
+        this.max_func_cycles = args.max_func_cycles
     }
 
     async sendUserMessageAndExecuteFunctions(
@@ -90,11 +93,12 @@ export class FunctionHandler {
         let newFuncIds: MetaId[] = []
         let cycles = 0
         while (extracted.hasCalls) {
-            ++cycles
-            if (cycles >= 4) {
-                throw new Error(`FunctionHandler: Too many cycles (${cycles}) in sendUserMessageAndExecuteFunctions.`)
-            }
             thoughts.push(extracted.thinking)
+            ++cycles
+            if (cycles >= this.max_func_cycles) {
+                thoughts.push('ERROR: Reached maximum number of cycles in sendUserMessageAndExecuteFunctions.')
+                return { thoughts, funcMementoIds }
+            }
             const invokeArgs: InvokeFunctionsArgs = {
                 extracted,
                 context,

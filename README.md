@@ -58,16 +58,26 @@ The Memento monorepo also includes the following applications:
 
 ## Getting Started
 
-### Recommendations
+### Requirements
+
 - Memento requires ollama for generating embeddings, using the model 'nomic-embed-text'.
 - Memento requires PostgreSQL, configured such that a connection to the url `postgres://localhost` is able to create databases. We use (Postgres.app)[https://postgresapp.com] on MacOS which works beautifully. We also require the (pgvector)[https://github.com/pgvector/pgvector] extension to be installed on the PostgreSQL server.
+
+### Recommendations
+
 - Memento is able to use models from from a varient of providers, including:
     1. ollama (local)
     2. OpenAI
     3. Anthropic
     4. Google
     5. Groq
-- However, we highly recommend Sonnet 3.5. The user experience and performance of Sonnet 3.5 is superior to the other models we have tested.
+
+- **However, we highly recommend Sonnet 3.5.**
+    - The user experience and performance of Sonnet 3.5 is superior to the other models we have tested.
+    - All recent development has been done with this model. Even though other models may work (i.e. be
+        able to execute functions by emitting proper function call requests), it is likely that some
+        tuning of prompts will be required to adapt to using model. If you want to try to use a different
+        model, open an issue so that we can discuss any problems you encounter.
 
 ### Setting up
 At this time you *must* clone the repo and you *must* use `bun`. No effort has yet been made to publish NPM packages or test

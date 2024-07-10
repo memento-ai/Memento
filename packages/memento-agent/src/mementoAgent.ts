@@ -54,7 +54,7 @@ export class MementoAgent extends FunctionCallingAgent {
         this.synopsisAgent = synopsisAgent
         this.config = config
         this.asyncResults = Promise.resolve([])
-        this.functionHandler = new FunctionHandler({ agent: this })
+        this.functionHandler = new FunctionHandler({ agent: this, max_func_cycles: config.memento_agent.max_func_cycles })
         this.asyncResponsePromise = Promise.resolve('')
         this.aggregateSearchResults = []
         this.priorMessages = []
