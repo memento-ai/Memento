@@ -111,23 +111,25 @@ export class MementoAgent extends FunctionCallingAgent {
         return prompt
     }
 
-    thoughtsToMessage(thoughts: string[], funcMementoIds: MetaId[]): AssistantMessage {
-        if (thoughts.length === 0) {
-            throw new Error('No thoughts to convert to message')
+    responsePartsToMessage(responseParts: string[], funcMementoIds: MetaId[]): AssistantMessage {
+        if (responseParts.length === 0) {
+            throw new Error('No responseParts to convert to message')
         }
-        if (funcMementoIds.length === 0 && thoughts.length === 1) {
+        if (funcMementoIds.length === 0 && responseParts.length === 1) {
             // This is the normal case when no functions were invoked
-            return constructAssistantMessage(thoughts[0])
-        } else if (funcMementoIds.length > 0 && thoughts.length > 1) {
+            return constructAssistantMessage(responseParts[0])
+        } else if (funcMementoIds.length > 0 && responseParts.length > 1) {
             // This is the case where functions were invoked, so we need to synthesize the response
-            const assistant_synthesized = thoughts.map((t) => `<partial_response>${t}</partial_response>`).join('\n')
+            const assistant_synthesized = responseParts
+                .map((t) => `<partial_response>${t}</partial_response>`)
+                .join('\n')
             const assistantMessage: AssistantMessage = constructAssistantMessage(
                 `<synthesized_response>\n${assistant_synthesized}\n</synthesized_response>`,
             )
             dlog(`assistantMessage: ${assistantMessage.content}, funcMementoIds: ${funcMementoIds}`)
             return assistantMessage
         } else {
-            throw new Error('Unexpected combination of thoughts and funcMementoIds')
+            throw new Error('Unexpected combination of responseParts and funcMementoIds')
         }
     }
 
@@ -156,16 +158,16 @@ export class MementoAgent extends FunctionCallingAgent {
                 stream,
             })
 
-        const { thoughts, funcMementoIds } = functionHandlerResult
+        const { responseParts, funcMementoIds } = functionHandlerResult
 
-        if (thoughts.length === 0) {
-            const error = new Error('Empty thoughts')
+        if (responseParts.length === 0) {
+            const error = new Error('Empty responseParts')
             Error.captureStackTrace(error)
             console.error(error, funcMementoIds)
             throw error
         }
 
-        const assistantMessage: AssistantMessage = this.thoughtsToMessage(thoughts, funcMementoIds)
+        const assistantMessage: AssistantMessage = this.responsePartsToMessage(responseParts, funcMementoIds)
 
         // Use the assistant's response to update the search context for the next user message.
         const args = zodParse(MementoSearchArgs, {
