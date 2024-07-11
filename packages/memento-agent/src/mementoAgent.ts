@@ -108,6 +108,26 @@ export class MementoAgent extends FunctionCallingAgent {
         return prompt
     }
 
+    thoughtsToMessage(thoughts: string[], funcMementoIds: MetaId[]): AssistantMessage {
+        if (thoughts.length === 0) {
+            throw new Error('No thoughts to convert to message')
+        }
+        if (funcMementoIds.length === 0 && thoughts.length === 1) {
+            // This is the normal case when no functions were invoked
+            return constructAssistantMessage(thoughts[0])
+        } else if (funcMementoIds.length > 0 && thoughts.length > 1) {
+            // This is the case where functions were invoked, so we need to synthesize the response
+            const assistant_synthesized = thoughts.map((t) => `<partial_response>${t}</partial_response>`).join('\n')
+            const assistantMessage: AssistantMessage = constructAssistantMessage(
+                `<synthesized_response>\n${assistant_synthesized}\n</synthesized_response>`,
+            )
+            dlog(`assistantMessage: ${assistantMessage.content}, funcMementoIds: ${funcMementoIds}`)
+            return assistantMessage
+        } else {
+            throw new Error('Unexpected combination of thoughts and funcMementoIds')
+        }
+    }
+
     /// This is the main entry point for the agent. It is called by the CLI to send a message to the agent.
     async run({ content, stream }: SendArgs): Promise<AssistantMessage> {
         dlog(`run: content: ${content.slice(0, 50)}...`)
@@ -142,9 +162,7 @@ export class MementoAgent extends FunctionCallingAgent {
             throw error
         }
 
-        const assistant_synthesized = thoughts.map((t) => `<partial_response>${t}<\\partial_response>`).join('\n')
-        const assistantMessage: AssistantMessage = constructAssistantMessage(`<synthesized_response>\n${assistant_synthesized}\n<\\synthesized_response>`)
-        dlog(`assistantMessage: ${assistantMessage.content}, funcMementoIds: ${funcMementoIds}`)
+        const assistantMessage: AssistantMessage = this.thoughtsToMessage(thoughts, funcMementoIds)
 
         // Use the assistant's response to update the search context for the next user message.
         const args = zodParse(MementoSearchArgs, {
