@@ -39,7 +39,7 @@ async function getFunctionMementos(db: MementoDb, xchg_ids: string[]): Promise<P
                     WHERE kind = 'xchg' AND id IN (${sql.join(xchg_ids, sql.fragment`, `)})
                 )
                 ORDER BY created_at ASC
-            `
+            `,
         )
         .catch((err) => {
             Error.captureStackTrace(err)

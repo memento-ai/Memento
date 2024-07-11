@@ -33,7 +33,7 @@ export async function insertMeta(
     conn: CommonQueryMethods,
     memId: string,
     metaId: string,
-    metaArgs: MetaArgs
+    metaArgs: MetaArgs,
 ): Promise<ID[]> {
     const { kind } = metaArgs
     let results: QueryResult<ID>
@@ -43,8 +43,8 @@ export async function insertMeta(
             results = await conn.query(sql.unsafe`
                 INSERT INTO meta (id, memid, kind, role, source, priority, docid)
                 VALUES (${metaId}, ${memId}, ${metaArgs.kind}, ${role}, ${source}, ${priority ?? null}, ${
-                docid ?? null
-            })
+                    docid ?? null
+                })
                 RETURNING id`)
             break
         }

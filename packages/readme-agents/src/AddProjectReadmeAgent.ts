@@ -37,7 +37,7 @@ export class AddProjectReadmeAgent extends Agent {
                 const pkg = path.split('/')[1]
                 const content = await fs.promises.readFile(path, 'utf-8')
                 return { package: pkg, content }
-            })
+            }),
         )
         return readmes
     }

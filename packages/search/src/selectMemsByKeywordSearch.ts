@@ -16,7 +16,7 @@ const dlog = debug('selectMemsByKeywordSearch')
 
 export async function queryMemsByKeywordSearch(
     dbPool: DatabasePool,
-    args: MementoSearchArgs
+    args: MementoSearchArgs,
 ): Promise<MementoSearchResult[]> {
     const { content } = MementoSearchArgs.parse(args)
     const keywords = await extractKeywordsFromContent(dbPool, args)
@@ -72,7 +72,7 @@ export async function queryMemsByKeywordSearch(
 
 export async function selectMemsByKeywordSearch(
     dbPool: DatabasePool,
-    args: MementoSearchArgs
+    args: MementoSearchArgs,
 ): Promise<MementoSearchResult[]> {
     const { content, max_tokens, keywords } = MementoSearchArgs.parse(args)
     dlog(`selectMemsByKeywordSearch: max_tokens:${max_tokens} keywords:${keywords} content: ${content.slice(0, 50)}...`)

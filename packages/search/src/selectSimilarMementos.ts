@@ -18,7 +18,7 @@ const dlog = debug('selectSimilarMementos')
 // We do not trim the result here but rather leave it to the caller to decide when to trim.
 export async function selectSimilarMementos(
     dbPool: DatabasePool,
-    args: MementoSearchArgs
+    args: MementoSearchArgs,
 ): Promise<MementoSearchResult[]> {
     const { content, max_tokens, keywords } = MementoSearchArgs.parse(args)
     dlog(`selectSimilarMementos: max_tokens:${max_tokens} keywords:${keywords} content: ${content.slice(0, 50)}...`)

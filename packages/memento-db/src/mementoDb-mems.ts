@@ -119,7 +119,7 @@ export async function addFuncMemento(pool: DatabasePool, args_: AddFunctionCallA
 
 export async function linkExchangeSynopsis(
     pool: DatabasePool,
-    { xchg_id, synopsis_id }: LinkExchangeArgs
+    { xchg_id, synopsis_id }: LinkExchangeArgs,
 ): Promise<void> {
     await pool.transaction(async (conn) => {
         // Update the conversation exchange memento, setting summaryid to the synopsis_id

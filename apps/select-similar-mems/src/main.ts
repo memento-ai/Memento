@@ -48,7 +48,7 @@ async function main() {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { created_at, ...rest } = { ...m, content: m.content.split('\n')[0].slice(0, 60) }
             return rest
-        })
+        }),
     )
 
     const semanticSearchMems = await selectMemsBySemanticSimilarity(db.pool, { content, max_tokens })
@@ -59,7 +59,7 @@ async function main() {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { created_at, ...rest } = { ...m, content: m.content.split('\n')[0].slice(0, 60) }
             return rest
-        })
+        }),
     )
 
     const fullSearchMems = await selectSimilarMementos(db.pool, { content, max_tokens })
@@ -70,7 +70,7 @@ async function main() {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { created_at, ...rest } = { ...m, content: m.content.split('\n')[0].slice(0, 60) }
             return rest
-        })
+        }),
     )
 }
 

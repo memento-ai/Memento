@@ -11,7 +11,7 @@ export async function insertMem(pool: CommonQueryMethods, mem: Mem): Promise<voi
             sql.unsafe`
         INSERT INTO mem (id, content, embed_vector, tokens)
         VALUES (${mem.id}, ${mem.content}, ${embed_vector}, ${mem.tokens})
-        ON CONFLICT (id) DO NOTHING;`
+        ON CONFLICT (id) DO NOTHING;`,
         )
         .catch((err) => {
             Error.captureStackTrace(err)

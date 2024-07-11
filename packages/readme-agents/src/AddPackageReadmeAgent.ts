@@ -43,7 +43,7 @@ export class AddPackageReadmeAgent extends Agent {
                 const projectRelativePath = path.relative(root, fullPath)
                 const content = await fs.promises.readFile(fullPath, 'utf-8')
                 return { source: projectRelativePath, content }
-            })
+            }),
         )
         return sources
     }
@@ -53,7 +53,7 @@ export class AddPackageReadmeAgent extends Agent {
         const project_readme: string = await fs.promises.readFile(`${this.projectRoot}/README.md`, 'utf-8')
         const package_readme: string = await fs.promises.readFile(
             `${this.projectRoot}/${this.package}/README.md`,
-            'utf-8'
+            'utf-8',
         )
         const sources: { source: string; content: string }[] = await this.getSources()
         return packageReadmePromptTemplate({ project_readme, package_readme, sources })

@@ -54,7 +54,10 @@ export class MementoAgent extends FunctionCallingAgent {
         this.synopsisAgent = synopsisAgent
         this.config = config
         this.asyncResults = Promise.resolve([])
-        this.functionHandler = new FunctionHandler({ agent: this, max_func_cycles: config.memento_agent.max_func_cycles })
+        this.functionHandler = new FunctionHandler({
+            agent: this,
+            max_func_cycles: config.memento_agent.max_func_cycles,
+        })
         this.asyncResponsePromise = Promise.resolve('')
         this.aggregateSearchResults = []
         this.priorMessages = []
@@ -78,8 +81,8 @@ export class MementoAgent extends FunctionCallingAgent {
         dlog(
             `generatePrompt: max_tokens: ${args.max_tokens}, keywords: ${args.keywords}, content: ${args.content.slice(
                 0,
-                50
-            )}...`
+                50,
+            )}...`,
         )
         const currentSearchResults = await selectSimilarMementos(this.db.pool, args)
         const { max_tokens } = args

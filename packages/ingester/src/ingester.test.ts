@@ -40,7 +40,7 @@ describe('Ingester', () => {
             dlog('dbname:', dbname)
             return expect(db).toBeTruthy()
         },
-        timeout
+        timeout,
     )
 
     it(
@@ -52,7 +52,7 @@ describe('Ingester', () => {
                 await ingestFile(db, 'packages/ingester/src/ingester.ts', summarizer)
             }).not.toThrow()
         },
-        timeout
+        timeout,
     )
 
     it(
@@ -64,7 +64,7 @@ describe('Ingester', () => {
             expect(files.length).toBeGreaterThan(0)
             return expect(files).toContain('packages/ingester/src/ingester.ts')
         },
-        timeout
+        timeout,
     )
 
     it(
@@ -76,6 +76,6 @@ describe('Ingester', () => {
             files = await getIngestedFiles(db)
             return expect(files.length).toBe(0)
         },
-        timeout
+        timeout,
     )
 })

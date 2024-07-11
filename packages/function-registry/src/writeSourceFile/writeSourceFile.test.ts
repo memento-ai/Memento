@@ -15,10 +15,13 @@ describe('writeSourceFile', () => {
         const testFilePath = 'test-write-file.txt'
         const testContent = 'This is a test content.'
 
-        const result: string = await writeSourceFile.fn({
-            filePath: testFilePath,
-            content: testContent,
-        }, { pool: null })
+        const result: string = await writeSourceFile.fn(
+            {
+                filePath: testFilePath,
+                content: testContent,
+            },
+            { pool: null },
+        )
 
         expect(result).toContain('File successfully written')
 
@@ -42,10 +45,13 @@ describe('writeSourceFile', () => {
             baz: 123,
         }
 
-        const result: string = await writeSourceFile.fn({
-            filePath: testFilePath,
-            content: testContent,
-        }, { pool: null })
+        const result: string = await writeSourceFile.fn(
+            {
+                filePath: testFilePath,
+                content: testContent,
+            },
+            { pool: null },
+        )
 
         expect(result).toContain('File successfully written')
 
@@ -62,10 +68,13 @@ describe('writeSourceFile', () => {
         const writeSourceFile = registry['writeSourceFile']
         expect(writeSourceFile).toBeDefined()
 
-        const result: string = await writeSourceFile.fn({
-            filePath: '../outside-project.txt',
-            content: 'This should not be written.',
-        }, { pool: null })
+        const result: string = await writeSourceFile.fn(
+            {
+                filePath: '../outside-project.txt',
+                content: 'This should not be written.',
+            },
+            { pool: null },
+        )
 
         expect(result).toContain('Error writing to source file')
         expect(result).toContain('Invalid file path')

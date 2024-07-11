@@ -91,11 +91,11 @@ describe('MementoAgent', () => {
         'can chat with the agent',
         async () => {
             const message: AssistantMessage = await mementoAgent.run(
-                sendArgs('0. What did Leonard Shelby suffer from?')
+                sendArgs('0. What did Leonard Shelby suffer from?'),
             )
             expect(message.content).toBeTruthy()
         },
-        timeout
+        timeout,
     )
 
     it(
@@ -108,7 +108,7 @@ describe('MementoAgent', () => {
             expect(message.content).toBeTruthy()
             expect(message.content).toBeTruthy()
         },
-        timeout
+        timeout,
     )
 
     it(
@@ -116,7 +116,7 @@ describe('MementoAgent', () => {
         async () => {
             await ingestDirectory({ db, dirPath: `${getMementoProjectRoot()}/packages/types` })
             const args = sendArgs(
-                'Using **only** the information provided in the <additional_context>, what are the various kinds/types of MemMetaData? Do not consult the database, as it is a test database with very limited data.'
+                'Using **only** the information provided in the <additional_context>, what are the various kinds/types of MemMetaData? Do not consult the database, as it is a test database with very limited data.',
             )
             const message: AssistantMessage = await mementoAgent.run(args)
             expect(message.content).toBeTruthy()
@@ -124,10 +124,10 @@ describe('MementoAgent', () => {
             // generatePrompt() is normally called from run(). We can call it directly here because run() has been called.
             const prompt = await mementoAgent.generatePrompt()
             expect(prompt).toInclude(
-                'The Memento system automatically retrieves information it believes may be relevant to the current conversation'
+                'The Memento system automatically retrieves information it believes may be relevant to the current conversation',
             )
             expect(prompt).toInclude('packages/types/src/metaSchema.ts')
         },
-        timeout
+        timeout,
     )
 })

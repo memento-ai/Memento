@@ -19,7 +19,7 @@ function validateFunctionCall(functionCallJson: string): FunctionCallRequest {
             return {
                 name: 'unknown',
                 input: { parsed },
-                error: 'The provided object is not a valid function call. It must have a "name" (string) and an "input" (object) property.'
+                error: 'The provided object is not a valid function call. It must have a "name" (string) and an "input" (object) property.',
             }
         }
     } catch (error) {
@@ -27,9 +27,9 @@ function validateFunctionCall(functionCallJson: string): FunctionCallRequest {
         return {
             name: 'unknown',
             input: {
-                badInput: functionCallJson
+                badInput: functionCallJson,
             },
-            error: 'Error parsing function call request. Likely malformed JSON: ' + (error as Error).message
+            error: 'Error parsing function call request. Likely malformed JSON: ' + (error as Error).message,
         }
     }
 }

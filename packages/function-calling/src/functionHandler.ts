@@ -5,12 +5,12 @@ import type { Context } from '@memento-ai/memento-db'
 import type { AssistantMessage, Message, MetaId, UserMessage } from '@memento-ai/types'
 import { constructAssistantMessage, constructUserMessage } from '@memento-ai/types'
 import { stripCommonIndent } from '@memento-ai/utils'
+import debug from 'debug'
 import type { Writable } from 'node:stream'
 import type { ExtractFunctionCallsResult } from './extractFunctionCalls'
 import type { InvokeFunctionsArgs } from './functionCalling'
 import type { FunctionCallingAgent } from './functionCallingAgent'
 import { invokeSyncAndAsyncFunctions } from './invokeSyncAndAsyncFunctions'
-import debug from 'debug'
 
 const dlog = debug('functionHandler')
 
@@ -23,7 +23,7 @@ export type FunctionHandlerHandleArgs = {
     userMessage: UserMessage
     priorMessages: Message[]
     extracted: ExtractFunctionCallsResult
-    stream?: Writable,
+    stream?: Writable
 }
 
 export type RecursiveSendArgs = FunctionHandlerHandleArgs & {
@@ -77,7 +77,7 @@ export class FunctionHandler {
     }
 
     async sendUserMessageAndExecuteFunctions(
-        args: SendUserMessageAndExecuteFunctionsArgs
+        args: SendUserMessageAndExecuteFunctionsArgs,
     ): Promise<SendUserMessageAndExecuteFunctionsResult> {
         const thoughts: string[] = []
         const funcMementoIds: MetaId[] = []
@@ -120,7 +120,7 @@ export class FunctionHandler {
                 this.summarizedAssistantMessage({
                     newFuncIds,
                     thinking: extracted.thinking,
-                })
+                }),
             )
 
             userMessage = this.onBehalfOfUserMessage(funcMementoIds)

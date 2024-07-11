@@ -9,9 +9,12 @@ describe('readSourceFile', () => {
         const projectRoot = getMementoProjectRoot()
         const readSourceFile = registry['readSourceFile']
         expect(readSourceFile).toBeDefined()
-        const content: string = await readSourceFile.fn({
-            filePath: `${projectRoot}/packages/function-registry/src/getCurrentTime/getCurrentTime.ts`,
-        }, { pool: null })
+        const content: string = await readSourceFile.fn(
+            {
+                filePath: `${projectRoot}/packages/function-registry/src/getCurrentTime/getCurrentTime.ts`,
+            },
+            { pool: null },
+        )
         expect(typeof content).toBe('string')
         expect(content).toContain('Path: packages/function-registry/src/getCurrentTime/getCurrentTime.ts')
     })

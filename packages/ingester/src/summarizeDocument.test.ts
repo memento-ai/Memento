@@ -51,7 +51,7 @@ describe('summarizeDocument', () => {
             LEFT JOIN mem
             ON meta.memId = mem.id
             WHERE meta.kind IN (${DOC}, ${DSUM})
-            ORDER BY meta.kind`)
+            ORDER BY meta.kind`),
         )
 
         const { rows } = result

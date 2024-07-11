@@ -30,8 +30,8 @@ program
     .version('0.0.1')
     .description(
         `A utility to ingest files into a MementoDb. Currently ingests only the file types used to implement Memento: ${SUPPORTED_EXTENSIONS.join(
-            ', '
-        )}`
+            ', ',
+        )}`,
     )
     .option('-d, --database <dbname>', 'The name of the database to use')
     .option('-x, --clean-slate', 'Drop the named database and start over')
@@ -124,7 +124,7 @@ async function main() {
     const dirPath = directory
 
     console.info(
-        `Ingesting files from ${dirPath} into template database ${template_db_name} then into database ${database}`
+        `Ingesting files from ${dirPath} into template database ${template_db_name} then into database ${database}`,
     )
     await ingestDirectory({ db, dirPath, summarizer, log: true })
 
@@ -146,7 +146,9 @@ async function main() {
 
     const result = await target.pool
         .query(
-            sql.type(Documents)`SELECT id, source, tokens FROM memento WHERE kind = 'doc' ORDER BY tokens DESC LIMIT 10`
+            sql.type(
+                Documents,
+            )`SELECT id, source, tokens FROM memento WHERE kind = 'doc' ORDER BY tokens DESC LIMIT 10`,
         )
         .catch((err) => {
             Error.captureStackTrace(err)

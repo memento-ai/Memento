@@ -51,7 +51,7 @@ describe('queryMementoView', () => {
             expect(typeof result).toBe('object')
             expect(result.length).toBe(2)
         },
-        timeout
+        timeout,
     )
 
     it(
@@ -65,7 +65,7 @@ describe('queryMementoView', () => {
             expect(typeof result).toBe('object')
             expect(result.length).toBe(1)
         },
-        timeout
+        timeout,
     )
 
     it(
@@ -88,7 +88,7 @@ describe('queryMementoView', () => {
             expect(result).toContainEqual({ content: 'test mem 1' })
             expect(result).toContainEqual({ content: 'test mem 2' })
         },
-        timeout
+        timeout,
     )
 
     it(
@@ -110,7 +110,7 @@ describe('queryMementoView', () => {
             expect(result.length).toBe(1)
             expect(result).toContainEqual({ content: 'test mem apple' })
         },
-        timeout
+        timeout,
     )
 
     it(
@@ -133,6 +133,6 @@ describe('queryMementoView', () => {
             expect(result).toContainEqual({ content: 'test mem apple' })
             expect(result).toContainEqual({ content: 'test mem cherry' })
         },
-        timeout
+        timeout,
     )
 })

@@ -87,7 +87,7 @@ export function createConversation(provider: Provider, options: ConversationOpti
 
 export function createConversationFromConfig(
     config: AgentConversationConfig,
-    stream?: Writable
+    stream?: Writable,
 ): ConversationInterface | undefined {
     const { provider, model, temperature, role } = config
     if (provider === 'none') {

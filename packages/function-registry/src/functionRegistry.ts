@@ -1,7 +1,7 @@
 // Path: packages/function-registry/src/functionRegistry.ts
 
-import debug from 'debug'
 import type { Context } from '@memento-ai/memento-db'
+import debug from 'debug'
 import { z, ZodObject } from 'zod'
 
 const dlog = debug('functionRegistry')
@@ -60,7 +60,7 @@ function generateExtraTypesDescription(indent: number, extraTypes?: Record<strin
     }
     const prefix = ['    '.repeat(indent) + 'Nested Types:']
     return prefix.concat(
-        Object.entries(extraTypes).map(([key, schema]) => generateDescription(schema, key, indent + 1).join('\n'))
+        Object.entries(extraTypes).map(([key, schema]) => generateDescription(schema, key, indent + 1).join('\n')),
     )
 }
 

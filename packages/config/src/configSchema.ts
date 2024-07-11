@@ -22,7 +22,7 @@ export const AgentConversationConfig = z.object({
 export type AgentConversationConfig = z.infer<typeof AgentConversationConfig>
 
 export const MementoAgentConfig = AgentConversationConfig.extend({
-    max_func_cycles: z.number().default(3)
+    max_func_cycles: z.number().default(3),
 })
 export type MementoAgentConfig = z.infer<typeof MementoAgentConfig>
 
