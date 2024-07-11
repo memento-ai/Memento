@@ -74,5 +74,5 @@ const packageReadmePromptTemplateText = stripCommonIndent(`
 `)
 
 export const packageReadmePromptTemplate = Handlebars.compile<PackageReadmePromptTemplateArgs>(
-    packageReadmePromptTemplateText
+    packageReadmePromptTemplateText,
 )

@@ -86,7 +86,7 @@ export async function getRecentConversation(db: MementoDb, max_exchanges: number
 export async function gatherContent(
     db: MementoDb,
     results: MementoSearchResult[],
-    config: Config
+    config: Config,
 ): Promise<DynamicContent> {
     const similarMementos: MementoSimilarityMap = await asSimilarityMap(results)
     const mementosByKind = indexMementosByKind(similarMementos)

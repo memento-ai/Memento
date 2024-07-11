@@ -124,7 +124,7 @@ export async function invokeMultFunctions({ registry, calls, context }: InvokeMu
     return Promise.all(
         calls.map(async (call): Promise<MetaId> => {
             return await processOneCall({ registry, context, call })
-        })
+        }),
     )
 }
 

@@ -34,7 +34,7 @@ describe('MementoCollection independent db required', () => {
             expect(db.name).toBe(dbname)
             expect(db.pool).toBeTruthy()
         },
-        timeout
+        timeout,
     )
 
     it(
@@ -56,6 +56,6 @@ describe('MementoCollection independent db required', () => {
             const conversation: GetConversationSnapshotResult = await db.getConversation(config)
             expect(conversation.messages.length).toBe(4)
         },
-        timeout
+        timeout,
     )
 })

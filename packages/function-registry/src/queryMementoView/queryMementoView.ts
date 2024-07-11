@@ -1,9 +1,9 @@
 // Path: packages/function-registry/src/queryMementoView/queryMementoView.ts
 
 import { count_tokens } from '@memento-ai/encoding'
+import { Context } from '@memento-ai/memento-db'
 import { stripCommonIndent } from '@memento-ai/utils'
 import debug from 'debug'
-import { Context } from '@memento-ai/memento-db'
 import { sql } from 'slonik'
 import { raw } from 'slonik-sql-tag-raw'
 import { z } from 'zod'
@@ -65,7 +65,7 @@ export async function queryMementoView(input: queryMementoViewInput, context: Co
                 }
             } else if (tokens > max_query_result_tokens / 2) {
                 dlog(
-                    `Query result has ${tokens} tokens, which is more than half the maximum of ${max_query_result_tokens}`
+                    `Query result has ${tokens} tokens, which is more than half the maximum of ${max_query_result_tokens}`,
                 )
             }
         }

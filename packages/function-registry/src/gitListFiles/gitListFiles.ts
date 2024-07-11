@@ -1,7 +1,7 @@
 // Path: packages/function-registry/src/gitListFiles/gitListFiles.ts
 
-import { gitListRepositoryFiles as listFiles } from '@memento-ai/utils'
 import { Context } from '@memento-ai/memento-db'
+import { gitListRepositoryFiles as listFiles } from '@memento-ai/utils'
 import { z } from 'zod'
 import type { FunctionConfig } from '../functionRegistry'
 import { baseInputSchema } from '../functionRegistry'

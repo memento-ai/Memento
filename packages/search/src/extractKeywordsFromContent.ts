@@ -15,7 +15,7 @@ export type ExtractKeywordsFromContentResult = z.infer<typeof ExtractKeywordsFro
 
 export async function extractKeywordsFromContent(
     dbPool: DatabasePool,
-    args: MementoSearchArgs
+    args: MementoSearchArgs,
 ): Promise<ExtractKeywordsFromContentResult[]> {
     const { content, keywords } = MementoSearchArgs.parse(args)
     const query = sql.type(ExtractKeywordsFromContentResult)`

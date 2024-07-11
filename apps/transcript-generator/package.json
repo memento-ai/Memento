@@ -1,19 +1,19 @@
 {
-  "name": "@memento-ai/transcript-generator",
-  "version": "0.1.0",
-  "description": "Utility to generate conversation transcripts from Memento database",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js"
-  },
-  "dependencies": {
-    "@memento-ai/postgres-db": "1.0.0",
-    "@memento-ai/types": "^1.0.0",
-    "commander": "11.1.0",
-    "slonik": "40.2.6"
-  },
-  "devDependencies": {
-    "typescript": "^4.5.4"
-  }
+    "name": "@memento-ai/transcript-generator",
+    "version": "0.1.0",
+    "description": "Utility to generate conversation transcripts from Memento database",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js"
+    },
+    "dependencies": {
+        "@memento-ai/postgres-db": "1.0.0",
+        "@memento-ai/types": "^1.0.0",
+        "commander": "11.1.0",
+        "slonik": "40.2.6"
+    },
+    "devDependencies": {
+        "typescript": "^4.5.4"
+    }
 }

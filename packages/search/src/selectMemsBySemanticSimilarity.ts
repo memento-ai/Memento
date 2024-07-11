@@ -16,7 +16,7 @@ const dlog = debug('selectMemsBySemanticSimilarity')
 
 export async function selectMemsBySemanticSimilarity(
     dbPool: DatabasePool,
-    args: MementoSearchArgs
+    args: MementoSearchArgs,
 ): Promise<MementoSearchResult[]> {
     const { content, max_tokens } = MementoSearchArgs.parse(args)
     dlog(`selectMemsBySemanticSimilarity: max_tokens:${max_tokens} content: ${content.slice(0, 50)}...`)

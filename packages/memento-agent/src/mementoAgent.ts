@@ -54,7 +54,10 @@ export class MementoAgent extends FunctionCallingAgent {
         this.synopsisAgent = synopsisAgent
         this.config = config
         this.asyncResults = Promise.resolve([])
-        this.functionHandler = new FunctionHandler({ agent: this, max_func_cycles: config.memento_agent.max_func_cycles })
+        this.functionHandler = new FunctionHandler({
+            agent: this,
+            max_func_cycles: config.memento_agent.max_func_cycles,
+        })
         this.asyncResponsePromise = Promise.resolve('')
         this.aggregateSearchResults = []
         this.priorMessages = []
@@ -78,8 +81,8 @@ export class MementoAgent extends FunctionCallingAgent {
         dlog(
             `generatePrompt: max_tokens: ${args.max_tokens}, keywords: ${args.keywords}, content: ${args.content.slice(
                 0,
-                50
-            )}...`
+                50,
+            )}...`,
         )
         const currentSearchResults = await selectSimilarMementos(this.db.pool, args)
         const { max_tokens } = args
@@ -108,6 +111,28 @@ export class MementoAgent extends FunctionCallingAgent {
         return prompt
     }
 
+    responsePartsToMessage(responseParts: string[], funcMementoIds: MetaId[]): AssistantMessage {
+        if (responseParts.length === 0) {
+            throw new Error('No responseParts to convert to message')
+        }
+        if (funcMementoIds.length === 0 && responseParts.length === 1) {
+            // This is the normal case when no functions were invoked
+            return constructAssistantMessage(responseParts[0])
+        } else if (funcMementoIds.length > 0 && responseParts.length > 1) {
+            // This is the case where functions were invoked, so we need to synthesize the response
+            const assistant_synthesized = responseParts
+                .map((t) => `<partial_response>${t}</partial_response>`)
+                .join('\n')
+            const assistantMessage: AssistantMessage = constructAssistantMessage(
+                `<synthesized_response>\n${assistant_synthesized}\n</synthesized_response>`,
+            )
+            dlog(`assistantMessage: ${assistantMessage.content}, funcMementoIds: ${funcMementoIds}`)
+            return assistantMessage
+        } else {
+            throw new Error('Unexpected combination of responseParts and funcMementoIds')
+        }
+    }
+
     /// This is the main entry point for the agent. It is called by the CLI to send a message to the agent.
     async run({ content, stream }: SendArgs): Promise<AssistantMessage> {
         dlog(`run: content: ${content.slice(0, 50)}...`)
@@ -133,18 +158,16 @@ export class MementoAgent extends FunctionCallingAgent {
                 stream,
             })
 
-        const { thoughts, funcMementoIds } = functionHandlerResult
+        const { responseParts, funcMementoIds } = functionHandlerResult
 
-        if (thoughts.length === 0) {
-            const error = new Error('Empty thoughts')
+        if (responseParts.length === 0) {
+            const error = new Error('Empty responseParts')
             Error.captureStackTrace(error)
             console.error(error, funcMementoIds)
             throw error
         }
 
-        const assistant_synthesized = thoughts.map((t) => `<partial_response>${t}<\\partial_response>`).join('\n')
-        const assistantMessage: AssistantMessage = constructAssistantMessage(`<synthesized_response>\n${assistant_synthesized}\n<\\synthesized_response>`)
-        dlog(`assistantMessage: ${assistantMessage.content}, funcMementoIds: ${funcMementoIds}`)
+        const assistantMessage: AssistantMessage = this.responsePartsToMessage(responseParts, funcMementoIds)
 
         // Use the assistant's response to update the search context for the next user message.
         const args = zodParse(MementoSearchArgs, {

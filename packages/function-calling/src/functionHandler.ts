@@ -5,12 +5,12 @@ import type { Context } from '@memento-ai/memento-db'
 import type { AssistantMessage, Message, MetaId, UserMessage } from '@memento-ai/types'
 import { constructAssistantMessage, constructUserMessage } from '@memento-ai/types'
 import { stripCommonIndent } from '@memento-ai/utils'
+import debug from 'debug'
 import type { Writable } from 'node:stream'
 import type { ExtractFunctionCallsResult } from './extractFunctionCalls'
 import type { InvokeFunctionsArgs } from './functionCalling'
 import type { FunctionCallingAgent } from './functionCallingAgent'
 import { invokeSyncAndAsyncFunctions } from './invokeSyncAndAsyncFunctions'
-import debug from 'debug'
 
 const dlog = debug('functionHandler')
 
@@ -23,7 +23,7 @@ export type FunctionHandlerHandleArgs = {
     userMessage: UserMessage
     priorMessages: Message[]
     extracted: ExtractFunctionCallsResult
-    stream?: Writable,
+    stream?: Writable
 }
 
 export type RecursiveSendArgs = FunctionHandlerHandleArgs & {
@@ -53,7 +53,7 @@ export type SendUserMessageAndExtractFunctionCallsArgs = SendUserMessageArgs
 export type SendUserMessageAndExecuteFunctionsArgs = SendUserMessageAndExtractFunctionCallsArgs
 
 export type SendUserMessageAndExecuteFunctionsResult = {
-    thoughts: string[]
+    responseParts: string[]
     funcMementoIds: MetaId[]
 }
 
@@ -77,9 +77,9 @@ export class FunctionHandler {
     }
 
     async sendUserMessageAndExecuteFunctions(
-        args: SendUserMessageAndExecuteFunctionsArgs
+        args: SendUserMessageAndExecuteFunctionsArgs,
     ): Promise<SendUserMessageAndExecuteFunctionsResult> {
-        const thoughts: string[] = []
+        const responseParts: string[] = []
         const funcMementoIds: MetaId[] = []
 
         let { userMessage } = args
@@ -96,11 +96,11 @@ export class FunctionHandler {
         let newFuncIds: MetaId[] = []
         let cycles = 0
         while (extracted.hasCalls) {
-            thoughts.push(extracted.thinking)
+            responseParts.push(extracted.thinking)
             ++cycles
             if (cycles >= this.max_func_cycles) {
-                thoughts.push('ERROR: Reached maximum number of cycles in sendUserMessageAndExecuteFunctions.')
-                return { thoughts, funcMementoIds }
+                responseParts.push('ERROR: Reached maximum number of cycles in sendUserMessageAndExecuteFunctions.')
+                return { responseParts, funcMementoIds }
             }
             const invokeArgs: InvokeFunctionsArgs = {
                 extracted,
@@ -120,7 +120,7 @@ export class FunctionHandler {
                 this.summarizedAssistantMessage({
                     newFuncIds,
                     thinking: extracted.thinking,
-                })
+                }),
             )
 
             userMessage = this.onBehalfOfUserMessage(funcMementoIds)
@@ -133,8 +133,8 @@ export class FunctionHandler {
             dlog('Extracted function calls:', extracted.syncCalls.length)
         }
 
-        thoughts.push(extracted.thinking)
-        return { thoughts, funcMementoIds }
+        responseParts.push(extracted.thinking)
+        return { responseParts, funcMementoIds }
     }
 
     private summarizedAssistantMessage({ newFuncIds, thinking }: SummarizedAssistantMessageArgs): AssistantMessage {

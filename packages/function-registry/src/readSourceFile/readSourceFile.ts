@@ -1,8 +1,8 @@
 // Path: packages/function-registry/src/readSourceFile/readSourceFile.ts
 
+import { Context } from '@memento-ai/memento-db'
 import debug from 'debug'
 import fs from 'fs/promises'
-import { Context } from '@memento-ai/memento-db'
 import { z } from 'zod'
 import { baseInputSchema, type FunctionConfig } from '../functionRegistry'
 const dlog = debug('readSourceFile')

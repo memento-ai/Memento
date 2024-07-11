@@ -24,7 +24,7 @@ const DocumentIdTuple = z.object({
 export async function ingestFile(
     db: MementoDb,
     filePath: string,
-    summarizer?: Summarizer
+    summarizer?: Summarizer,
 ): Promise<DocAndSummaryResult> {
     summarizer = summarizer ?? (await import('./summarizeDocument')).createMockSummarizer()
     const content = await fs.promises.readFile(filePath, 'utf-8')
@@ -36,8 +36,8 @@ export async function ingestFile(
     await db.pool.connect(async (conn) => {
         const row = await conn.maybeOne(
             sql.type(
-                DocumentIdTuple
-            )`SELECT id, summaryid, memid, tokens FROM memento WHERE source = ${source} AND kind = ${DOC};`
+                DocumentIdTuple,
+            )`SELECT id, summaryid, memid, tokens FROM memento WHERE source = ${source} AND kind = ${DOC};`,
         )
         if (row) {
             const { id, memid, summaryid, tokens } = row

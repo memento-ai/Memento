@@ -25,7 +25,7 @@ export const MementoSearchResult = MemBaseMetaData.pick({
 
             // embed_vector: false,
             // tssearch: false,
-        })
+        }),
     )
     .extend({
         score: z.number(), // The score of the search result, either the rank or similarity.

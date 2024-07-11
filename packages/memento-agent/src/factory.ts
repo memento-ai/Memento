@@ -17,7 +17,7 @@ export type MementoAgentExtraArgs = {
 export async function createMementoAgent(
     config: Config,
     db: MementoDb,
-    extra: MementoAgentExtraArgs
+    extra: MementoAgentExtraArgs,
 ): Promise<MementoAgent> {
     const { synopsisAgent, resolutionAgent, outStream } = extra
     const conversation = createConversationFromConfig(config.memento_agent, outStream)

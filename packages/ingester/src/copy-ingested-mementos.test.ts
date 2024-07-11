@@ -46,6 +46,6 @@ describe('copyIngestedMementos', () => {
             await ingestDirectory({ db: fromdb, dirPath: `${projectRoot}/packages/function-calling/src` })
             await copyIngestedMementos(fromdb.pool, todb.pool)
         },
-        timeout
+        timeout,
     )
 })
