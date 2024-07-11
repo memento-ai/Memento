@@ -61,11 +61,11 @@ The Memento monorepo also includes the following applications:
 ### Requirements
 
 - Memento requires ollama for generating embeddings, using the model 'nomic-embed-text'.
-- Memento requires PostgreSQL, configured such that a connection to the url `postgres://localhost` is able to create databases. We use (Postgres.app)[https://postgresapp.com] on MacOS which works beautifully. We also require the (pgvector)[https://github.com/pgvector/pgvector] extension to be installed on the PostgreSQL server.
+- Memento requires PostgreSQL, configured such that a connection to the url `postgres://localhost` is able to create databases. We use [Postgres.app](https://postgresapp.com) on MacOS which works beautifully. We also require the [pgvector](https://github.com/pgvector/pgvector) extension to be installed on the PostgreSQL server.
 
 ### Recommendations
 
-- Memento is able to use models from from a varient of providers, including:
+- Memento is able to use models from a variety of providers, including:
     1. ollama (local)
     2. OpenAI
     3. Anthropic

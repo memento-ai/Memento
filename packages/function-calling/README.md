@@ -75,7 +75,7 @@ The `FunctionHandler` class manages the execution of functions within a conversa
 ```typescript
 import { FunctionHandler } from '@memento-ai/function-calling';
 
-const handler = new FunctionHandler({ agent: myAgent });
+const handler = new FunctionHandler({ agent: myAgent, max_func_cycles: 5 });
 
 const userMessage = { content: 'What time is it?', role: 'user' };
 const priorMessages = [];
