@@ -13,6 +13,7 @@ model = "opus"
 temperature = 1.5
 role = "memento"
 max_response_tokens = 500
+max_func_cycles = 3
 
 [resolution_agent]
 provider = "anthropic"

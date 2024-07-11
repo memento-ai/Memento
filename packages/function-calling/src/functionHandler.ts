@@ -10,6 +10,9 @@ import type { ExtractFunctionCallsResult } from './extractFunctionCalls'
 import type { InvokeFunctionsArgs } from './functionCalling'
 import type { FunctionCallingAgent } from './functionCallingAgent'
 import { invokeSyncAndAsyncFunctions } from './invokeSyncAndAsyncFunctions'
+import debug from 'debug'
+
+const dlog = debug('functionHandler')
 
 export type FunctionHandlerArgs = {
     agent: FunctionCallingAgent
@@ -126,6 +129,8 @@ export class FunctionHandler {
                 priorMessages,
                 stream,
             })
+
+            dlog('Extracted function calls:', extracted.syncCalls.length)
         }
 
         thoughts.push(extracted.thinking)
@@ -134,13 +139,14 @@ export class FunctionHandler {
 
     private summarizedAssistantMessage({ newFuncIds, thinking }: SummarizedAssistantMessageArgs): AssistantMessage {
         const content = stripCommonIndent(`
-            <thinking>
+            <partial_response>
             ${thinking}
-            </thinking>
+            </partial_response>
             <invoked>
             ${newFuncIds.map((m) => `<func>${m}</func>`).join('\n')}
             </invoked>
             `)
+        dlog('summarizedAssistantMessage:', content)
         return constructAssistantMessage(content)
     }
 

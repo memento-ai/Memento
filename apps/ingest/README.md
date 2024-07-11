@@ -1,7 +1,11 @@
 # @memento-ai/ingest
 
 ## Description
-The `@memento-ai/ingest` package is a command-line utility for ingesting files into a Memento database. It supports ingesting various file types used in the Memento project, such as TypeScript (`.ts`), SQL (`.sql`), and others.
+The `@memento-ai/ingest` package is a command-line utility for ingesting files into a Memento database. It supports ingesting various file types used in the Memento project, such as TypeScript (`.ts`), SQL (`.sql`), and others. This tool is essential for populating the Memento database with content that can be used for context-aware conversations.
+
+Note: Currenty, the ingest tool is hard-coded to ingest from the Memento repository only.
+This restriction will eventually be relaxed, but perhaps still focused on ingesting
+content from git repositories.
 
 ## Key Features
 - Recursively ingest files from a specified directory into a Memento database.
@@ -9,7 +13,6 @@ The `@memento-ai/ingest` package is a command-line utility for ingesting files i
 - Option to create a new database or use an existing one.
 - Ability to specify the language model provider (e.g., Anthropic, OpenAI, Ollama) and model for summarization.
 - Clean-slate option to drop the existing database and start over.
-- Utility functions for managing the Memento database, such as creating, wiping, and connecting to databases.
 - Automatically creates a template database for the specified provider and model if it doesn't exist.
 - Copies ingested mementos from the template database to the target database.
 - Removes abandoned files (files that were previously ingested but no longer exist) from the target database.

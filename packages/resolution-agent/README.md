@@ -1,14 +1,11 @@
 # @memento-ai/resolution-agent
 
 ## Description
-The `@memento-ai/resolution-agent` package provides a Resolution Agent that monitors conversations between a user and an AI assistant. Its role is to identify and extract explicit resolutions made by the assistant to change its future behavior based on user feedback, as well as important user facts and negotiated commitments.
+The `@memento-ai/resolution-agent` package provides a Resolution Agent that monitors conversations between a user and an AI assistant. Its role is to identify and extract explicit resolutions made by the assistant to change its future behavior based on user feedback, as well as important user facts and preferences.
 
 ## Key Features
 - Analyzes the most recent exchange between the user and assistant
-- Identifies three types of resolutions:
-  1. Explicit commitments: Assistant's acknowledgments of mistakes and commitments to change behavior
-  2. Negotiated commitments: Resolutions agreed upon by both user and assistant
-  3. User facts: Important information about the user relevant for future discussions
+- Identifies explicit resolutions and important user facts
 - Extracts resolution text, rephrasing for clarity and concision as needed
 - Encloses extracted resolutions in `<resolution>` tags
 - Handles cases where multiple resolutions are made in a single response

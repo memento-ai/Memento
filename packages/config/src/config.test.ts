@@ -14,6 +14,7 @@ const defaultConfig: Config = {
         model: 'haiku',
         temperature: 0,
         max_response_tokens: 2000,
+        max_func_cycles: 3,
     },
     resolution_agent: {
         role: 'resolution',
