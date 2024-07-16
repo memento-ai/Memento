@@ -99,6 +99,7 @@ export class FunctionHandler {
             responseParts.push(extracted.thinking)
             ++cycles
             if (cycles >= this.max_func_cycles) {
+                console.error('ERROR: Reached maximum number of cycles in sendUserMessageAndExecuteFunctions.')
                 responseParts.push('ERROR: Reached maximum number of cycles in sendUserMessageAndExecuteFunctions.')
                 return { responseParts, funcMementoIds }
             }
