@@ -3,7 +3,7 @@
 ## Description
 The `@memento-ai/ingest` package is a command-line utility for ingesting files into a Memento database. It supports ingesting various file types used in the Memento project, such as TypeScript (`.ts`), SQL (`.sql`), and others. This tool is essential for populating the Memento database with content that can be used for context-aware conversations.
 
-Note: Currenty, the ingest tool is hard-coded to ingest from the Memento repository only.
+Note: Currently, the ingest tool is hard-coded to ingest from the Memento repository only.
 This restriction will eventually be relaxed, but perhaps still focused on ingesting
 content from git repositories.
 
@@ -41,7 +41,7 @@ Available options:
 Example usage:
 
 ```
-nx run ingest --provider=anthropic --model=haiku --database=my-memento-db
+nx run ingest --provider=anthropic --model=claude-3-sonnet-20240229 --database=my-memento-db
 ```
 
-This command will ingest files from the current directory into a database named `my-memento-db`, using the Anthropic provider and the `haiku` model for summarization. If a template database for the Anthropic provider and `haiku` model doesn't exist, it will be created. The ingested mementos will be copied from the template database to the `my-memento-db` database, and any abandoned files or unreferenced mementos will be removed from `my-memento-db`.
+This command will ingest files from the current directory into a database named `my-memento-db`, using the Anthropic provider and the `claude-3-sonnet-20240229` model for summarization. If a template database for the Anthropic provider and `claude-3-sonnet-20240229` model doesn't exist, it will be created. The ingested mementos will be copied from the template database to the `my-memento-db` database, and any abandoned files or unreferenced mementos will be removed from `my-memento-db`.

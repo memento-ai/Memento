@@ -1,0 +1,20 @@
+{
+    "name": "@memento-ai/memento-htmx",
+    "version": "1.0.0",
+    "type": "module",
+    "peerDependencies": {
+        "@memento-ai/config": "^1.0.0",
+        "@memento-ai/memento-agent": "^1.0.0"
+    },
+    "dependencies": {
+        "@elysiajs/html": "^0.8.0",
+        "@elysiajs/static": "^0.8.1",
+        "elysia": "^0.8.17",
+        "marked": "^13.0.2"
+    },
+    "devDependencies": {
+        "@types/marked": "^6.0.0",
+        "@types/node": "^20.14.10",
+        "bun-types": "latest"
+    }
+}

@@ -1,7 +1,7 @@
-# Memento Transcript Generator
+# Transcript Generator
 
 ## Description
-The Memento Transcript Generator is a command-line utility designed to generate formatted transcripts from Memento conversation data stored in a PostgreSQL database. It allows users to extract conversations within a specified date range and output them in either Markdown or HTML format.
+The Transcript Generator is a command-line utility designed to generate formatted transcripts from Memento conversation data stored in a PostgreSQL database. It allows users to extract conversations within a specified date range and output them in either Markdown or HTML format.
 
 ## Key Features
 - Query conversation mementos from a Memento database for a specified date range

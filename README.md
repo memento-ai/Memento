@@ -52,6 +52,7 @@ The Memento monorepo also includes the following applications:
 - `add-path-comments`: A utility application that adds or updates the "Path" comment at the top of TypeScript files in the Memento project.
 - `ingest`: A command-line utility for ingesting files into a Memento database.
 - `memento-cli`: A command-line interface (CLI) for interacting with the Memento AI system.
+- `memento-htmx`: A web-based user interface for interacting with the Memento AI system.
 - `select-similar-mems`: A utility for selecting mementos from a Memento database based on their similarity to a given content.
 - `transcript-generator`: A command-line utility designed to generate formatted transcripts from Memento conversation data stored in a PostgreSQL database.
 - `update-readmes`: A utility for updating the README.md files across the Memento monorepo project.

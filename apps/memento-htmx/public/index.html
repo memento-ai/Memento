@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Memento Chatbot</title>
+        <link rel="stylesheet" href="/styles.css" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    </head>
+    <body>
+        <div class="app-container">
+            <div id="chat-container">
+                <div id="conversation"></div>
+                <div id="input-area">
+                    <textarea id="user-input" placeholder="Type your message here..."></textarea>
+                    <button id="send-button">Send</button>
+                </div>
+            </div>
+
+            <div
+                id="content-chunks"
+                hx-get="/api/content-chunks"
+                hx-trigger="contentUpdate from:body"
+                hx-swap="innerHTML"
+            >
+                <!-- Content chunks will be loaded here -->
+            </div>
+        </div>
+
+        <script src="client.mjs" type="module"></script>
+    </body>
+</html>

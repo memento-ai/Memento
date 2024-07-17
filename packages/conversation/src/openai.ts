@@ -1,10 +1,13 @@
 // Path: packages/conversation/src/openai.ts
 
 import type { AssistantMessage, Message, Role } from '@memento-ai/types'
+import debug from 'debug'
 import OpenAI from 'openai'
 import type { Stream } from 'openai/streaming.mjs'
 import type { ConversationInterface, SendMessageArgs } from './conversation'
 import { type ConversationOptions } from './factory'
+
+const dlog = debug('memento:conversation:openai')
 
 export class OpenAIConversation implements ConversationInterface {
     private model: string
@@ -15,6 +18,7 @@ export class OpenAIConversation implements ConversationInterface {
         this.model = options.model ?? 'gpt-3.5-turbo'
         this.client = new OpenAI({ apiKey: process.env['OPENAI_API_KEY'] })
         this.temperature = options.temperature
+        dlog(`Created OpenAI client with model ${this.model}`)
     }
 
     async sendMessage(args: SendMessageArgs): Promise<AssistantMessage> {

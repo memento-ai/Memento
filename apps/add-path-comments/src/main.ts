@@ -26,7 +26,7 @@ const updateFilePath = (filePath: string) => {
 
 const trackedFiles = gitListRepositoryFiles()
 trackedFiles.forEach((filePath) => {
-    if (path.extname(filePath) === '.ts') {
+    if (['.ts', '.mjs'].includes(path.extname(filePath))) {
         updateFilePath(filePath)
     }
 })

@@ -29,7 +29,7 @@ const conversation = createConversation(provider, options);
 ```
 
 Note: for most providers you must use the name of the model as defined by the provider.
-The Memento provider for `anthropic` provides convenient aliass like `'haiku'`, `'sonnet35'`, etc. that map to specific Anthropic models.
+The Memento provider for `anthropic` provides convenient aliases like `'haiku'`, `'sonnet35'`, etc. that map to specific Anthropic models.
 
 ### Sending Messages
 You can then use the `sendMessage` method to send a message to the language model and receive a response:

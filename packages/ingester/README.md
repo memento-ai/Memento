@@ -5,7 +5,7 @@ The `@memento-ai/ingester` package provides functionality for ingesting and summ
 
 ## Key Features
 - Ingest individual files or entire directories
-- Supports TypeScript (.ts), SQL (.sql), and Markdown (.md) file types
+- Supports TypeScript (.ts), SQL (.sql), Markdown (.md), and JavaScript (.mjs) file types
 - Configurable summarizer for generating document summaries
 - Automatically deletes ingested files from the database if they no longer exist on the file system
 - Retrieves a list of ingested files
@@ -122,3 +122,16 @@ await copyIngestedMementos(fromDb.pool, toDb.pool);
 ```
 
 This function copies all ingested documents and their summaries from the source database to the destination database.
+
+### Dropping Abandoned Files
+To remove files from the database that no longer exist in the file system:
+
+```typescript
+import { MementoDb } from '@memento-ai/memento-db';
+import { dropAbandonedFiles } from '@memento-ai/ingester';
+
+const db = await MementoDb.connect('my-database');
+await dropAbandonedFiles(db);
+```
+
+This function compares the files in the database with the files in the Git repository and removes any database entries for files that no longer exist.

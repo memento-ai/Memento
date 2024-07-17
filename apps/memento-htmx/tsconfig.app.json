@@ -1,0 +1,18 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ES2022",
+        "moduleResolution": "bundler",
+        "esModuleInterop": true,
+        "strict": true,
+        "outDir": "../../dist/out-tsc",
+        "declaration": true,
+        "types": ["bun-types"],
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "composite": true
+    },
+    "include": ["src/**/*.ts", "public/*.js", "public/client.mjs"],
+    "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+}
