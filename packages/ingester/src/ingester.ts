@@ -12,7 +12,7 @@ import { summarizeAndStoreDocuments, type Summarizer } from './summarizeDocument
 
 const dlog = debug('ingester')
 
-export const SUPPORTED_EXTENSIONS = ['.ts', '.sql', '.md']
+export const SUPPORTED_EXTENSIONS = ['.ts', '.sql', '.md', '*.mjs']
 
 const DocumentIdTuple = z.object({
     id: z.string(),
