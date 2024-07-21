@@ -1,6 +1,7 @@
 // Path: packages/memento-agent/src/mementoPromptTemplate.ts
 
 import type { MementoSearchResult } from '@memento-ai/search'
+import { MetaId } from '@memento-ai/types'
 import { stripCommonIndent } from '@memento-ai/utils'
 import Handlebars from 'handlebars'
 import { additional_context } from './prompt-partials/additional_context'
@@ -22,6 +23,24 @@ export type MementoPromptTemplateArgs = {
     dsumMems: MementoSearchResult[]
     docMems: MementoSearchResult[]
     xchgMems: MementoSearchResult[]
+}
+
+export type ContextMementosResult = {
+    funcMems: MetaId[]
+    dsumMems: MetaId[]
+    docMems: MetaId[]
+    xchgMems: MetaId[]
+}
+
+export const emptyPromptTemplateArgs: MementoPromptTemplateArgs = {
+    functions: '',
+    databaseSchema: '',
+    resolutions: [],
+    synMems: [],
+    funcMems: [],
+    dsumMems: [],
+    docMems: [],
+    xchgMems: [],
 }
 
 Handlebars.registerHelper('obj', function (context) {
