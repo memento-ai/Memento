@@ -1,0 +1,56 @@
+.app-container {
+    display: flex;
+    width: 96vw;
+    height: 96vh;
+    max-width: 1800px;
+    max-height: 1200px;
+    gap: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#chat-container {
+    width: 60%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#conversation-scroll {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+#historical-synopses {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+#active-conversation {
+    flex-shrink: 0;
+}
+
+#input-area {
+    display: flex;
+    padding: 10px;
+    background-color: #f0f0f0;
+}
+
+#context-mementos {
+    width: 40%;
+    height: 100%;
+    overflow-y: auto;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+}

@@ -1,0 +1,79 @@
+#user-input {
+    flex-grow: 1;
+    resize: none;
+    height: 40px;
+    padding: 10px;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #333;
+    background-color: #ffffff;
+}
+
+#send-button {
+    width: 80px;
+    margin-left: 10px;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+#send-button:hover {
+    background-color: #003d82;
+}
+
+.message {
+    margin-bottom: 15px;
+    line-height: 1.4;
+    color: #333;
+}
+
+.user {
+    color: #00478f;
+}
+
+.assistant {
+    color: #145a32;
+}
+
+.historical-synopsis {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.historical-synopsis:hover {
+    background-color: #e0e0e0;
+}
+
+.historical-synopsis .synopsis-content {
+    font-weight: bold;
+}
+
+.historical-synopsis .full-exchange {
+    display: none;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 5px;
+}
+
+.historical-synopsis.expanded .full-exchange {
+    display: block;
+}
+
+.active-exchange {
+    background-color: #e6f3ff;
+    border: 1px solid #b3d4fc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
