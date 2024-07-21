@@ -15,6 +15,7 @@ The `@memento-ai/ingester` package provides functionality for ingesting and summ
   - Model-based summarizer using a specified provider and model
   - Ability to create custom summarizers by extending the `SummarizerAgent` class
 - Copy ingested mementos from one database to another
+- Drop abandoned files (files that no longer exist in the file system)
 
 ## Usage and Examples
 ### Ingesting a File

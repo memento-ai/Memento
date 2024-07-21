@@ -12,6 +12,7 @@ The `@memento-ai/function-calling` package provides a framework for defining, ex
 - Recursive function calling with cycle count limit
 - Integration with Memento agents for seamless function execution within conversations
 - Robust error handling for various scenarios, including invalid function calls, execution errors, and exceeding function call limits
+- Dirty JSON parsing for handling imperfect function call inputs
 
 ## Usage and Examples
 
@@ -99,5 +100,25 @@ const { newAsyncResultsP, funcMementoIds } = await invokeSyncAndAsyncFunctions(a
 
 ### Error Handling
 The package includes robust error handling for various scenarios, including invalid function calls, execution errors, and exceeding function call limits. Errors are returned as part of the function call results, allowing for graceful error handling and reporting.
+
+### Dirty JSON Parsing
+The package uses the `dirty-json` library to handle imperfect JSON inputs in function calls, making it more resilient to minor formatting issues:
+
+```typescript
+import { extractFunctionCalls } from '@memento-ai/function-calling';
+
+const content = `
+\`\`\`function
+{
+  "name": "writeSourceFile",
+  "input": {
+    "s": 'This is a dirty json string\n    with a newline in it'
+  }
+}
+\`\`\``;
+
+const { syncCalls } = extractFunctionCalls(content);
+// syncCalls will contain the parsed function call, even with the imperfect JSON
+```
 
 For more detailed information on each function and its usage, refer to the source files in the `src` directory.
