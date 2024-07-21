@@ -2,12 +2,12 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5; /* Slightly lighter background */
+    background-color: #f5f5f5;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    color: #333; /* Darker base text color */
+    color: #333;
 }
 
 .app-container {
@@ -15,9 +15,9 @@ body {
     width: 96vw;
     height: 96vh;
     max-width: 1800px;
-    max-height: 1000px;
+    max-height: 1200px;
     gap: 20px;
-    background-color: #ffffff; /* Brighter background for main container */
+    background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     padding: 20px;
@@ -29,23 +29,31 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    border: 1px solid #bbb; /* Slightly darker border */
+    border: 1px solid #bbb;
     border-radius: 5px;
     overflow: hidden;
 }
 
-#conversation {
+#conversation-scroll {
     flex-grow: 1;
     overflow-y: auto;
-    padding: 20px;
-    border-bottom: 1px solid #ddd;
-    background-color: #ffffff; /* Ensure white background for better contrast */
+    display: flex;
+    flex-direction: column;
+}
+
+#historical-synopses {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+#active-conversation {
+    flex-shrink: 0;
 }
 
 #input-area {
     display: flex;
     padding: 10px;
-    background-color: #f0f0f0; /* Slightly darker input area background */
+    background-color: #f0f0f0;
 }
 
 #user-input {
@@ -56,14 +64,14 @@ body {
     border: 1px solid #bbb;
     border-radius: 3px;
     font-size: 14px;
-    color: #333; /* Darker text color */
-    background-color: #ffffff; /* White background for input */
+    color: #333;
+    background-color: #ffffff;
 }
 
 #send-button {
     width: 80px;
     margin-left: 10px;
-    background-color: #0056b3; /* Darker blue for better contrast */
+    background-color: #0056b3;
     color: white;
     border: none;
     border-radius: 3px;
@@ -73,24 +81,24 @@ body {
 }
 
 #send-button:hover {
-    background-color: #003d82; /* Even darker on hover */
+    background-color: #003d82;
 }
 
 .message {
     margin-bottom: 15px;
     line-height: 1.4;
-    color: #333; /* Ensure dark text color for all messages */
+    color: #333;
 }
 
 .user {
-    color: #00478f; /* Darker blue for user messages */
+    color: #00478f;
 }
 
 .assistant {
-    color: #145a32; /* Darker green for assistant messages */
+    color: #145a32;
 }
 
-#content-chunks {
+#context-mementos {
     width: 40%;
     height: 100%;
     overflow-y: auto;
@@ -98,102 +106,125 @@ body {
     border-radius: 5px;
     padding: 20px;
     box-sizing: border-box;
-    background-color: #ffffff; /* White background for content chunks */
+    background-color: #ffffff;
 }
 
-.chunk {
-    margin-bottom: 15px;
+.historical-synopsis {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
     padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.historical-synopsis:hover {
+    background-color: #e0e0e0;
+}
+
+.historical-synopsis .synopsis-content {
+    font-weight: bold;
+}
+
+.historical-synopsis .full-exchange {
+    display: none;
+    background-color: #ffffff;
     border: 1px solid #ccc;
     border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-.chunk-content {
-    display: block;
-    margin-bottom: 5px;
-    color: #333; /* Ensure dark text color for chunk content */
-}
-
-.expand-btn {
-    background-color: #e0e0e0;
-    border: 1px solid #bbb;
-    border-radius: 3px;
-    padding: 5px 10px;
-    font-size: 0.9em;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    color: #333; /* Dark text color for button */
-}
-
-.expand-btn:hover {
-    background-color: #d0d0d0;
-}
-
-.chunk-detail {
-    margin-top: 10px;
     padding: 10px;
-    background-color: #f0f0f0;
-    border-radius: 3px;
-    font-size: 0.9em;
-    color: #333; /* Ensure dark text color for chunk details */
+    margin-top: 5px;
 }
 
-.detail {
+.historical-synopsis.expanded .full-exchange {
+    display: block;
+}
+
+.active-exchange {
     background-color: #e6f3ff;
-}
-.summary {
-    background-color: #e6ffe6;
-}
-.retrieval {
-    background-color: #fff0e6;
+    border: 1px solid #b3d4fc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
 }
 
 /* Markdown styles */
-.message p {
-    margin: 0 0 10px 0;
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25;
 }
 
-.message ul,
-.message ol {
-    margin: 0 0 10px 20px;
+.markdown h1 {
+    font-size: 2em;
+}
+.markdown h2 {
+    font-size: 1.5em;
+}
+.markdown h3 {
+    font-size: 1.25em;
 }
 
-.message code {
+.markdown p {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.markdown code {
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    background-color: rgba(27, 31, 35, 0.05);
+    border-radius: 3px;
+}
+
+.markdown pre {
+    padding: 16px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f6f8fa;
+    border-radius: 3px;
+}
+
+.markdown ul,
+.markdown ol {
+    padding-left: 2em;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.markdown blockquote {
+    padding: 0 1em;
+    color: #6a737d;
+    border-left: 0.25em solid #dfe2e5;
+}
+
+.code-language {
+    display: inline-block;
     background-color: #f0f0f0;
-    padding: 2px 4px;
-    border-radius: 4px;
-    color: #333; /* Ensure dark text color for inline code */
+    color: #333;
+    font-size: 0.8em;
+    padding: 2px 6px;
+    border-radius: 3px 3px 0 0;
+    margin-bottom: -1px;
+    border: 1px solid #ccc;
+    border-bottom: none;
 }
 
-.message pre {
-    background-color: #f0f0f0;
-    padding: 10px;
-    border-radius: 4px;
-    overflow-x: auto;
+pre {
+    margin-top: 0;
+    border-radius: 3px;
 }
 
-.message pre code {
-    color: #333; /* Ensure dark text color for code blocks */
-}
-
-.message blockquote {
-    border-left: 3px solid #aaa; /* Darker border for blockquotes */
-    margin: 0 0 10px 0;
-    padding-left: 10px;
-    color: #444; /* Darker text for blockquotes */
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .app-container {
-        flex-direction: column;
-        height: auto;
-    }
-
-    #chat-container,
-    #content-chunks {
-        width: 100%;
-        height: 50vh;
-    }
+pre code {
+    display: block;
+    padding: 1em;
+    border: 1px solid #ccc;
+    border-radius: 0 3px 3px 3px;
 }

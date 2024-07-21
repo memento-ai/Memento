@@ -1,38 +1,72 @@
 # Memento HTMX
 
-## Description
-Memento HTMX is a web-based interface for the Memento AI system, providing a user-friendly chat interface and content display using HTMX for dynamic updates.
+Memento HTMX is a web-based interface for the Memento AI system, designed for local development and single-user interaction. It provides a streamlined, efficient interface for conversing with the Memento AI, leveraging WebSocket technology for real-time communication.
 
-## Key Features
-- Real-time chat interface with WebSocket communication
-- Dynamic content updates using HTMX
-- Markdown rendering for chat messages
-- Expandable content chunks for additional information
-- Responsive design for various screen sizes
+## Features
 
-## Usage and Examples
+- **Real-time Chat Interface**: Engage in conversations with the Memento AI system through a responsive chat interface.
+- **WebSocket Communication**: Utilizes a persistent WebSocket connection for low-latency, bidirectional communication.
+- **Streaming Responses**: Assistant responses are streamed in real-time, providing a fluid conversation experience.
+- **Local Development**: Designed to run locally, allowing for rapid development and testing of the Memento system.
 
-To run the Memento HTMX application:
+## Architecture
 
-1. Ensure you have the required dependencies installed:
-   - Bun (for running TypeScript)
-   - HTMX (included via CDN)
-   - Required Memento AI packages
+### Server-Side
 
-2. Set the `MEMENTO_CONFIG_TOML` environment variable to point to your Memento configuration file.
+- **Framework**: Built with Elysia, a performant TypeScript web framework.
+- **Memento System**: Instantiates a single Memento system for the life of the server process.
+- **WebSocket Handling**: Manages a persistent WebSocket connection for each client session.
+- **Response Streaming**: Implements a streaming mechanism for assistant responses.
 
-3. Start the application:
+### Client-Side
 
-```bash
-bun run src/main.ts
-```
+- **HTMX**: Utilizes HTMX for seamless, AJAX-powered interactions.
+- **WebSocket Client**: Implements a WebSocket client for real-time communication with the server.
+- **Dynamic Content Updates**: Updates the chat interface in real-time as messages are received.
 
-4. Open a web browser and navigate to `http://localhost:53530` (or the appropriate host and port).
+### Data Flow
 
-5. Use the chat interface to interact with the Memento AI system. Type your messages in the input area and click "Send" or press Enter to submit.
+1. User input is sent to the server via WebSocket.
+2. The server processes the input using the Memento system.
+3. The assistant's response is streamed back to the client via WebSocket.
+4. The client updates the UI in real-time as response chunks are received.
 
-6. Observe the conversation in the main chat area and related content chunks in the sidebar.
+## Setup and Running
 
-7. Click "Expand" on content chunks to view more detailed information.
+1. See the *Getting Started* section in the project [README.md](../../README.md)
+2. Create your configuration with a TOML file (see [@memento-ai/config/README.md](../../packages/config/README.md))
+3. Set the ENV variable `MEMENTO_CONFIG_TOML` to the full path to your config file.
+4. Run `bun dev` from the root directory of the project
 
-The application uses WebSockets for real-time communication with the Memento AI system and HTMX for dynamic updates of the content chunks. The interface is designed to be intuitive and responsive, adapting to different screen sizes for a seamless experience on both desktop and mobile devices.
+## Future Improvements
+
+### Context Mementos Viewer
+
+We plan to enhance the user experience and provide deeper insights into the Memento system's operation through a new feature called the Context Mementos Viewer. This will be implemented in the `context-mementos` div.
+
+Planned features include:
+
+1. **Inspectable Listing**: Display an interactive list of mementos used in the system prompt for each interaction.
+2. **Real-time Updates**: Dynamically update the displayed mementos as they are retrieved and used in the conversation.
+3. **Filtering and Search**: Implement tools to filter and search through the mementos for easier navigation.
+4. **Detailed View**: Allow users to click on mementos to see more detailed information.
+5. **Relevance Visualization**: Add visual elements to represent the relevance or usage frequency of different mementos.
+6. **Context Influence**: Enable users to interact with mementos to influence the conversation context.
+
+### API Enhancements
+
+- Expand the `/api/context-mementos` endpoint to serve actual context mementos.
+- Implement pagination or lazy loading for efficient handling of large numbers of mementos.
+
+### Development Tools
+
+- Integrated testing interface for running and visualizing test conversations.
+- Debugging panel for detailed insights into the system's decision-making process.
+- Performance monitoring tools for tracking response times, token usage, and other metrics.
+- Configuration interface for adjusting system parameters without server restarts.
+
+These improvements aim to transform Memento HTMX into not just a user interface, but a comprehensive environment for development, debugging, and understanding the Memento AI system.
+
+## Contributing
+
+Please see the Contributing section of the project [README.md](../../README.md)

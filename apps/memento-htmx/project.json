@@ -16,7 +16,7 @@
         },
         "serve": {
             "executor": "nx:run-commands",
-            "options": { "command": "bun run src/main.ts", "cwd": "apps/memento-htmx" }
+            "options": { "command": "bun run --watch src/main.ts", "cwd": "apps/memento-htmx" }
         },
         "test": {
             "executor": "@nx-bun/nx:test",

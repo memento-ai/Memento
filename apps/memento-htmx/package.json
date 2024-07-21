@@ -4,7 +4,9 @@
     "type": "module",
     "peerDependencies": {
         "@memento-ai/config": "^1.0.0",
-        "@memento-ai/memento-agent": "^1.0.0"
+        "@memento-ai/memento-agent": "^1.0.0",
+        "@memento-ai/memento-db": "^1.0.0",
+        "@memento-ai/types": "^1.0.0"
     },
     "dependencies": {
         "@elysiajs/html": "^0.8.0",

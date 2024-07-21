@@ -11,7 +11,9 @@
     <body>
         <div class="app-container">
             <div id="chat-container">
-                <div id="conversation"></div>
+                <div id="conversation-scroll">
+                    <!-- All exchanges (historical and active) will be dynamically inserted here -->
+                </div>
                 <div id="input-area">
                     <textarea id="user-input" placeholder="Type your message here..."></textarea>
                     <button id="send-button">Send</button>
@@ -19,12 +21,12 @@
             </div>
 
             <div
-                id="content-chunks"
-                hx-get="/api/content-chunks"
+                id="context-mementos"
+                hx-get="/api/context-mementos"
                 hx-trigger="contentUpdate from:body"
                 hx-swap="innerHTML"
             >
-                <!-- Content chunks will be loaded here -->
+                <!-- Context mementos will be loaded here -->
             </div>
         </div>
 
