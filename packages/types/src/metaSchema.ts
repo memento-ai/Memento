@@ -21,6 +21,7 @@ export const RequiredMetaBase = z.object({
     memId: z.string(), // The foreign key to the associated mem content.
     created_at: z.coerce.date(), // The time the meta record was created.
 })
+export type RequiredMetaBase = z.TypeOf<typeof RequiredMetaBase>
 
 export const MemBaseMetaData = RequiredMetaBase.extend({
     priority: z.optional(z.number()).default(0),
@@ -65,6 +66,7 @@ export type ResolutionMetaData = z.TypeOf<typeof ResolutionMetaData>
 
 export const SynopsisMetaData = RequiredMetaBase.extend({
     kind: z.literal(SYN),
+    docid: z.string(),
 })
 export type SynopsisMetaData = z.TypeOf<typeof SynopsisMetaData>
 

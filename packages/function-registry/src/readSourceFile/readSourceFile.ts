@@ -3,6 +3,8 @@
 import { Context } from '@memento-ai/memento-db'
 import debug from 'debug'
 import fs from 'fs/promises'
+import path from 'node:path'
+import { gitRepoRoot } from 'packages/utils'
 import { z } from 'zod'
 import { baseInputSchema, type FunctionConfig } from '../functionRegistry'
 const dlog = debug('readSourceFile')
@@ -27,7 +29,9 @@ export async function readSourceFile(input: ReadSourceFileInput, _context: Conte
     dlog(`Reading source file: ${filePath}`)
 
     try {
-        const content = await fs.readFile(filePath, 'utf-8')
+        const projectRoot = gitRepoRoot()
+        const fullPath = path.join(projectRoot, filePath)
+        const content = await fs.readFile(fullPath, 'utf-8')
         dlog(`File content length: ${content.length}`)
         return content
     } catch (error) {

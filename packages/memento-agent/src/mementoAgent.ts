@@ -19,7 +19,7 @@ import debug from 'debug'
 import { Writable } from 'node:stream'
 import { awaitAsyncAgentActions, startAsyncAgentActions } from './asyncAgentGlue'
 import type { MementoPromptTemplateArgs } from './mementoPromptTemplate'
-import { mementoPromptTemplate } from './mementoPromptTemplate'
+import { emptyPromptTemplateArgs, mementoPromptTemplate } from './mementoPromptTemplate'
 import { retrieveContext } from './retrieveContext'
 
 const dlog = debug('mementoAgent')
@@ -44,6 +44,7 @@ export class MementoAgent extends FunctionCallingAgent {
     aggregateSearchResults: MementoSearchResult[]
     priorMessages: Message[]
     xchg_ids: MetaId[]
+    promptContext: MementoPromptTemplateArgs
 
     constructor(args: MementoAgentArgs) {
         const { conversation, db, outStream, resolutionAgent, synopsisAgent, config } = args
@@ -62,6 +63,7 @@ export class MementoAgent extends FunctionCallingAgent {
         this.aggregateSearchResults = []
         this.priorMessages = []
         this.xchg_ids = []
+        this.promptContext = emptyPromptTemplateArgs
 
         dlog('MementoAgent created')
     }
@@ -105,6 +107,7 @@ export class MementoAgent extends FunctionCallingAgent {
             aggregateSearchResults,
             xchg_ids: this.xchg_ids,
         })
+        this.promptContext = context
         const prompt = mementoPromptTemplate({ ...context, synMems })
 
         dlog(`generatePrompt: prompt: ${prompt.slice(0, 50)}...`)

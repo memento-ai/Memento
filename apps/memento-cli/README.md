@@ -1,5 +1,7 @@
 # @memento-ai/memento-cli
 
+*This app is now deprecated. See memento-htmx for the preferred replacement.*
+
 ## Description
 The `@memento-ai/memento-cli` package provides a command-line interface (CLI) for interacting with the Memento AI system. It allows users to engage in conversational interactions with the AI assistant, leveraging the Memento system's capabilities for maintaining long-term context and coherence.
 

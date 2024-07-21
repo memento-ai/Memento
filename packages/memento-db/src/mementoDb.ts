@@ -10,12 +10,20 @@ import {
     type GetConversationSnapshotResult,
     type ID,
 } from '@memento-ai/postgres-db'
-import type { Message } from '@memento-ai/types'
+import type { Message, MetaId } from '@memento-ai/types'
+import { Memento } from '@memento-ai/types'
 import debug from 'debug'
 import type { DatabasePool, Interceptor } from 'slonik'
 import { sql } from 'slonik'
 import { z } from 'zod'
-import { getSynopses, type GetSynopsesArgs } from './getSynopses'
+import { getMementoById } from './getMementoById'
+import {
+    getRecentSynopses,
+    getSynopses,
+    type GetRecentSynopsesArgs,
+    type GetSynopsesArgs,
+    type RecentSynopsis,
+} from './getSynopses'
 import { addConvExchangeFuncMementos } from './mementoDb-addConvXchg'
 import {
     addConversationMem,
@@ -157,6 +165,10 @@ export class MementoDb {
         return getSynopses(this.pool, args)
     }
 
+    async getRecentSynopses(args: GetRecentSynopsesArgs): Promise<RecentSynopsis[]> {
+        return getRecentSynopses(this.pool, args)
+    }
+
     async get_last_user_message(): Promise<Message> {
         return get_last_user_message(this.pool)
     }
@@ -185,6 +197,10 @@ export class MementoDb {
                 throw err
             })
         return result
+    }
+
+    async getMementoById(id: MetaId): Promise<Memento> {
+        return getMementoById(this.pool, id)
     }
 }
 

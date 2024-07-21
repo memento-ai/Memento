@@ -1,4 +1,5 @@
 # @memento-ai/memento-agent
+
 ## Description
 The `@memento-ai/memento-agent` package is a key component of the Memento system, an AI-powered conversational assistant designed to maintain long-term coherent context during open-ended dialogue over extended time periods. It implements the `MementoAgent`, which mediates the conversation between the 'user' and the 'assistant'.
 

@@ -4,9 +4,9 @@
 This package is a utility application that adds or updates the "Path" comment at the top of TypeScript and JavaScript files in the Memento project. The "Path" comment specifies the relative path of the file from the project root directory.
 
 ## Key Features
-- Automatically adds a "Path" comment to TypeScript and JavaScript files that do not have one.
+- Automatically adds a "Path" comment to TypeScript (.ts) and JavaScript (.mjs) files that do not have one.
 - Updates the "Path" comment in files where it already exists but is outdated.
-- Processes both TypeScript (.ts) and JavaScript (.mjs) files.
+- Processes only TypeScript (.ts) and JavaScript (.mjs) files.
 - Skips non-TypeScript/JavaScript files.
 - Uses the Git repository to identify tracked files for processing.
 
@@ -50,4 +50,6 @@ import path from 'path'
 // ... rest of the code
 ```
 
-This utility helps maintain consistent file path comments across the Memento project, making it easier to identify the location of each file within the codebase. It processes TypeScript (.ts) and JavaScript (.mjs) files, skipping all other file types.
+This utility helps maintain consistent file path comments across the Memento project, making it easier to identify the location of each file within the codebase. It processes only TypeScript (.ts) and JavaScript (.mjs) files, skipping all other file types.
+
+The utility uses the `gitListRepositoryFiles` function from the `@memento-ai/utils` package to get the list of tracked files in the Git repository. It then iterates through these files, updating or adding the "Path" comment as necessary.
