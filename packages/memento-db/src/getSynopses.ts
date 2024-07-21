@@ -1,5 +1,6 @@
 // Path: packages/memento-db/src/getSynopses.ts
 
+import { SynopsisMemento } from '@memento-ai/types'
 import { sql, type DatabasePool } from 'slonik'
 import { z } from 'zod'
 
@@ -33,4 +34,34 @@ export async function getSynopses(pool: DatabasePool, args: GetSynopsesArgs): Pr
             throw err
         })
     return result
+}
+
+export type GetRecentSynopsesArgs = {
+    limit: number
+}
+
+export const RecentSynopsis = SynopsisMemento.pick({
+    id: true,
+    content: true,
+    docid: true,
+    created_at: true,
+})
+export type RecentSynopsis = z.infer<typeof RecentSynopsis>
+
+export async function getRecentSynopses(pool: DatabasePool, args: GetRecentSynopsesArgs): Promise<RecentSynopsis[]> {
+    const { limit } = args
+    const query = sql.type(RecentSynopsis)`
+        WITH cte AS (
+            SELECT id, docid, content, created_at
+            FROM memento
+            WHERE kind = 'syn'
+            ORDER BY created_at DESC
+            LIMIT ${limit}
+        )
+        SELECT *
+        FROM cte
+        ORDER by created_at
+        `
+    const result = await pool.query(query)
+    return result.rows.map((row) => row)
 }
