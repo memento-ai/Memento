@@ -18,7 +18,7 @@
         "debug": "^4.3.4",
         "handlebars": "4.7.8",
         "nanoid": "^5.0.6",
-        "slonik": "^40.2.1",
+        "slonik": "^40.2.6",
         "slonik-sql-tag-raw": "^2.0.0",
         "zod": "3.23.8"
     }

@@ -11,9 +11,6 @@
         "@memento-ai/postgres-db": "1.0.0",
         "@memento-ai/types": "^1.0.0",
         "commander": "11.1.0",
-        "slonik": "40.2.6"
-    },
-    "devDependencies": {
-        "typescript": "^4.5.4"
+        "slonik": "^40.2.6"
     }
 }
