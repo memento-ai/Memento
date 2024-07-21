@@ -51,8 +51,8 @@ The Memento monorepo also includes the following applications:
 
 - `add-path-comments`: A utility application that adds or updates the "Path" comment at the top of TypeScript files in the Memento project.
 - `ingest`: A command-line utility for ingesting files into a Memento database.
-- `memento-cli`: A command-line interface (CLI) for interacting with the Memento AI system.
-- `memento-htmx`: A web-based user interface for interacting with the Memento AI system.
+- `memento-cli`: A command-line interface (CLI) for interacting with the Memento AI system. (***deprecated***)
+- `memento-htmx`: A web-based user interface for interacting with the Memento AI system. (**new, recommended**)
 - `select-similar-mems`: A utility for selecting mementos from a Memento database based on their similarity to a given content.
 - `transcript-generator`: A command-line utility designed to generate formatted transcripts from Memento conversation data stored in a PostgreSQL database.
 - `update-readmes`: A utility for updating the README.md files across the Memento monorepo project.
@@ -106,11 +106,10 @@ ingest other git repos and documents).
 
 See [apps/ingest/README.md](apps/ingest/README.md) for how to ingest files.
 
-### Run the memento-cli
+### Run the memento-htmx app
 
-See [apps/memento-cli/README.md](apps/memento-cli/README.md) for how to chat with Memento.
-Yes, the memento-cli is pretty lame. I hope to create a web-ui soon which will not only be a more pleasant experience but
-have features that take advantage of and enhance Memento's capabilities.
+See [apps/memento-htmx/README.md](apps/memento-htmx/README.md) for how to chat with Memento using a simple web chatbot interface.
+This app will be an active area of development going forward.
 
 ## Contributing
 
