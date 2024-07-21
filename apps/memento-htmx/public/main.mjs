@@ -1,24 +1,11 @@
-// Path: apps/memento-htmx/public/client.mjs
+// Path: apps/memento-htmx/public/main.mjs
 
 import { marked } from 'https://cdn.jsdelivr.net/npm/marked@11.2.0/lib/marked.esm.js'
+import { sendMessage, setupWebSocket } from './websocket.mjs'
 
 const conversationScroll = document.getElementById('conversation-scroll')
 const userInput = document.getElementById('user-input')
 const sendButton = document.getElementById('send-button')
-
-const ws = new WebSocket(`ws://${window.location.host}/ws`)
-
-ws.onopen = () => {
-    console.log('WebSocket connection established')
-}
-
-ws.onerror = (error) => {
-    console.error('WebSocket error:', error)
-}
-
-ws.onclose = () => {
-    console.log('WebSocket connection closed')
-}
 
 // Custom renderer for code blocks
 const renderer = new marked.Renderer()
@@ -95,30 +82,7 @@ function adjustTextareaHeight() {
     userInput.style.height = Math.min(userInput.scrollHeight, 150) + 'px'
 }
 
-userInput.addEventListener('input', adjustTextareaHeight)
-
-sendButton.addEventListener('click', () => {
-    const message = userInput.value.trim()
-    if (message) {
-        createNewExchange(message)
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'message', content: message }))
-        } else {
-            console.error('WebSocket is not open. ReadyState:', ws.readyState)
-        }
-        userInput.value = ''
-        adjustTextareaHeight()
-    }
-})
-
-userInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        sendButton.click()
-    }
-})
-
-ws.onmessage = (event) => {
+function onMessage(event) {
     try {
         const data = JSON.parse(event.data)
 
@@ -188,8 +152,33 @@ async function toggleSynopsis(element) {
     }
 }
 
-// Call fetchRecentSynopses when the page loads
-document.addEventListener('DOMContentLoaded', fetchRecentSynopses)
+function init() {
+    setupWebSocket(onMessage)
 
-// Initialize textarea height
-adjustTextareaHeight()
+    userInput.addEventListener('input', adjustTextareaHeight)
+
+    sendButton.addEventListener('click', () => {
+        const message = userInput.value.trim()
+        if (message) {
+            createNewExchange(message)
+            sendMessage({ type: 'message', content: message })
+            userInput.value = ''
+            adjustTextareaHeight()
+        }
+    })
+
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault()
+            sendButton.click()
+        }
+    })
+
+    // Call fetchRecentSynopses when the page loads
+    document.addEventListener('DOMContentLoaded', fetchRecentSynopses)
+
+    // Initialize textarea height
+    adjustTextareaHeight()
+}
+
+init()
