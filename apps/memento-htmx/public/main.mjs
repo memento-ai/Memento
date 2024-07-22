@@ -22,7 +22,12 @@ renderer.code = (code, language) => {
 }
 
 // Configure marked to use the custom renderer
-marked.use({ renderer })
+marked.use({
+    renderer,
+    pedantic: false,
+    gfm: true,
+    breaks: true,
+})
 
 let activeExchange = null
 let accumulatedResponse = ''
@@ -62,10 +67,11 @@ function updateActiveExchange(chunk) {
 }
 
 function finalizeExchange() {
+    a
     if (activeExchange) {
         const assistantMessage = activeExchange.querySelector('.message.assistant')
         // Use marked.parse with the custom renderer
-        assistantMessage.innerHTML = marked.parse(`**Assistant:** ${accumulatedResponse}`, { renderer })
+        assistantMessage.innerHTML = marked.parse(`**Assistant:** ${accumulatedResponse}`)
         activeExchange.classList.add('historical-exchange')
         accumulatedResponse = '' // Reset for the next exchange
         accumulatedEscapedResponse = '' // Reset the escaped version as well
