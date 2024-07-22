@@ -2,16 +2,17 @@
 
 import { Message } from '@memento-ai/types'
 import { getMementoProjectRoot } from '@memento-ai/utils'
+import { readFileSync } from 'node:fs'
 import { sql, type CommonQueryMethods, type DatabasePool, type QueryResult } from 'slonik'
 import { raw } from 'slonik-sql-tag-raw'
+import { z } from 'zod'
+
 
 export async function executeFileQuery(conn: CommonQueryMethods, fileName: string): Promise<QueryResult<unknown>> {
     const root = getMementoProjectRoot()
     const fullPath = `${root}/packages/postgres-db/sql/${fileName}`
-    const file = Bun.file(fullPath)
-    const text = await file.text()
-    const sqlFragment = raw(text, [])
-    return await conn.query(sql.unsafe`${sqlFragment}`)
+    const query = sql.type(z.void())`${raw(readFileSync(fullPath, 'utf8'))}`
+    return await conn.query(query)
 }
 
 export async function delete_unreferenced_mems(conn: CommonQueryMethods) {
