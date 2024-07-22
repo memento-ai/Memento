@@ -23,9 +23,12 @@ export type AddConvArgs = {
     priority?: number
 }
 
-export type AddConvExchangeFuncArgs = {
+export type MessagePair = {
     userContent: string
     asstContent: string
+}
+
+export type AddConvExchangeFuncArgs = MessagePair & {
     funcMementoIds: MetaId[]
 }
 

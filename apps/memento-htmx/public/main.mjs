@@ -1,24 +1,11 @@
-// Path: apps/memento-htmx/public/client.mjs
+// Path: apps/memento-htmx/public/main.mjs
 
 import { marked } from 'https://cdn.jsdelivr.net/npm/marked@11.2.0/lib/marked.esm.js'
+import { sendMessage, setupWebSocket } from './websocket.mjs'
 
 const conversationScroll = document.getElementById('conversation-scroll')
 const userInput = document.getElementById('user-input')
 const sendButton = document.getElementById('send-button')
-
-const ws = new WebSocket(`ws://${window.location.host}/ws`)
-
-ws.onopen = () => {
-    console.log('WebSocket connection established')
-}
-
-ws.onerror = (error) => {
-    console.error('WebSocket error:', error)
-}
-
-ws.onclose = () => {
-    console.log('WebSocket connection closed')
-}
 
 // Custom renderer for code blocks
 const renderer = new marked.Renderer()
@@ -35,7 +22,12 @@ renderer.code = (code, language) => {
 }
 
 // Configure marked to use the custom renderer
-marked.use({ renderer })
+marked.use({
+    renderer,
+    pedantic: false,
+    gfm: true,
+    breaks: true,
+})
 
 let activeExchange = null
 let accumulatedResponse = ''
@@ -75,11 +67,12 @@ function updateActiveExchange(chunk) {
 }
 
 function finalizeExchange() {
+    a
     if (activeExchange) {
         const assistantMessage = activeExchange.querySelector('.message.assistant')
         // Use marked.parse with the custom renderer
-        assistantMessage.innerHTML = marked.parse(`**Assistant:** ${accumulatedResponse}`, { renderer })
-        activeExchange.classList.add('historical-synopsis')
+        assistantMessage.innerHTML = marked.parse(`**Assistant:** ${accumulatedResponse}`)
+        activeExchange.classList.add('historical-exchange')
         accumulatedResponse = '' // Reset for the next exchange
         accumulatedEscapedResponse = '' // Reset the escaped version as well
         activeExchange = null
@@ -95,30 +88,7 @@ function adjustTextareaHeight() {
     userInput.style.height = Math.min(userInput.scrollHeight, 150) + 'px'
 }
 
-userInput.addEventListener('input', adjustTextareaHeight)
-
-sendButton.addEventListener('click', () => {
-    const message = userInput.value.trim()
-    if (message) {
-        createNewExchange(message)
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'message', content: message }))
-        } else {
-            console.error('WebSocket is not open. ReadyState:', ws.readyState)
-        }
-        userInput.value = ''
-        adjustTextareaHeight()
-    }
-})
-
-userInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        sendButton.click()
-    }
-})
-
-ws.onmessage = (event) => {
+function onMessage(event) {
     try {
         const data = JSON.parse(event.data)
 
@@ -144,33 +114,33 @@ ws.onmessage = (event) => {
     }
 }
 
-async function fetchRecentSynopses() {
+async function fetchRecentExchanges() {
     try {
         const response = await fetch('/api/recent-synopses')
-        const synopses = await response.json()
-        synopses.forEach((synopsis) => {
-            const synopsisElement = createSynopsisElement(synopsis)
-            conversationScroll.appendChild(synopsisElement)
+        const exchanges = await response.json()
+        exchanges.forEach((exchange) => {
+            const exchangeElement = createExchangeElement(exchange)
+            conversationScroll.appendChild(exchangeElement)
         })
         scrollToBottom()
     } catch (error) {
-        console.error('Error fetching recent synopses:', error)
+        console.error('Error fetching recent exchanges:', error)
     }
 }
 
-function createSynopsisElement(synopsis) {
-    const synopsisDiv = document.createElement('div')
-    synopsisDiv.classList.add('exchange', 'historical-synopsis')
-    synopsisDiv.setAttribute('data-docid', synopsis.docid)
-    synopsisDiv.innerHTML = `
+function createExchangeElement(synopsis) {
+    const exchangeDiv = document.createElement('div')
+    exchangeDiv.classList.add('exchange', 'historical-exchange')
+    exchangeDiv.setAttribute('data-docid', synopsis.docid)
+    exchangeDiv.innerHTML = `
         <div class="synopsis-content">${escapeForPre(synopsis.content)}</div>
         <div class="full-exchange"></div>
     `
-    synopsisDiv.addEventListener('click', () => toggleSynopsis(synopsisDiv))
-    return synopsisDiv
+    exchangeDiv.addEventListener('click', () => toggleExchange(exchangeDiv))
+    return exchangeDiv
 }
 
-async function toggleSynopsis(element) {
+async function toggleExchange(element) {
     const docid = element.getAttribute('data-docid')
     const fullExchange = element.querySelector('.full-exchange')
 
@@ -178,7 +148,16 @@ async function toggleSynopsis(element) {
         try {
             const response = await fetch(`/api/memento/${docid}`)
             const exchange = await response.json()
-            fullExchange.innerHTML = marked.parse(exchange.content, { renderer })
+            const { userMessage, assistantMessage } = parseExchange(exchange.content)
+
+            fullExchange.innerHTML = `
+                <div class="message user">
+                    <strong>User:</strong> ${marked.parse(userMessage)}
+                </div>
+                <div class="message assistant">
+                    <strong>Assistant:</strong> ${marked.parse(assistantMessage)}
+                </div>
+            `
         } catch (error) {
             console.error('Error fetching full exchange:', error)
             fullExchange.innerHTML = 'Error loading full exchange'
@@ -188,8 +167,44 @@ async function toggleSynopsis(element) {
     }
 }
 
-// Call fetchRecentSynopses when the page loads
-document.addEventListener('DOMContentLoaded', fetchRecentSynopses)
+function parseExchange(content) {
+    const re = /# User:\n(.+)\n\n---\n\n# Assistant:\n(.+)\n/ms
+    const m = content.match(re)
+    if (!m) {
+        throw new Error(`parseExchangeAsMessagePair failed to parse content: ${content}`)
+    }
+    const userMessage = m[1].trim() + '\n'
+    const assistantMessage = m[2].trim() + '\n'
+    return { userMessage, assistantMessage }
+}
 
-// Initialize textarea height
-adjustTextareaHeight()
+function init() {
+    setupWebSocket(onMessage)
+
+    userInput.addEventListener('input', adjustTextareaHeight)
+
+    sendButton.addEventListener('click', () => {
+        const message = userInput.value.trim()
+        if (message) {
+            createNewExchange(message)
+            sendMessage({ type: 'message', content: message })
+            userInput.value = ''
+            adjustTextareaHeight()
+        }
+    })
+
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault()
+            sendButton.click()
+        }
+    })
+
+    // Call fetchRecentExchanges when the page loads
+    document.addEventListener('DOMContentLoaded', fetchRecentExchanges)
+
+    // Initialize textarea height
+    adjustTextareaHeight()
+}
+
+init()

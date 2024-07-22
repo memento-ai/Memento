@@ -16,9 +16,24 @@ import { zodParse } from '@memento-ai/utils'
 import debug from 'debug'
 import { nanoid } from 'nanoid'
 import { sql, type DatabasePool } from 'slonik'
-import type { AddConvExchangeFuncArgs } from './mementoDb-types'
+import type { AddConvExchangeFuncArgs, MessagePair } from './mementoDb-types'
 
 const dlog = debug('mementoDb:mems')
+
+export function formatMessagePairAsExchange(pair: MessagePair): string {
+    const { userContent, asstContent } = pair
+    return `# User:\n${userContent.trim()}\n\n---\n\n# Assistant:\n${asstContent.trim()}\n`
+}
+
+export function parseExchangeAsMessagePair(content: string): MessagePair {
+    const re = /# User:\n(.+)\n\n---\n\n# Assistant:\n(.+)\n/ms
+    const m = content.match(re)
+    if (!m) {
+        throw new Error(`parseExchangeAsMessagePair failed to parse content: ${content}`)
+    }
+    const [_, userContent, asstContent] = m
+    return { userContent, asstContent }
+}
 
 export async function addConvExchangeFuncMementos(pool: DatabasePool, args_: AddConvExchangeFuncArgs): Promise<ID> {
     const { userContent, asstContent, funcMementoIds } = args_
@@ -26,9 +41,7 @@ export async function addConvExchangeFuncMementos(pool: DatabasePool, args_: Add
     const result = await pool.connect(async (conn) => {
         const userMem: Mem = await createMem(userContent)
         const asstMem: Mem = await createMem(asstContent)
-        const xchgMem: Mem = await createMem(
-            `# User:\n${userContent.trim()}\n\n---\n\n# Assistant:\n${asstContent.trim()}\n`,
-        )
+        const xchgMem: Mem = await createMem(formatMessagePairAsExchange({ userContent, asstContent }))
 
         const userMetaId = nanoid()
         const asstMetaId = nanoid()

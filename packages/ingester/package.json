@@ -19,7 +19,7 @@
     "dependencies": {
         "debug": "^4.3.4",
         "nanoid": "^5.0.7",
-        "slonik": "^40.2.1",
+        "slonik": "^40.2.6",
         "zod": "^3.0.0"
     }
 }
