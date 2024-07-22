@@ -29,7 +29,7 @@
     flex-direction: column;
 }
 
-#historical-synopses {
+#historical-exchanges {
     flex-grow: 1;
     overflow-y: auto;
 }

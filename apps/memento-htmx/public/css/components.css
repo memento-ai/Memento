@@ -40,7 +40,7 @@
     color: #145a32;
 }
 
-.historical-synopsis {
+.historical-exchange {
     background-color: #f0f0f0;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -49,15 +49,15 @@
     cursor: pointer;
 }
 
-.historical-synopsis:hover {
+.historical-exchange:hover {
     background-color: #e0e0e0;
 }
 
-.historical-synopsis .synopsis-content {
+.historical-exchange .synopsis-content {
     font-weight: bold;
 }
 
-.historical-synopsis .full-exchange {
+.historical-exchange .full-exchange {
     display: none;
     background-color: #ffffff;
     border: 1px solid #ccc;
@@ -66,7 +66,7 @@
     margin-top: 5px;
 }
 
-.historical-synopsis.expanded .full-exchange {
+.historical-exchange.expanded .full-exchange {
     display: block;
 }
 

@@ -66,7 +66,7 @@ function finalizeExchange() {
         const assistantMessage = activeExchange.querySelector('.message.assistant')
         // Use marked.parse with the custom renderer
         assistantMessage.innerHTML = marked.parse(`**Assistant:** ${accumulatedResponse}`, { renderer })
-        activeExchange.classList.add('historical-synopsis')
+        activeExchange.classList.add('historical-exchange')
         accumulatedResponse = '' // Reset for the next exchange
         accumulatedEscapedResponse = '' // Reset the escaped version as well
         activeExchange = null
@@ -108,33 +108,33 @@ function onMessage(event) {
     }
 }
 
-async function fetchRecentSynopses() {
+async function fetchRecentExchanges() {
     try {
         const response = await fetch('/api/recent-synopses')
-        const synopses = await response.json()
-        synopses.forEach((synopsis) => {
-            const synopsisElement = createSynopsisElement(synopsis)
-            conversationScroll.appendChild(synopsisElement)
+        const exchanges = await response.json()
+        exchanges.forEach((exchange) => {
+            const exchangeElement = createExchangeElement(exchange)
+            conversationScroll.appendChild(exchangeElement)
         })
         scrollToBottom()
     } catch (error) {
-        console.error('Error fetching recent synopses:', error)
+        console.error('Error fetching recent exchanges:', error)
     }
 }
 
-function createSynopsisElement(synopsis) {
-    const synopsisDiv = document.createElement('div')
-    synopsisDiv.classList.add('exchange', 'historical-synopsis')
-    synopsisDiv.setAttribute('data-docid', synopsis.docid)
-    synopsisDiv.innerHTML = `
+function createExchangeElement(synopsis) {
+    const exchangeDiv = document.createElement('div')
+    exchangeDiv.classList.add('exchange', 'historical-exchange')
+    exchangeDiv.setAttribute('data-docid', synopsis.docid)
+    exchangeDiv.innerHTML = `
         <div class="synopsis-content">${escapeForPre(synopsis.content)}</div>
         <div class="full-exchange"></div>
     `
-    synopsisDiv.addEventListener('click', () => toggleSynopsis(synopsisDiv))
-    return synopsisDiv
+    exchangeDiv.addEventListener('click', () => toggleExchange(exchangeDiv))
+    return exchangeDiv
 }
 
-async function toggleSynopsis(element) {
+async function toggleExchange(element) {
     const docid = element.getAttribute('data-docid')
     const fullExchange = element.querySelector('.full-exchange')
 
@@ -142,7 +142,16 @@ async function toggleSynopsis(element) {
         try {
             const response = await fetch(`/api/memento/${docid}`)
             const exchange = await response.json()
-            fullExchange.innerHTML = marked.parse(exchange.content, { renderer })
+            const { userMessage, assistantMessage } = parseExchange(exchange.content)
+
+            fullExchange.innerHTML = `
+                <div class="message user">
+                    <strong>User:</strong> ${marked.parse(userMessage)}
+                </div>
+                <div class="message assistant">
+                    <strong>Assistant:</strong> ${marked.parse(assistantMessage)}
+                </div>
+            `
         } catch (error) {
             console.error('Error fetching full exchange:', error)
             fullExchange.innerHTML = 'Error loading full exchange'
@@ -150,6 +159,17 @@ async function toggleSynopsis(element) {
     } else {
         fullExchange.innerHTML = ''
     }
+}
+
+function parseExchange(content) {
+    const re = /# User:\n(.+)\n\n---\n\n# Assistant:\n(.+)\n/ms
+    const m = content.match(re)
+    if (!m) {
+        throw new Error(`parseExchangeAsMessagePair failed to parse content: ${content}`)
+    }
+    const userMessage = m[1].trim() + '\n'
+    const assistantMessage = m[2].trim() + '\n'
+    return { userMessage, assistantMessage }
 }
 
 function init() {
@@ -174,8 +194,8 @@ function init() {
         }
     })
 
-    // Call fetchRecentSynopses when the page loads
-    document.addEventListener('DOMContentLoaded', fetchRecentSynopses)
+    // Call fetchRecentExchanges when the page loads
+    document.addEventListener('DOMContentLoaded', fetchRecentExchanges)
 
     // Initialize textarea height
     adjustTextareaHeight()
